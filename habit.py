@@ -1,363 +1,475 @@
-"""Contains the habit tracker logic."""
-from datetime import date, timedelta, datetime
 from db import Database
+from datetime import date, timedelta, datetime
+from os import system
 
 
 class Habit:
-    """Habit class for the general habit tracker logic."""
-
-    def __init__(self, name: str = None, description: str = None, periodicity: int = None, default_time: int = None,
-                 db_filename: str = None, user_mode: bool = None) -> None:
+    def __init__(self, db_filename: str = "main.db"):
         """
-        Initialize the necessary definition of a habit with name, description, periodicity and default_time_value.
-
-        Saving the current date and setting the date format for date to string conversion
-
-        Connect to the database using db_filename.
-
-        :param name: str name of a habit (default "")
-        :param description: str description of a habit (default "")
-        :param periodicity: int periodicity of a habit (currently only 1 and 7 is supported) (default 0)
-        :param default_time: int default time of a habit (default 0)
-        :param db_filename: str name of the database file (default main.db)
-        :param user_mode: bool, if True it will generate a new date on every create/update event
+        Initializing the necessary definition of a habit with name, description, periodicity and default_time_value\n
+        Saving the current date and setting the date format for date to string conversion\n
+        Connect to the database and initialize the tables if they do no exist yet\n
+        Set interactive mode off by default for easier unittests/access to the class\n
+        :param db_filename: the name of the database file as a string
         """
-        if name is None:
-            self.name: str = ""
-        else:
-            self.name = name
 
-        if description is None:
-            self.description: str = ""
-        else:
-            self.description = description
-
-        if periodicity is None:
-            self.periodicity: int = 0
-        else:
-            self.periodicity = periodicity
-
-        if default_time is None:
-            self.default_time: int = 0
-        else:
-            self.default_time = default_time
-
-        if db_filename is None:
-            self.db_filename: str = "main.db"
-        else:
-            self.db_filename = db_filename
-
-        if user_mode is None:
-            self.user_mode: bool = True
-        else:
-            self.user_mode = user_mode
-
-        self.completed: bool = False
-
-        self.database = Database(self.db_filename)
-        self.time: int = 0
-        self.unique_id: int = 0
-
-        self.date_format: str = "%Y-%m-%d"
-        self.date_today: date = date.today()
-        self.created_date: date = date.today()
-        self.next_periodicity_due_date: date = date.today()
-        self.next_periodicity_range_start: date = date.today()
-        self.initialize_database()
-
-    def initialize_database(self) -> None:
-        """Call the database initialization method which creates two tables."""
+        self.name = [str]
+        self.description = [str]
+        self.periodicity = [str]
+        self.default_time_value = [int]
+        self.db_filename = db_filename
+        self.database = Database(db_filename)
         self.database.initialize_database()
+        self.date_format = "%Y-%m-%d"
+        self.date_today = date.today()
+        self.interactive_mode = False
 
-    def is_existing(self, habit_name: str) -> bool:
+    def create(self, name: str, description: str, periodicity: str, default_time: int):
         """
-        Check if there is a database entry for given name.
+        Create the habit by preparing the parameters in the form of the database and run the database command\n
+        :param name: the habit's name in text form
+        :param description: the habit's description in text form
+        :param periodicity: the habit's periodicity in text form
+        :param default_time: the habit's default time in text form
+        :return: False if the habit already exists, True on successful insert into the database
+        """
 
-        :param habit_name: str name of a habit
-        :return: bool True if there is a record, False if there is none
-        """
-        return self.database.read_habit_unique_id(habit_name) is not None
+        if self.database.select_get_habit_unique_id(name):
+            self.helper_clear_terminal(self.interactive_mode)
+            print("A habit with the name \"{name}\" already exists! Please choose another name!".format(name=name))
+            self.helper_wait_for_key(self.interactive_mode)
+            return False
+        else:
 
-    def set_id(self, habit_name: str) -> bool:
-        """
-        Set the habit unique id value for given name.
+            # Convert the input periodicity text to an integer and calculate the next_periodicity_due_date.
+            periodicity = self.helper_periodicity(periodicity)
+            next_periodicity_due_date = self.date_today + timedelta(days=periodicity)
+            # Store the habit as record in the database
+            self.database.insert_new_habit(name, description, periodicity, self.date_today,
+                                           next_periodicity_due_date, default_time)
 
-        :param habit_name: str name of a habit
-        :return: bool True if there is an id found in the database, False if there is none
-        """
-        unique_id: tuple = self.database.read_habit_unique_id(habit_name)
-        if unique_id is not None:
-            self.unique_id = unique_id[0]
+            self.helper_clear_terminal(self.interactive_mode)
+            print("Successfully created habit \"{name}\" with the description \"{description}\" and a \"{periodicity}\""
+                  " periodicity.\nThe first time it needs to be checked is until "
+                  "the end of the \"{next_periodicity_due_date}\" and \"{default_time}\" minutes are added by default."
+                  .format(name=name, description=description, periodicity=self.helper_periodicity(periodicity),
+                          default_time=default_time, next_periodicity_due_date=next_periodicity_due_date))
+            self.helper_wait_for_key(self.interactive_mode)
             return True
-        return False
 
-    def set_periodicity(self, habit_id: int) -> bool:
+    def event(self, name: str, completed: bool, time: int):
         """
-        Set the habit periodicity value for given id.
+        Prepare the habit event for usage and call the update method, it is also checked if an event was missed and
+        the record for this is inserted into the database.\n
+        The events need to be checked if they are in the range of today to the next day or this or next week, as the
+        user can create today a habit, complete it already today or go back tomorrow and tell the application it
+        was completed for yesterday.\n
+        :param name: the name of the habit
+        :param completed: the status of the completion of a habit
+        :param time: the time value of the habit event
+        :return: True if an event was added to the database, False if no event was added to the database
+        """
 
-        :param habit_id: int id of a habit
-        :return: bool True if there is a periodicity found in the database, False if there is none
-        """
-        periodicity: tuple = self.database.read_habit_periodicity(habit_id)
-        if periodicity is not None:
-            self.periodicity = periodicity[0]
+        # Check if the habit exists, if it's the case get its id, next periodicity due date, convert this to a date
+        # (sqlite will return it as a string) , get the periodicity and calculate the lower range for which a habit can
+        # be updated by subtracting the periodicity from the next periodicity due date
+        if self.database.select_get_habit_unique_id(name):
+            habit_id = self.database.select_get_habit_unique_id(name)[0]
+            next_periodicity_due_date = self.database.select_next_periodicity_due_date(habit_id)[0]
+            next_periodicity_due_date = datetime.strptime(next_periodicity_due_date, self.date_format).date()
+            periodicity = self.database.select_periodicity(habit_id)[0]
+            update_lower_range = next_periodicity_due_date - timedelta(days=periodicity)
+            # Get the default time value from the database in case no time is passed
+            if time == 0:
+                time = self.database.select_get_habit_default_time(habit_id)[0]
+            # If the current date is in the range of next_periodicity_due_date and this minus the periodicity the update
+            # method is called
+            if (self.date_today >= update_lower_range) and (self.date_today <= next_periodicity_due_date):
+                self.update(habit_id, name, completed, update_lower_range, time, next_periodicity_due_date, periodicity)
+                return True
+            # If it is too early to update the habit, tell the user
+            elif self.date_today < update_lower_range:
+                self.helper_clear_terminal(self.interactive_mode)
+                print("You cannot update the habit \"{name}\" at the moment! The next time will be on the "
+                      "\"{update_lower_range}\"".format(name=name, update_lower_range=update_lower_range))
+                self.helper_wait_for_key(self.interactive_mode)
+                return True
+            # If the user is already above the next periodicity due date calculate the number of times he missed the
+            # habit already and fill failure events for these dates into the database and a normal update at the end
+            elif self.date_today > next_periodicity_due_date:
+                missed = int(((self.date_today - timedelta(days=periodicity)) - update_lower_range)
+                             / timedelta(days=periodicity))
+                for i in range(missed):
+                    print("Detected {number}. break of the habit \"{name}\". Marking as \"{completed}\" for date "
+                          "\"{update_lower_range}\""
+                          .format(number=i + 1, name=name, completed="failure", update_lower_range=update_lower_range))
+                    self.database.insert_new_event(habit_id, False, update_lower_range, 0)
+                    next_periodicity_due_date += timedelta(days=periodicity)
+                    self.database.update_next_periodicity_due_date(habit_id, next_periodicity_due_date)
+                    update_lower_range = next_periodicity_due_date - timedelta(days=periodicity)
+                if missed == 0:
+                    print("The habit was broken once!")
+                else:
+                    print("The habit was broken {missed} times!".format(missed=missed + 1))
+                self.helper_wait_for_key(self.interactive_mode)
+                self.update(habit_id, name, completed, update_lower_range, time, next_periodicity_due_date, periodicity)
+                return True
+        else:
+            self.helper_clear_terminal(self.interactive_mode)
+            print("The habit \"{name}\" does not exist!".format(name=name))
+            self.helper_wait_for_key(self.interactive_mode)
             return True
-        return False
 
-    def set_next_periodicity_due_date(self, habit_id: int) -> bool:
+    def update(self, habit_id: int, name: str, completed: bool, update_lower_range: date, time: int,
+               next_periodicity_due_date: date, periodicity: int):
         """
-        Set the habit next periodicity due date value for given id.
-
-        :param habit_id: int id of a habit
-        :return: bool True if there is a habit next periodicity due date found in the database, False if there is none
+        Create a habit event by preparing the parameters in the form of the database and run the database command\n
+        :param habit_id: the id of a habit
+        :param name: the habit name
+        :param completed: the status if the event was a success or failure
+        :param update_lower_range: the date of the habit event
+        :param time: the time that was invested into this habit event
+        :param next_periodicity_due_date: the due date of the habit event
+        :param periodicity: the periodicity of the habit
+        :return: Always True
         """
-        next_periodicity_due_date: tuple = self.database.read_next_periodicity_due_date(habit_id)
-        if next_periodicity_due_date is not None:
-            self.next_periodicity_due_date = datetime.strptime(next_periodicity_due_date[0], self.date_format).date()
-            return True
-        return False
 
-    def set_default_time(self, habit_id: int) -> bool:
-        """
-        Set the habit default time value for given id.
-
-        :param habit_id: int id of a habit
-        :return: bool True if there is a default time found in the database, False if there is none
-        """
-        default_time: tuple = self.database.read_habit_default_time(habit_id)
-        if default_time is not None:
-            self.default_time = default_time[0]
-            return True
-        return False
-
-    def set_name(self, habit_id: int) -> bool:
-        """
-        Set the habit name value for given id.
-
-        :param habit_id: int id of a habit
-        :return: bool True if there is a name found in the database, False if there is none
-        """
-        name: tuple = self.database.read_habit_name(habit_id)
-        if name is not None:
-            self.name = name[0]
-            return True
-        return False
-
-    def create_habit(self, created_date: date = None, next_periodicity_due_date: date = None) -> bool:
-        """
-        Insert a new habit into the habits table.
-
-        :param created_date: date of the change
-        :param next_periodicity_due_date: date of next periodicity due date
-        :return: bool True if the creation was successful, False if not or a database error occurred
-        """
-        if created_date is None:
-            if self.user_mode:
-                created_date = date.today()
-            else:
-                created_date = self.date_today
-            self.created_date = created_date
-        if next_periodicity_due_date is None:
-            next_periodicity_due_date = self.created_date + timedelta(days=self.periodicity)
-        self.next_periodicity_due_date = next_periodicity_due_date
-        create_status = self.database.create_new_habit(self.name, self.description, self.periodicity,
-                                                       self.created_date, self.next_periodicity_due_date,
-                                                       self.default_time)
-        return create_status
-
-    def create_event_update(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) \
-            -> bool:
-        """
-        Insert a new event into the habits_events table.
-
-        If the user mode is active a new date will be created, else it will use the date provided. When the time value
-        is 0, default time will be used.
-
-        If completed is False the time value will be set to 0, else it will use the time provided.
-
-        :param completed: bool True if the habit was a success, False if not
-        :param next_periodicity_due_date: date of next periodicity due date
-        :param change_date: date of the change
-        :return: bool True if the creation was successful, False if not or a database error occurred
-        """
-        if change_date is None:
-            if self.user_mode:
-                change_date = date.today()
-            else:
-                change_date = self.date_today
-        if self.time == 0:
-            self.time = self.default_time
+        # Set time to 0 if the habit was a failure
         if not completed:
             time = 0
-        else:
-            time = self.time
-        create_status = self.database.create_new_event(self.unique_id, completed, change_date, time)
-        if create_status is not None:
-            self.next_periodicity_due_date = next_periodicity_due_date + timedelta(days=self.periodicity)
-            self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
-        return create_status
+        # Insert the new habit event as record into the database
+        self.database.insert_new_event(habit_id, completed, update_lower_range, time)
+        # Calculate the next date on which the habit will be needed to complete and update the habit table with this
+        next_periodicity_due_date += timedelta(days=periodicity)
+        self.database.update_next_periodicity_due_date(habit_id, next_periodicity_due_date)
 
-    def create_event(self, name: str, next_periodicity_due_date: date, change_date: date = None) \
-            -> [str, dict]:
-        """
-        Event logic, to decide if it is a simple update, too early to update or an update with additional fills.
+        completed = self.helper_completed(completed)
+        self.helper_clear_terminal(self.interactive_mode)
+        print("Successfully updated the habit \"{name}\" as \"{completed}\" for date \"{update_lower_range}\" and "
+              "added \"{time}\" minutes.\nThe next routine for this habit needs to be checked until "
+              "\"{next_periodicity_due_date}\"."
+              .format(name=name, completed=completed, update_lower_range=update_lower_range, time=time,
+                      next_periodicity_due_date=next_periodicity_due_date))
+        self.helper_wait_for_key(self.interactive_mode)
+        return True
 
-        :param name: str habit name
-        :param next_periodicity_due_date: date next_periodicity_due_date
-        :param change_date: date of change
-        :return: str status and dict missed_dates, status can be "normal","too early" or "with fill".
-         missed_dates always provides on the first (0) key the current periodicity range start as date, on a fill the
-         fills are starting at the second (1) key with their dates as values.
+    def remove(self, name: str, safety_ask: bool):
         """
-        if self.is_existing(name):
-            self.set_id(name)
-            self.set_periodicity(self.unique_id)
-            self.set_next_periodicity_due_date(self.unique_id)
-            self.set_default_time(self.unique_id)
-        status: str = ""
-        missed_dates: dict = {}
-        if change_date is None:
-            if self.user_mode:
-                change_date = date.today()
+        Remove a habit by preparing the parameters in the form of the database and run the database command\n
+        :param name: the habit's name
+        :param safety_ask: the answer of the safety question
+        :return: True on completion, False if habit was not found or the action was aborted
+        """
+
+        # Only run the removal if the user accepted this, afterwards it is checked if there is an entry in the database
+        # with the habit name, if this is the case the database command for removal is triggered
+        if safety_ask:
+            if self.database.select_get_habit_unique_id(name):
+                habit_id = self.database.select_get_habit_unique_id(name)[0]
+                self.database.delete_habit_and_events(habit_id)
+
+                self.helper_clear_terminal(self.interactive_mode)
+                print("Successfully removed the habit \"{name}\".".format(name=name))
+                self.helper_wait_for_key(self.interactive_mode)
+                return True
             else:
-                change_date = self.date_today
-        update_lower_range: date = next_periodicity_due_date - timedelta(days=self.periodicity)
-        if next_periodicity_due_date >= change_date >= update_lower_range:
-            self.create_event_update(self.completed, self.next_periodicity_due_date, change_date=change_date)
-            status = "normal"
-            missed_dates[0] = change_date
-        elif change_date < update_lower_range:
-            status = "too early"
-            missed_dates[0] = update_lower_range
-        elif change_date > next_periodicity_due_date:
-            status = "with fill"
-            update_lower_range, missed_dates = self.create_event_fill(update_lower_range)
-            self.create_event_update(self.completed, self.next_periodicity_due_date, update_lower_range)
-            missed_dates[0] = update_lower_range
-        return status, missed_dates
-
-    def create_event_fill(self, update_lower_range: date) -> [date, dict]:
-        """
-        Fill events if there are missed events.
-
-        :param update_lower_range: date of lower range of next periodicity due date
-        :return: dict of number of miss and the date when this miss occurred. This dict uses a human-readable format and
-         starts at 1
-        """
-        missed: int = int(((self.date_today - timedelta(days=self.periodicity)) - update_lower_range) / timedelta(
-            days=self.periodicity))
-        missed_dates: dict = {}
-        for i in range(missed):
-            missed_dates[i + 1] = str(update_lower_range)
-            self.create_event_update(False, self.next_periodicity_due_date, update_lower_range)
-            self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
-            update_lower_range = self.next_periodicity_due_date - timedelta(days=self.periodicity)
-        return update_lower_range, missed_dates
-
-    def analyse_all_active(self) -> list:
-        """
-        Read all habit records from the database that do not have the status finished.
-
-        :return: list of all habits in format [id, name, description, periodicity, default_time, created_date,
-         next_periodicity_due_date]
-        """
-        result: list = self.database.read_habits_by_not_finished()
-        return result
-
-    def analyse_all_active_same_periodicity(self, periodicity: int) -> list:
-        """
-        Read all habit records from the database that do not have the status finished and share the same periodicity.
-
-        :param periodicity: int periodicity (currently 1 or 7)
-        :return: list of all habits in format [id, name, description, periodicity, default_time, created_date,
-         next_periodicity_due_date]
-        """
-        result: list = self.database.read_habits_by_periodicity(periodicity)
-        return result
-
-    def analyse_longest_streak(self, habit_id: int = None) -> tuple:
-        """
-        Read all habit events from the habits_events table and calculates the longest streak.
-
-        If a habit id is provided it will check only the events of this one, if none is provided all habits and their
-        events will be considered.
-
-        :param habit_id: int the id of a habit
-        :return: tuple of (highest_habit_id, highest_count_overall) or empty tuple if no streak was found
-        """
-        if habit_id is None:
-            habit_unique_ids: list = self.database.read_habits_unique_ids()
+                print("The habit \"{name}\" does not exist!".format(name=name))
+                self.helper_wait_for_key(self.interactive_mode)
+                return False
         else:
-            habit_unique_ids = [(habit_id,)]
-        if habit_unique_ids:
-            # Count the number of times an event was successful for a habit by iterating over all events in all
-            # existing habits.
-            highest_count_overall: int = 0
-            highest_habit_id: int = 0
-            for i in habit_unique_ids:
-                all_events = self.database.read_habit_events(unique_id=i[0])
-                count: int = 0
-                highest_count: int = 0
-                for j in all_events:
-                    if j[2] == 1:
-                        count += 1
-                    # If a failure event was found the counter resets.
-                    else:
-                        count = 0
-                    # If the current count is higher than the highest count for this habit, set it as the new highest
-                    # count.
-                    if count > highest_count:
-                        highest_count = count
-                # If the highest count is bigger than the overall highest count, save this and the habit id.
-                if highest_count > highest_count_overall:
-                    highest_count_overall = highest_count
-                    highest_habit_id = i[0]
-            return highest_habit_id, highest_count_overall
-        return ()
+            print("Removal was aborted.")
+            return False
 
-    def analyse_time(self, habit_id: int) -> int:
+    def analyse(self, option: str, argument=None):
         """
-        Read all habit events for the given habit id from the habits_events table and calculates the time summary.
-
-        :param habit_id: int the id of a habit
-        :return: int time_summary  or -1 if no events were found
+        The analyse function will use the data from the database and give the user information about the existing data
+        of the habits.\n
+        :param option: can be "all", "all same periodicity", "longest streak of all", "longest streak" or "time"
+        :param argument: can be None or for the parameters "all same periodicity" a periodicity as string or for
+         "longest streak" a name as string
+        :return: True if the parameter was successfully used, False if a step failed
         """
-        all_events: list = self.database.read_habit_events(habit_id)
-        if all_events:
-            time_summary: int = 0
-            for i in all_events:
-                if i[2] == 1:
-                    time_summary += i[3]
+        # "Show all currently tracked habits"
+        if option == "all":
+            result = self.database.analyse_get_all()
+            if result:
+                self.helper_clear_terminal(self.interactive_mode)
+                print("Showing all currently tracked habits:")
+                if len(result) == 1:
+                    print("There is currently {number} habit:".format(number=len(result)))
                 else:
-                    pass
-            return time_summary
-        return -1
+                    print("There are currently {number} habits:".format(number=len(result)))
+                self.helper_format_and_output(result)
+                self.helper_wait_for_key(self.interactive_mode)
+                return True
+            else:
+                print("There are currently no habits! Please create one first!")
+                self.helper_wait_for_key(self.interactive_mode)
+                return False
 
-    def delete(self, habit_id: int) -> bool:
+        # "Show all habits with the same periodicity"
+        elif option == "all same periodicity":
+            periodicity = argument
+            argument = self.helper_periodicity(argument)
+            result = self.database.analyse_get_same_periodicity(argument)
+            if result:
+                self.helper_clear_terminal(self.interactive_mode)
+                print("Showing all currently tracked habits with the same periodicity of \"{periodicity}\":"
+                      .format(periodicity=periodicity))
+                self.helper_format_and_output(result)
+                self.helper_wait_for_key(self.interactive_mode)
+                return True
+            else:
+                print("There are currently no habits! Please create one first!")
+                self.helper_wait_for_key(self.interactive_mode)
+                return False
+
+        # "Return the longest run streak of all defined habits"
+        elif option == "longest streak of all":
+            # get all habits and their ids
+            habit_ids = self.database.select_get_all_habits_unique_id()
+            if habit_ids:
+                # Count the number of times an event was successful for a habit by iterating over all events in all
+                # existing habits.
+                highest_count_overall = 0
+                highest_habit_id = 0
+                for i in habit_ids:
+                    all_events = self.database.select_get_habit_events(unique_id=i[0])
+                    count = 0
+                    highest_count = 0
+                    for j in all_events:
+                        if j[2] == 1:
+                            count += 1
+                        # If a failure event was found the counter resets.
+                        else:
+                            count = 0
+                        # If the current count is higher than the highest count for this habit, set it as the new highest
+                        # count.
+                        if count > highest_count:
+                            highest_count = count
+                    # If the highest count is bigger than the overall highest count, save this and the habit id.
+                    if highest_count > highest_count_overall:
+                        highest_count_overall = highest_count
+                        highest_habit_id = i[0]
+                # Check in general if it's a streak or just a single event.
+                if highest_habit_id == 0 or 1 == highest_count_overall == 0:
+                    print("There is currently no streak ongoing at all!")
+                    self.helper_wait_for_key(self.interactive_mode)
+                    return False
+                else:
+                    name = self.database.select_get_habit_name(highest_habit_id)[0]
+                    periodicity = self.database.select_periodicity(highest_habit_id)[0]
+                    periodicity = self.helper_periodicity_to_noun(periodicity)
+                    self.helper_clear_terminal(self.interactive_mode)
+                    print("Showing the longest streak of all habits:")
+                    print(
+                        "The habit \"{name}\" is currently your best habit with a run streak of "
+                        "\"{highest_count_overall}\" {periodicity} in a row."
+                        .format(name=name, highest_count_overall=highest_count_overall, periodicity=periodicity))
+                    self.helper_wait_for_key(self.interactive_mode)
+                    return True
+            else:
+                print("There are currently no habits! Please create one first!")
+                self.helper_wait_for_key(self.interactive_mode)
+                return False
+
+        # "Return the longest run streak for a given habit"
+        elif option == "longest streak":
+            if self.database.select_get_habit_unique_id(argument):
+                name = argument
+                argument = self.database.select_get_habit_unique_id(argument)[0]
+                all_events = self.database.select_get_habit_events(unique_id=argument)
+                # This function is similar to the function from "longest streak of all" except that it only iterates
+                # over the events of a single habit
+                if all_events:
+                    count = 0
+                    highest_count = 0
+                    for i in all_events:
+                        if i[2] == 1:
+                            count += 1
+                        else:
+                            count = 0
+                        if count > highest_count:
+                            highest_count = count
+                    if count == 0 or count == 1:
+                        print("The habit \"{name}\" does not have a streak currently!".format(name=name))
+                        self.helper_wait_for_key(self.interactive_mode)
+                        return False
+                    else:
+                        self.helper_clear_terminal(self.interactive_mode)
+                        periodicity = self.database.select_periodicity(argument)[0]
+                        periodicity = self.helper_periodicity_to_noun(periodicity)
+                        print("Showing the longest streak for given habit:")
+                        print(
+                            "The habit \"{name}\" best run streak is \"{highest_count}\" consecutive "
+                            "{periodicity} in a row.".format(name=name, highest_count=highest_count,
+                                                             periodicity=periodicity))
+                        self.helper_wait_for_key(self.interactive_mode)
+                        return True
+                else:
+                    print("The habit \"{name}\" was not updated yet!".format(name=name))
+                    self.helper_wait_for_key(self.interactive_mode)
+                    return False
+            else:
+                print("The habit \"{name}\" does not exist!".format(name=argument))
+                self.helper_wait_for_key(self.interactive_mode)
+                return False
+
+        # "Return the longest run streak for a given habit"
+        elif option == "time":
+            if self.database.select_get_habit_unique_id(argument):
+                name = argument
+                argument = self.database.select_get_habit_unique_id(argument)[0]
+                all_events = self.database.select_get_habit_events(unique_id=argument)
+                if all_events:
+                    time_summary = 0
+                    for i in all_events:
+                        if i[2] == 1:
+                            time_summary += i[3]
+                        else:
+                            pass
+                    self.helper_clear_terminal(self.interactive_mode)
+                    if time_summary == 0:
+                        print("There is currently no time tracked for the habit \"{name}\"!".format(name=name))
+                        self.helper_wait_for_key(self.interactive_mode)
+                        return False
+                    else:
+                        time_unit = ["minutes", "hours", "days"]
+                        if 60 < time_summary < 1440:
+                            time_unit = time_unit[1]
+                            time_summary = round(time_summary / 60, 2)
+                        elif time_summary > 1440:
+                            time_unit = time_unit[2]
+                            time_summary = round(time_summary / 1440, 2)
+                        else:
+                            time_unit = time_unit[0]
+                        print("Showing the time summary for given habit:")
+                        print("You already spend on the habit \"{name}\" \"{time_summary}\" {time_unit}.".format(
+                            name=name,
+                            time_summary=time_summary, time_unit=time_unit))
+                        self.helper_wait_for_key(self.interactive_mode)
+                        return True
+                else:
+                    print("There is currently no time tracked for the habit \"{name}\"!".format(name=name))
+                    self.helper_wait_for_key(self.interactive_mode)
+                    return False
+            else:
+                print("The habit \"{name}\" does not exist!".format(name=argument))
+                self.helper_wait_for_key(self.interactive_mode)
+                return False
+
+    def helper_format_and_output(self, result: list):
         """
-        Delete a habit and all its events from the database.
-
-        :param habit_id: int id of a habit
-        :return: bool True if the removal was successful, False if not or a database error occurred
+        Formatting the output of the analyse functions in a tabular form\n
+        :param result: the result of the function, consists of id, name, periodicity, default_time_value, created_date
+         and next_periodicity_due_date
+        :return: Always True
         """
-        delete = self.database.delete_habit_and_events(habit_id)
-        return delete
 
-    # Methods currently only used in developer options or unit testing
-    def get_event_count(self, habit_id: int) -> int:
+        print("{:20}  {:35}  {:10}  {:10}  {:15}  {:15}"
+              .format("Name", "Description", "Periodicity", "Default time", "Creation date", "Next due date"))
+        print("{0:_^120}".format("_"))
+        for i in result:
+            name = i[1]
+            description = i[2]
+            periodicity = i[3]
+            periodicity = self.helper_periodicity(periodicity)
+            default_time_value = i[4]
+            created_date = i[5]
+            next_periodicity_due_date = i[6]
+            formatted_output = ("{name:20}\t"
+                                "{description:35}\t"
+                                "{periodicity:10}\t"
+                                "{default_time_value:5}\t"
+                                "{created_date:15}\t"
+                                "{next_periodicity_due_date:15}\t".format(name=name, description=description,
+                                                                          periodicity=periodicity,
+                                                                          default_time_value=default_time_value,
+                                                                          created_date=created_date,
+                                                                          next_periodicity_due_date=next_periodicity_due_date))
+            print(formatted_output)
+        return True
+
+    @staticmethod
+    def helper_periodicity(periodicity: str or int):
         """
-        Read all events from the database and output the count as a number of these.
-
-        :param habit_id: int id of a habit
-        :return: int the length of all events
+        Convert the periodicity text to number or number to text\n
+        :param periodicity: can be either the text or the number value of periodicity
+        :return: if string is given 1 or 7, if integer is given "daily" or "weekly"
         """
-        habit_events: list = self.database.read_habit_events(habit_id)
-        return len(habit_events)
 
-    def manipulate_time(self, offset: int) -> None:
+        if type(periodicity) is str:
+            if periodicity == "daily".casefold():
+                return 1
+            elif periodicity == "weekly".casefold():
+                return 7
+        elif type(periodicity) is int:
+            if periodicity == 1:
+                return "daily"
+            elif periodicity == 7:
+                return "weekly"
+
+    @staticmethod
+    def helper_periodicity_to_noun(periodicity: int):
         """
-        Offset the current date_today by an int to go back in time or into the future.
+        Convert the periodicity number to a text in form of a noun\n
+        :param periodicity: the number value of periodicity
+        :return: if given 1 "days", if given 7 "weeks"
+        """
 
-        :param offset: int negative or positive number as days
+        if periodicity == 1:
+            return "days"
+        elif periodicity == 7:
+            return "weeks"
+
+    @staticmethod
+    def helper_completed(completed: int):
+        """
+        Convert the completed integer to a text form\n
+        :param completed: the number value of completed
+        :return: if given 1 "success", if given 0 "failure"
+        """
+
+        if completed == 1:
+            return "success"
+        elif completed == 0:
+            return "failure"
+
+    @staticmethod
+    def helper_clear_terminal(interactive_mode: bool = True):
+        """
+        Clears the terminal for better and clearer visibility\n
+        :param interactive_mode: option to set the clearing on or off
+        :return: True if input parameter is True, False otherwise
+        """
+
+        if interactive_mode:
+            system('cls||clear')
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def helper_wait_for_key(interactive_mode: bool = True):
+        """
+        Simple input function with text to give the user the chance to read his last actions\n
+        :param interactive_mode: option to set the clearing on or off
+        :return: True if input parameter is True, False otherwise
+        """
+
+        if interactive_mode:
+            input("...press enter to continue...\n>")
+            return True
+        else:
+            return False
+
+    # dev method for unit testing
+    def manipulate_time(self, offset: int):
+        """
+        Currently only used in unit testing to go back in time\n
+        :param offset: can be either a positive or negative number
+        :return: Always True
         """
         self.date_today += timedelta(days=offset)
+        print("the new date is {date}".format(date=self.date_today))
+        return True
