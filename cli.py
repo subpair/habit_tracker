@@ -65,62 +65,62 @@ class Cli:
                       .format(question_type=question_type,
                               questions=questions_options))
                 validation_input = input(">")
-                try:
-                    # Allow only a choice between two options
-                    if validation_type.casefold() == "choice":
-                        if validation_input.casefold() == option_one:
+
+                # Allow only a choice between two options
+                if validation_type.casefold() == "choice":
+                    if validation_input.casefold() == option_one:
+                        valid_input = True
+                        return True
+                    elif validation_input.casefold() == option_two:
+                        valid_input = True
+                        return True
+                    else:
+                        print("This is not a valid answer!")
+                        valid_input = False
+                # Allow only numbers between a range of two options
+                elif validation_type.casefold() == "number":
+                    if validation_input.isnumeric():
+                        validation_input = int(validation_input)
+                        if option_one <= validation_input <= option_two:
                             valid_input = True
-                            return True
-                        elif validation_input.casefold() == option_two:
-                            valid_input = True
-                            return False
+                            return validation_input
                         else:
-                            print("This is not a valid answer!")
+                            print("This number is too high! Please reduce it to a number between "
+                                  "{number_lower_limit} and {number_upper_limit}!"
+                                  .format(number_lower_limit=option_one, number_upper_limit=option_two))
                             valid_input = False
-                    # Allow only numbers between a range of two options
-                    elif validation_type.casefold() == "number":
-                        if validation_input.isnumeric():
-                            validation_input = int(validation_input)
-                            if option_one <= validation_input <= option_two:
-                                valid_input = True
-                                return validation_input
-                            else:
-                                print("This number is too high! Please reduce it to a number between "
-                                      "{number_lower_limit} and {number_upper_limit}!"
-                                      .format(number_lower_limit=option_one, number_upper_limit=option_two))
-                                valid_input = False
-                        else:
-                            print("This is not a valid number! Please enter a valid Number!")
-                            valid_input = False
-                    # Allow only text with a defined max length
-                    elif option_identifier == "max_length":
-                        if validation_input == "":
-                            print("Please enter something!")
-                            valid_input = False
-                        else:
-                            if len(validation_input) > option_two:
-                                print("The text is too long! Please reduce the number to the allowed "
-                                      "{allowed_text_length}!"
-                                      .format(allowed_text_length=option_two))
-                                valid_input = False
-                            else:
-                                valid_input = True
-                                return validation_input
-                    # Generic option that accepts every input
-                    elif validation_input.casefold() in options or option_one == "any":
-                        if validation_input == "":
-                            print("Please enter something.")
+                    else:
+                        print("This is not a valid number! Please enter a valid Number!")
+                        valid_input = False
+                # Allow only text with a defined max length
+                elif option_identifier == "max_length":
+                    if validation_input == "":
+                        print("Please enter something!")
+                        valid_input = False
+                    else:
+                        if len(validation_input) > option_two:
+                            print("The text is too long! Please reduce the number to the allowed "
+                                  "{allowed_text_length}!"
+                                  .format(allowed_text_length=option_two))
                             valid_input = False
                         else:
                             valid_input = True
                             return validation_input
-                    else:
-                        print("Option not possible! The options are : {questions}"
-                              .format(questions=questions_options))
+                # Generic option that accepts every input
+                elif validation_input.casefold() in options or option_one == "any":
+                    if validation_input == "":
+                        print("Please enter something.")
                         valid_input = False
-                except KeyError:
+                    else:
+                        valid_input = True
+                        return validation_input
+                else:
                     print("Option not possible! The options are : {questions}"
                           .format(questions=questions_options))
+                    valid_input = False
+            else:
+                print("Option not possible! The options are : {questions}"
+                      .format(questions=questions_options))
 
     @staticmethod
     def menu(menu_name: str, menu_options: dict, menu_functions: dict):
@@ -138,16 +138,21 @@ class Cli:
             print(key, value)
         valid_input = False
         while not valid_input:
-            try:
-                menu_number = int(input(">"))
-                if menu_number in menu_options.keys():
+            menu_number = input(">")
+            # Check if it is a number
+            if menu_number.isnumeric():
+                menu_number = int(menu_number)
+                # Check if there is an option and a function for the input number
+                if menu_number in menu_options.keys() and menu_number in menu_functions.keys():
                     menu_functions[menu_number]()
                     valid_input = True
-                else:
+                # KeyError menu_options
+                elif menu_number not in menu_options.keys():
                     print("There is no option for this number! Please enter the number of an existing option!")
-            # DEV
-            except KeyError:
-                print("This option is missing its function! Please bring the dev some coffee :>")
-            # eDEV
-            except ValueError:
+                # KeyError menu_functions
+                elif menu_number not in menu_functions.keys():
+                    print(
+                        "There is currently not function assigned to this option! Please bring the dev some coffee so "
+                        "he can add this function :)")
+            else:
                 print("Invalid input! Please enter a number for an existing option!")
