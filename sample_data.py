@@ -85,6 +85,7 @@ class SampleData:
         also  simulates a skip of the habit e.g. when the user forgot to check the habit
         """
 
+        # "practice guitar"
         days = self.duration
         print("simulating events for {days} days".format(days=days))
         for i in range(days):
@@ -102,6 +103,7 @@ class SampleData:
             else:
                 print("skipping")
 
+        # "sleep 6 hours"
         days = self.duration
         print("simulating events for {days} days".format(days=days))
         for i in range(days):
@@ -119,6 +121,7 @@ class SampleData:
             else:
                 print("skipping")
 
+        # "read a book"
         days = self.duration
         print("simulating events for {days} days".format(days=days))
         for i in range(days):
@@ -136,6 +139,7 @@ class SampleData:
             else:
                 print("skipping")
 
+        # "do code challenges"
         days = self.duration
         print("simulating events for {days} days".format(days=days))
         for i in range(days):
@@ -153,6 +157,7 @@ class SampleData:
             else:
                 print("skipping")
 
+        # "study daily"
         days = self.duration
         print("simulating events for {days} days".format(days=days))
         for i in range(days):

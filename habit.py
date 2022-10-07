@@ -186,177 +186,243 @@ class Habit:
         of the habits.\n
         :param option: can be "all", "all same periodicity", "longest streak of all", "longest streak" or "time"
         :param argument: can be None or for the parameters "all same periodicity" a periodicity as string or for
-         "longest streak" a name as string
-        :return: True if the parameter was successfully used, False if a step failed
+         "longest streak" a name as string and for "time" also a name as string
+        :return: always True
         """
         # "Show all currently tracked habits"
         if option == "all":
-            result = self.database.analyse_get_all()
-            if result:
-                self.helper_clear_terminal(self.interactive_mode)
-                print("Showing all currently tracked habits:")
-                if len(result) == 1:
-                    print("There is currently {number} habit:".format(number=len(result)))
-                else:
-                    print("There are currently {number} habits:".format(number=len(result)))
-                self.helper_format_and_output(result)
-                self.helper_wait_for_key(self.interactive_mode)
-                return True
-            else:
-                print("There are currently no habits! Please create one first!")
-                self.helper_wait_for_key(self.interactive_mode)
-                return False
+            self.analyse_all()
+            return True
 
         # "Show all habits with the same periodicity"
         elif option == "all same periodicity":
-            periodicity = argument
-            argument = self.helper_periodicity(argument)
-            result = self.database.analyse_get_same_periodicity(argument)
-            if result:
-                self.helper_clear_terminal(self.interactive_mode)
-                print("Showing all currently tracked habits with the same periodicity of \"{periodicity}\":"
-                      .format(periodicity=periodicity))
-                self.helper_format_and_output(result)
-                self.helper_wait_for_key(self.interactive_mode)
-                return True
-            else:
-                print("There are currently no habits! Please create one first!")
-                self.helper_wait_for_key(self.interactive_mode)
-                return False
+            self.analyse_same_periodicity(periodicity=argument)
+            return True
 
         # "Return the longest run streak of all defined habits"
         elif option == "longest streak of all":
-            # get all habits and their ids
-            habit_ids = self.database.select_get_all_habits_unique_id()
-            if habit_ids:
-                # Count the number of times an event was successful for a habit by iterating over all events in all
-                # existing habits.
-                highest_count_overall = 0
-                highest_habit_id = 0
-                for i in habit_ids:
-                    all_events = self.database.select_get_habit_events(unique_id=i[0])
-                    count = 0
-                    highest_count = 0
-                    for j in all_events:
-                        if j[2] == 1:
-                            count += 1
-                        # If a failure event was found the counter resets.
-                        else:
-                            count = 0
-                        # If the current count is higher than the highest count for this habit, set it as the new highest
-                        # count.
-                        if count > highest_count:
-                            highest_count = count
-                    # If the highest count is bigger than the overall highest count, save this and the habit id.
-                    if highest_count > highest_count_overall:
-                        highest_count_overall = highest_count
-                        highest_habit_id = i[0]
-                # Check in general if it's a streak or just a single event.
-                if highest_habit_id == 0 or 1 == highest_count_overall == 0:
-                    print("There is currently no streak ongoing at all!")
-                    self.helper_wait_for_key(self.interactive_mode)
-                    return False
-                else:
-                    name = self.database.select_get_habit_name(highest_habit_id)[0]
-                    periodicity = self.database.select_periodicity(highest_habit_id)[0]
-                    periodicity = self.helper_periodicity_to_noun(periodicity)
-                    self.helper_clear_terminal(self.interactive_mode)
-                    print("Showing the longest streak of all habits:")
-                    print(
-                        "The habit \"{name}\" is currently your best habit with a run streak of "
-                        "\"{highest_count_overall}\" {periodicity} in a row."
-                        .format(name=name, highest_count_overall=highest_count_overall, periodicity=periodicity))
-                    self.helper_wait_for_key(self.interactive_mode)
-                    return True
-            else:
-                print("There are currently no habits! Please create one first!")
-                self.helper_wait_for_key(self.interactive_mode)
-                return False
+            self.analyse_longest_streak_all()
+            return True
 
         # "Return the longest run streak for a given habit"
         elif option == "longest streak":
-            if self.database.select_get_habit_unique_id(argument):
-                name = argument
-                argument = self.database.select_get_habit_unique_id(argument)[0]
-                all_events = self.database.select_get_habit_events(unique_id=argument)
-                # This function is similar to the function from "longest streak of all" except that it only iterates
-                # over the events of a single habit
-                if all_events:
-                    count = 0
-                    highest_count = 0
-                    for i in all_events:
-                        if i[2] == 1:
-                            count += 1
-                        else:
-                            count = 0
-                        if count > highest_count:
-                            highest_count = count
-                    if count == 0 or count == 1:
-                        print("The habit \"{name}\" does not have a streak currently!".format(name=name))
-                        self.helper_wait_for_key(self.interactive_mode)
-                        return False
-                    else:
-                        self.helper_clear_terminal(self.interactive_mode)
-                        periodicity = self.database.select_periodicity(argument)[0]
-                        periodicity = self.helper_periodicity_to_noun(periodicity)
-                        print("Showing the longest streak for given habit:")
-                        print(
-                            "The habit \"{name}\" best run streak is \"{highest_count}\" consecutive "
-                            "{periodicity} in a row.".format(name=name, highest_count=highest_count,
-                                                             periodicity=periodicity))
-                        self.helper_wait_for_key(self.interactive_mode)
-                        return True
-                else:
-                    print("The habit \"{name}\" was not updated yet!".format(name=name))
-                    self.helper_wait_for_key(self.interactive_mode)
-                    return False
-            else:
-                print("The habit \"{name}\" does not exist!".format(name=argument))
-                self.helper_wait_for_key(self.interactive_mode)
-                return False
+            self.analyse_longest_streak_single(name=argument)
+            return True
 
         # "Return the longest run streak for a given habit"
         elif option == "time":
-            if self.database.select_get_habit_unique_id(argument):
-                name = argument
-                argument = self.database.select_get_habit_unique_id(argument)[0]
-                all_events = self.database.select_get_habit_events(unique_id=argument)
-                if all_events:
-                    time_summary = 0
-                    for i in all_events:
-                        if i[2] == 1:
-                            time_summary += i[3]
-                        else:
-                            pass
-                    self.helper_clear_terminal(self.interactive_mode)
-                    if time_summary == 0:
-                        print("There is currently no time tracked for the habit \"{name}\"!".format(name=name))
-                        self.helper_wait_for_key(self.interactive_mode)
-                        return False
+            self.analyse_time(name=argument)
+            return True
+
+    def analyse_all(self):
+        """
+        This will output all currently tracked habits that do not have the status finished in the database and print
+        them as a table.\n
+        :return: True if the parameter was successfully used, False if a step failed or no record is found in the
+         database
+        """
+        # "Show all currently tracked habits"
+        result = self.database.analyse_get_all()
+        if result:
+            self.helper_clear_terminal(self.interactive_mode)
+            print("Showing all currently tracked habits:")
+            if len(result) == 1:
+                print("There is currently {number} habit:".format(number=len(result)))
+            else:
+                print("There are currently {number} habits:".format(number=len(result)))
+            self.helper_format_and_output(result)
+            self.helper_wait_for_key(self.interactive_mode)
+            return True
+        else:
+            print("There are currently no habits! Please create one first!")
+            self.helper_wait_for_key(self.interactive_mode)
+            return False
+
+    def analyse_same_periodicity(self, periodicity: str):
+        """
+        This will output all currently tracked habits that share the same periodicity of the input parameter
+        periodicity, and do not have the status finished in the database, and print them as a table.\n
+        :param periodicity: can be currently only "daily" and "weekly"
+        :return: True if the parameter was successfully used, False if a step failed or no record is found in the
+         database
+        """
+
+        # "Show all habits with the same periodicity"
+        argument = periodicity
+        periodicity = argument
+        argument = self.helper_periodicity(argument)
+        result = self.database.analyse_get_same_periodicity(argument)
+        if result:
+            self.helper_clear_terminal(self.interactive_mode)
+            print("Showing all currently tracked habits with the same periodicity of \"{periodicity}\":"
+                  .format(periodicity=periodicity))
+            self.helper_format_and_output(result)
+            self.helper_wait_for_key(self.interactive_mode)
+            return True
+        else:
+            print("There are currently no habits with a {periodicity} periodicity! Please create one first!"
+                  .format(periodicity=periodicity))
+            self.helper_wait_for_key(self.interactive_mode)
+            return False
+
+    def analyse_longest_streak_all(self):
+        """
+        Iterates over all existing habits and their events and calculates the highest run streak. Prints the largest
+        streak including the habit name to which it belongs.\n
+        :return: True if the parameter was successfully used, False if a step failed, no record is found in the
+         database or the currently best streak counter is 1
+        """
+
+        # "Return the longest run streak of all defined habits"
+
+        # get all habits and their ids
+        habit_ids = self.database.select_get_all_habits_unique_id()
+        if habit_ids:
+            # Count the number of times an event was successful for a habit by iterating over all events in all
+            # existing habits.
+            highest_count_overall = 0
+            highest_habit_id = 0
+            for i in habit_ids:
+                all_events = self.database.select_get_habit_events(unique_id=i[0])
+                count = 0
+                highest_count = 0
+                for j in all_events:
+                    if j[2] == 1:
+                        count += 1
+                    # If a failure event was found the counter resets.
                     else:
-                        time_unit = ["minutes", "hours", "days"]
-                        if 60 < time_summary < 1440:
-                            time_unit = time_unit[1]
-                            time_summary = round(time_summary / 60, 2)
-                        elif time_summary > 1440:
-                            time_unit = time_unit[2]
-                            time_summary = round(time_summary / 1440, 2)
-                        else:
-                            time_unit = time_unit[0]
-                        print("Showing the time summary for given habit:")
-                        print("You already spend on the habit \"{name}\" \"{time_summary}\" {time_unit}.".format(
-                            name=name,
-                            time_summary=time_summary, time_unit=time_unit))
-                        self.helper_wait_for_key(self.interactive_mode)
-                        return True
+                        count = 0
+                    # If the current count is higher than the highest count for this habit, set it as the new highest
+                    # count.
+                    if count > highest_count:
+                        highest_count = count
+                # If the highest count is bigger than the overall highest count, save this and the habit id.
+                if highest_count > highest_count_overall:
+                    highest_count_overall = highest_count
+                    highest_habit_id = i[0]
+            # Check in general if it's a streak or just a single event.
+            if highest_habit_id == 0 or 1 == highest_count_overall == 0:
+                print("There is currently no streak ongoing at all!")
+                self.helper_wait_for_key(self.interactive_mode)
+                return False
+            else:
+                name = self.database.select_get_habit_name(highest_habit_id)[0]
+                periodicity = self.database.select_periodicity(highest_habit_id)[0]
+                periodicity = self.helper_periodicity_to_noun(periodicity)
+                self.helper_clear_terminal(self.interactive_mode)
+                print("Showing the longest streak of all habits:")
+                print(
+                    "The habit \"{name}\" is currently your best habit with a run streak of "
+                    "\"{highest_count_overall}\" {periodicity} in a row."
+                    .format(name=name, highest_count_overall=highest_count_overall, periodicity=periodicity))
+                self.helper_wait_for_key(self.interactive_mode)
+                return True
+        else:
+            print("There are currently no habits! Please create one first!")
+            self.helper_wait_for_key(self.interactive_mode)
+            return False
+
+    def analyse_longest_streak_single(self, name: str):
+        """
+        Iterates over the events of an existing habit and calculates the highest run streak. Prints the largest
+        streak including the habit name.\n
+        :param name: the name of a habit
+        :return: True if the parameter was successfully used, False if a step failed, no record is found in the
+         database or the currently best streak counter is 1
+        """
+
+        # "Return the longest run streak for a given habit"
+        argument = name
+        if self.database.select_get_habit_unique_id(argument):
+            name = argument
+            argument = self.database.select_get_habit_unique_id(argument)[0]
+            all_events = self.database.select_get_habit_events(unique_id=argument)
+            # This function is similar to the function from "longest streak of all" except that it only iterates
+            # over the events of a single habit
+            if all_events:
+                count = 0
+                highest_count = 0
+                for i in all_events:
+                    if i[2] == 1:
+                        count += 1
+                    else:
+                        count = 0
+                    if count > highest_count:
+                        highest_count = count
+                if count == 0 or count == 1:
+                    print("The habit \"{name}\" does not have a streak currently!".format(name=name))
+                    self.helper_wait_for_key(self.interactive_mode)
+                    return False
                 else:
+                    self.helper_clear_terminal(self.interactive_mode)
+                    periodicity = self.database.select_periodicity(argument)[0]
+                    periodicity = self.helper_periodicity_to_noun(periodicity)
+                    print("Showing the longest streak for given habit:")
+                    print(
+                        "The habit \"{name}\" best run streak is \"{highest_count}\" consecutive "
+                        "{periodicity} in a row.".format(name=name, highest_count=highest_count,
+                                                         periodicity=periodicity))
+                    self.helper_wait_for_key(self.interactive_mode)
+                    return True
+            else:
+                print("The habit \"{name}\" was not updated yet!".format(name=name))
+                self.helper_wait_for_key(self.interactive_mode)
+                return False
+        else:
+            print("The habit \"{name}\" does not exist!".format(name=argument))
+            self.helper_wait_for_key(self.interactive_mode)
+            return False
+
+    def analyse_time(self, name: str):
+        """
+        Iterates over the events of an existing habit and calculates the time summary. Calculates the time summary to
+        either hours or days if possible. Prints the time summary and the habit name.\n
+        :param name: the name of a habit
+        :return: True if the parameter was successfully used, False if a step failed, no record is found in the
+         database or the current value for time is 0
+        """
+        argument = name
+        # "Return the longest run streak for a given habit"
+        if self.database.select_get_habit_unique_id(argument):
+            name = argument
+            argument = self.database.select_get_habit_unique_id(argument)[0]
+            all_events = self.database.select_get_habit_events(unique_id=argument)
+            if all_events:
+                time_summary = 0
+                for i in all_events:
+                    if i[2] == 1:
+                        time_summary += i[3]
+                    else:
+                        pass
+                self.helper_clear_terminal(self.interactive_mode)
+                if time_summary == 0:
                     print("There is currently no time tracked for the habit \"{name}\"!".format(name=name))
                     self.helper_wait_for_key(self.interactive_mode)
                     return False
+                else:
+                    time_unit = ["minutes", "hours", "days"]
+                    if 60 < time_summary < 1440:
+                        time_unit = time_unit[1]
+                        time_summary = round(time_summary / 60, 2)
+                    elif time_summary > 1440:
+                        time_unit = time_unit[2]
+                        time_summary = round(time_summary / 1440, 2)
+                    else:
+                        time_unit = time_unit[0]
+                    print("Showing the time summary for given habit:")
+                    print("You already spend on the habit \"{name}\" \"{time_summary}\" {time_unit}.".format(
+                        name=name,
+                        time_summary=time_summary, time_unit=time_unit))
+                    self.helper_wait_for_key(self.interactive_mode)
+                    return True
             else:
-                print("The habit \"{name}\" does not exist!".format(name=argument))
+                print("There is currently no time tracked for the habit \"{name}\"!".format(name=name))
                 self.helper_wait_for_key(self.interactive_mode)
                 return False
+        else:
+            print("The habit \"{name}\" does not exist!".format(name=argument))
+            self.helper_wait_for_key(self.interactive_mode)
+            return False
 
     def helper_format_and_output(self, result: list):
         """
