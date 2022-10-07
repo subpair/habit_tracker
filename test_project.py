@@ -58,7 +58,6 @@ class Tests:
         self.habit_five.periodicity = "daily"
         self.habit_five.default_time_value = 120
 
-
         # 5 create habit records in the database
         self.habit_one.create(self.habit_one.name, self.habit_one.description, self.habit_one.periodicity,
                               self.habit_one.default_time_value)
@@ -166,7 +165,7 @@ class Tests:
     def teardown_method(self):
         """
         Steps:\n
-        1: Test the analyse functions\n
+        1: Test the analyse-functions\n
         2: Test the habit removal function\n
         3: Close connections to database \n
         4: Remove database file

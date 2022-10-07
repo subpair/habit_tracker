@@ -198,7 +198,7 @@ Detected 6. break of the habit "my first habit". Marking as "failure" for date "
 The habit was broken 6 times! 
 ```
 ### Analyse Menu
-The analyse menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. 
+The analyse-menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. 
 It is used to gain all information that are currently available about the saved habits.
 ```console
 You are in the Analyse menu.

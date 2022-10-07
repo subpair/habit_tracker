@@ -182,7 +182,7 @@ class Habit:
 
     def analyse(self, option: str, argument=None):
         """
-        The analyse function will use the data from the database and give the user information about the existing data
+        The analyse-function will use the data from the database and give the user information about the existing data
         of the habits.\n
         :param option: can be "all", "all same periodicity", "longest streak of all", "longest streak" or "time"
         :param argument: can be None or for the parameters "all same periodicity" a periodicity as string or for
@@ -426,7 +426,7 @@ class Habit:
 
     def helper_format_and_output(self, result: list):
         """
-        Formatting the output of the analyse functions in a tabular form\n
+        Formatting the output of the analyse-functions in a tabular form\n
         :param result: the result of the function, consists of id, name, periodicity, default_time_value, created_date
          and next_periodicity_due_date
         :return: Always True
