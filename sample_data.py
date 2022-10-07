@@ -33,31 +33,31 @@ class SampleData:
 
         # 1 assigning the habit definitions and manipulating the time value
         self.habit_one.name = "practice guitar"
-        self.habit_one.description = "practice guitar for at least 30min"
+        self.habit_one.description = "for at least 30min"
         self.habit_one.periodicity = "daily"
         self.habit_one.default_time_value = 30
         self.habit_one.manipulate_time(-self.duration)
 
         self.habit_two.name = "sleep 6 hours"
-        self.habit_two.description = "sleep at least 6 hours per day"
+        self.habit_two.description = "at least 6 hours per day"
         self.habit_two.periodicity = "daily"
         self.habit_two.default_time_value = 360
         self.habit_two.manipulate_time(-self.duration)
 
         self.habit_three.name = "read a book"
-        self.habit_three.description = "read every week a little bit in a book"
+        self.habit_three.description = "every week a little bit"
         self.habit_three.periodicity = "weekly"
         self.habit_three.default_time_value = 0
         self.habit_three.manipulate_time(-self.duration)
 
         self.habit_four.name = "do code challenges"
-        self.habit_four.description = "do code challenges for at least 30 min"
+        self.habit_four.description = "at least 30 min"
         self.habit_four.periodicity = "daily"
         self.habit_four.default_time_value = 30
         self.habit_four.manipulate_time(-self.duration)
 
         self.habit_five.name = "study daily"
-        self.habit_five.description = "study daily without interruptions"
+        self.habit_five.description = "without interruptions"
         self.habit_five.periodicity = "daily"
         self.habit_five.default_time_value = 120
         self.habit_five.manipulate_time(-self.duration)

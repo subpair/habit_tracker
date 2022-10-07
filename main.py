@@ -73,30 +73,26 @@ if __name__ == "__main__":
                                                          mainmenu_functions)}
 
         # validation definitions
-        cli.validate_functions = {"text": "any",
-                                  "name": ["max_length", 20],
-                                  "description": ["max_length", 40],
-                                  "periodicity": ["daily", "weekly"],
-                                  "choice": ["y", "n"],
-                                  "number": [0, 1440]}
+        cli.validate_functions.update({"name": ["max_length", 20],
+                                       "description": ["max_length", 30],
+                                       "periodicity": ["daily", "weekly"],
+                                       "choice": ["y", "n"],
+                                       "number": [0, 1440]})
 
         # question definitions
-        cli.questions = {"name": ["the habit name", "Any text is valid up to 20 letters"],
-                         "description": ["the description of the habit", "Any text is valid up to 40 letters"],
-                         "periodicity": ["the periodicity of the habit", "[daily] and [weekly]"],
-                         "completed": ["if you completed this habit", "[y]es or [n]o"],
-                         "text": ["something", "Any text is valid"],
-                         "time": ["a time value", "Any number up to 1440 is valid. "
-                                                  "This is optional, if you want to skip this enter 0"],
-                         "safety": ["if you are sure you want to do this action", "[y]es or [n]o"]}
+        cli.questions.update({"name": ["the habit name", "Any text is valid up to 20 letters"],
+                              "description": ["the description of the habit", "Any text is valid up to 30 letters"],
+                              "periodicity": ["the periodicity of the habit", "[daily] and [weekly]"],
+                              "completed": ["if you completed this habit", "[y]es or [n]o"],
+                              "time": ["a time value", "Any number up to 1440 is valid. "
+                                                       "This is optional, if you want to skip this enter 0"],
+                              "safety": ["if you are sure you want to do this action", "[y]es or [n]o"]})
 
         # DEV
         # mainmenu_options[5] = "offset time"
         # mainmenu_functions[5] = lambda: habit.manipulate_time(int(input()))
         # mainmenu_options[6] = "current date"
-        # mainmenu_functions[6] = lambda: print(habit.date_today)
-        # mainmenu_options[7] = "work"
-        # mainmenu_functions[7] = lambda: cli.validate("some words", "text")
+        # mainmenu_functions[6] = lambda: [print(habit.date_today), habit.helper_wait_for_key()]
         # eDEV
 
         # Ask if sample data should be generated and loaded into the database

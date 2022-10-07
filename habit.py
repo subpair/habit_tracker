@@ -102,7 +102,7 @@ class Habit:
                 for i in range(missed):
                     print("Detected {number}. break of the habit \"{name}\". Marking as \"{completed}\" for date "
                           "\"{update_lower_range}\""
-                          .format(number=i + 1, name=name, completed="failure", update_lower_range=update_lower_range))
+                          .format(number=i + 1, name=name, completed="failed", update_lower_range=update_lower_range))
                     self.database.insert_new_event(habit_id, False, update_lower_range, 0)
                     next_periodicity_due_date += timedelta(days=periodicity)
                     self.database.update_next_periodicity_due_date(habit_id, next_periodicity_due_date)
@@ -110,7 +110,7 @@ class Habit:
                 if missed == 0:
                     print("The habit was broken once!")
                 else:
-                    print("The habit was broken {missed} times!".format(missed=missed + 1))
+                    print("The habit was broken {missed} times!".format(missed=missed))
                 self.helper_wait_for_key(self.interactive_mode)
                 self.update(habit_id, name, completed, update_lower_range, time, next_periodicity_due_date, periodicity)
                 return True
@@ -126,7 +126,7 @@ class Habit:
         Create a habit event by preparing the parameters in the form of the database and run the database command\n
         :param habit_id: the id of a habit
         :param name: the habit name
-        :param completed: the status if the event was a success or failure
+        :param completed: the status if the event was a success or failed
         :param update_lower_range: the date of the habit event
         :param time: the time that was invested into this habit event
         :param next_periodicity_due_date: the due date of the habit event
@@ -431,10 +431,11 @@ class Habit:
          and next_periodicity_due_date
         :return: Always True
         """
-
-        print("{:20}  {:35}  {:10}  {:10}  {:15}  {:15}"
-              .format("Name", "Description", "Periodicity", "Default time", "Creation date", "Next due date"))
-        print("{0:_^120}".format("_"))
+        headlines = ["Name", "Description", "Periodicity", "Def. time", "Start date", "Due date"]
+        entries = [[]]
+        print("{:25}  {:20}  {:1}  {:1}  {:12}  {:1}"
+              .format("Name", "Description", "Periodicity", "Def. time", "Start date", "Due date"))
+        print("{0:_^100}".format("_"))
         for i in result:
             name = i[1]
             description = i[2]
@@ -443,16 +444,17 @@ class Habit:
             default_time_value = i[4]
             created_date = i[5]
             next_periodicity_due_date = i[6]
+            entries.append([name, description, periodicity, default_time_value, created_date,
+                            next_periodicity_due_date])
             formatted_output = ("{name:20}\t"
-                                "{description:35}\t"
-                                "{periodicity:10}\t"
-                                "{default_time_value:5}\t"
-                                "{created_date:15}\t"
-                                "{next_periodicity_due_date:15}\t".format(name=name, description=description,
-                                                                          periodicity=periodicity,
-                                                                          default_time_value=default_time_value,
-                                                                          created_date=created_date,
-                                                                          next_periodicity_due_date=next_periodicity_due_date))
+                                "{description:30}\t"
+                                "{periodicity:6}\t"
+                                "{default_time_value:4}\t"
+                                "{created_date:10}\t"
+                                "{next_periodicity_due_date:10}\t"
+                                .format(name=name, description=description, periodicity=periodicity,
+                                        default_time_value=default_time_value, created_date=created_date,
+                                        next_periodicity_due_date=next_periodicity_due_date))
             print(formatted_output)
         return True
 
@@ -493,13 +495,13 @@ class Habit:
         """
         Convert the completed integer to a text form\n
         :param completed: the number value of completed
-        :return: if given 1 "success", if given 0 "failure"
+        :return: if given 1 "success", if given 0 "failed"
         """
 
         if completed == 1:
             return "success"
         elif completed == 0:
-            return "failure"
+            return "failed"
 
     @staticmethod
     def helper_clear_terminal(interactive_mode: bool = True):
