@@ -1,3 +1,4 @@
+import sqlite3
 from sqlite3 import connect, Error
 from datetime import date
 
@@ -14,11 +15,11 @@ class Database:
         if file_name is None:
             file_name = "main.db"
         try:
-            self.db_connection = connect(file_name)
+            self.db_connection: sqlite3.Connection = connect(file_name)
         except Error as err:
             print(err)
 
-    def close_connection(self):
+    def close_connection(self) -> bool:
         """
         Close database connection \n
         :return: True on success, False on error
@@ -32,7 +33,7 @@ class Database:
             return False
 
     # Initialization
-    def initialize_database(self):
+    def initialize_database(self) -> bool:
         """
         Initializes the database with two tables: \n
         >habits
@@ -74,7 +75,7 @@ class Database:
 
     # Insert functions
     def insert_habit(self, name: str, description: str, periodicity: int, created_date: date,
-                     next_periodicity_due_date: date, default_time: int):
+                     next_periodicity_due_date: date, default_time: int) -> bool:
         """
         Inserts a new habit into the habits table \n
         :param name: the name of the habit
@@ -98,7 +99,7 @@ class Database:
             print(err)
             return False
 
-    def insert_event(self, habit_id: int, completed: bool, change_date: date, time: int):
+    def insert_event(self, habit_id: int, completed: bool, change_date: date, time: int) -> bool:
         """
         Inserts a new event into the habits_events table \n
         :param habit_id: the id of a habit to connect a change event with a specific habit
@@ -124,7 +125,7 @@ class Database:
     # Select functions
     # habits table
 
-    def select_get_habit_unique_id(self, name: str):
+    def select_get_habit_unique_id(self, name: str) -> tuple:
         """
         Get a single id via a name input \n
         :param name: the name of a habit
@@ -138,9 +139,9 @@ class Database:
             return cur.fetchone()
         except Error as err:
             print(err)
-            return None
+            return ()
 
-    def select_get_all_habits_unique_ids(self):
+    def select_get_all_habits_unique_ids(self) -> list:
         """
         Get all existing habit ids \n
         :return: list of unique_id's is returned if a record with the name exists, will be an empty list if no record is
@@ -155,7 +156,7 @@ class Database:
             print(err)
             return []
 
-    def select_get_habit_name(self, unique_id: int):
+    def select_get_habit_name(self, unique_id: int) -> tuple:
         """
         Get the name via an id input \n
         :param unique_id: the id of a habit
@@ -169,9 +170,9 @@ class Database:
             return cur.fetchone()
         except Error as err:
             print(err)
-            return None
+            return ()
 
-    def select_periodicity(self, unique_id: int):
+    def select_periodicity(self, unique_id: int) -> tuple:
         """
         Get the periodicity via an input id \n
         :param unique_id: the id of a habit
@@ -184,9 +185,9 @@ class Database:
             return cur.fetchone()
         except Error as err:
             print(err)
-            return None
+            return ()
 
-    def select_get_habit_default_time(self, unique_id: int):
+    def select_get_habit_default_time(self, unique_id: int) -> tuple:
         """
         Get the default_time via an input id \n
         :param unique_id: the id of a habit
@@ -199,9 +200,9 @@ class Database:
             return cur.fetchone()
         except Error as err:
             print(err)
-            return None
+            return ()
 
-    def select_next_periodicity_due_date(self, unique_id: int):
+    def select_next_periodicity_due_date(self, unique_id: int) -> tuple:
         """
         Get the next_periodicity_due_date via an input id \n
         :param unique_id: the id of a habit
@@ -215,10 +216,10 @@ class Database:
             return cur.fetchone()
         except Error as err:
             print(err)
-            return None
+            return ()
 
     # habits_events table
-    def select_get_habit_events(self, unique_id: int):
+    def select_get_habit_events(self, unique_id: int) -> list:
         """
         Gets all events for a specific habit via an input id \n
         :param unique_id: the id of a habit
@@ -235,7 +236,7 @@ class Database:
             return []
 
     # Update functions
-    def update_next_periodicity_due_date(self, unique_id: int, next_periodicity_due_date: date):
+    def update_next_periodicity_due_date(self, unique_id: int, next_periodicity_due_date: date) -> bool:
         """
         Updates the habits' table with a new next_periodicity_due_date \n
         :param unique_id: the id of a habit
@@ -255,7 +256,7 @@ class Database:
             return False
 
     # Delete functions
-    def delete_habit_and_events(self, unique_id: int):
+    def delete_habit_and_events(self, unique_id: int) -> bool:
         """
         Deletes a habit entry and all its events from the database \n
         :param unique_id: the id of a habit
@@ -279,7 +280,7 @@ class Database:
             return False
 
     # Analyse functions
-    def analyse_get_all(self):
+    def analyse_get_all(self) -> list:
         """
         Gets all habits that are active \n
         :return: returns all records from the habits' table which do not have the finished status, will be an empty list
@@ -294,7 +295,7 @@ class Database:
             print(err)
             return []
 
-    def analyse_get_same_periodicity(self, periodicity: int):
+    def analyse_get_same_periodicity(self, periodicity: int) -> list:
         """
         Gets all habits with the same periodicity \n
         :param periodicity: an integer of allowed periodicity
@@ -310,20 +311,20 @@ class Database:
             print(err)
             return []
 
-    def select_get_all_habits(self):
+    def select_get_all_habits(self) -> list:
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT * FROM habits")
             return cur.fetchall()
         except Error as err:
             print(err)
-            return False
+            return []
 
-    def select_structure(self):
+    def select_structure(self) -> list:
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name")
             return cur.fetchall()
         except Error as err:
             print(err)
-            return False
+            return []
