@@ -1,4 +1,5 @@
-from sys import setrecursionlimit
+import sys
+from random import choices, randrange
 from cli import Cli
 
 
@@ -22,7 +23,7 @@ class Tests:
 
     def test_menu(self, monkeypatch):
         monkeypatch.setattr('builtins.input', lambda _: "0")
-        setrecursionlimit(99)
+        sys.setrecursionlimit(99)
         try:
             self.cli.menu()
         except RecursionError:
