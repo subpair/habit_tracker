@@ -1,3 +1,6 @@
+from os import system
+
+
 class Cli:
     # The CLI class consist of a validation and a menu method
 
@@ -21,9 +24,9 @@ class Cli:
     #   On an invalid input the user will be re-asked until he enters a valid input
     #
     #   Example:
-    #   validate_functions = {"choice": ["yellow", "red"],
+    #   validate_functions.update({"choice": ["yellow", "red"],
     #                         "some words": ["works", "working", "work", "worked"],
-    #                         "tag": ["max_length", 5]}
+    #                         "tag": ["max_length", 5]})
     #   The first option can be accessed by its name "choice" and will validate user input if it matches either yellow
     #   or red.
     #   The second option "some words" will validate the user input until it matches on of the words.
@@ -37,7 +40,7 @@ class Cli:
     # the list
     #
     #   Example:
-    #   questions = {"color": ["which color do you rather like", "[yellow] or [red]"]}
+    #   questions.update({"color": ["which color do you rather like", "[yellow] or [red]"]})
     #   Will ask the User "Please enter which color do you rather like? Available options are: [yellow] or [red]"
 
     def __init__(self):
@@ -47,8 +50,16 @@ class Cli:
         Example Usage: cli.validate("text", "text") will validate input of text and check if it only contains numerical
         and/or alphabetical content.
         """
-        self.validate_functions = {"text": "any"}
-        self.questions = {"text": ["something", "Any text is valid"]}
+        self.validate_functions = {"text": "any",
+                                   "choice": ["y", "n"],
+                                   "number": [0, 1440]}
+        self.questions = {"text": ["something", "Any text is valid"],
+                          "choice": ["a choice out of two options", "[y]es or [n]o"],
+                          "number": ["a number out of a range", "0 and 1440"]}
+        self.interactive_mode = True
+        self.main_menu_name = "main"
+        self.main_menu_options = {0: "Show menu"}
+        self.main_menu_functions = {0: lambda: self.menu()}
 
     def validate(self, validation_type: str, question_object: str):
         """
@@ -80,10 +91,8 @@ class Cli:
                         # Allow only a choice between two options
                         if validation_type.casefold() == "choice":
                             if validation_input.casefold() == option_one:
-                                valid_input = True
                                 return True
                             elif validation_input.casefold() == option_two:
-                                valid_input = True
                                 return False
                             else:
                                 print("This is not a valid answer!")
@@ -93,7 +102,6 @@ class Cli:
                             if validation_input.isnumeric():
                                 validation_input = int(validation_input)
                                 if option_one <= validation_input <= option_two:
-                                    valid_input = True
                                     return validation_input
                                 else:
                                     print("This number is too high! Please reduce it to a number between "
@@ -110,11 +118,9 @@ class Cli:
                                       "{allowed_text_length}!".format(allowed_text_length=option_two))
                                 valid_input = False
                             else:
-                                valid_input = True
                                 return validation_input
                         # Generic option that accepts every input
                         elif validation_input.casefold() in options or options == "any":
-                            valid_input = True
                             return validation_input
                         else:
                             print("Option not possible! The options are : {questions}".
@@ -130,14 +136,20 @@ class Cli:
                 print("There is currently no question assigned to this option! Please bring the dev some coffee so "
                       "he can add this :)")
 
-    @staticmethod
-    def menu(menu_name: str, menu_options: dict, menu_functions: dict):
+    def menu(self, menu_name: str = None, menu_options: dict = None, menu_functions: dict = None):
         """
         The menu will be created via the parameters and loop until an associated option is found.\n
         :param menu_name: The name text of the menu to be displayed
         :param menu_options: The options the menu does have
         :param menu_functions: The functions for the menu options
         """
+
+        if menu_name is None:
+            menu_name = self.main_menu_name
+        if menu_options is None:
+            menu_options = self.main_menu_options
+        if menu_functions is None:
+            menu_functions = self.main_menu_functions
 
         print("You are in the {current_menu_name} menu.\nThe options are:"
               .format(current_menu_name=menu_name))
@@ -154,6 +166,7 @@ class Cli:
                 if menu_number in menu_options.keys() and menu_number in menu_functions.keys():
                     menu_functions[menu_number]()
                     valid_input = True
+                    return valid_input
                 # KeyError menu_options
                 elif menu_number not in menu_options.keys():
                     print("There is no option for this number! Please enter the number of an existing option!")
@@ -163,4 +176,22 @@ class Cli:
                         "There is currently not function assigned to this option! Please bring the dev some coffee so "
                         "he can add this function :) \n")
             else:
-                print("Invalid input! Please enter a number for an existing option!")
+                print("This was not a number you entered! Please enter a number of an existing option!")
+
+    def helper_wait_for_key(self):
+        """
+        Simple input function with text to give the user the chance to read his last actions\n
+        :return: True if input parameter is True, False otherwise
+        """
+
+        if self.interactive_mode:
+            input("...press enter to continue...\n>")
+
+    def helper_clear_terminal(self):
+        """
+        Clears the terminal for better and clearer visibility\n
+        :return: True if input parameter is True, False otherwise
+        """
+
+        if self.interactive_mode:
+            system('cls||clear')
