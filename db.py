@@ -10,7 +10,7 @@ class Database:
         Afterwards the connection is initiated. \n
         :param file_name: name of the database file
         """
-        
+
         if file_name is None:
             file_name = "main.db"
         try:
@@ -23,7 +23,7 @@ class Database:
         Close database connection \n
         :return: True on success, False on error
         """
-        
+
         try:
             self.db_connection.close()
             return True
@@ -40,11 +40,11 @@ class Database:
             created_date, next_periodicity_due_date, finish_date and the finished status. \n
             Every entry in this table will get also a primary key assigned called unique_id.
         >habits_events
-            This table stores the events for the habits which includes the habit_id as foreign key imported from the 
+            This table stores the events for the habits which includes the habit_id as foreign key imported from the
             habits table, a completed status, a time value and a change_date. \n
         :return: True on successful run, False on database error
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute("""CREATE TABLE IF NOT EXISTS habits (
@@ -73,8 +73,8 @@ class Database:
             return False
 
     # Insert functions
-    def insert_new_habit(self, name: str, description: str, periodicity: int, created_date: date,
-                         next_periodicity_due_date: date, default_time: int):
+    def insert_habit(self, name: str, description: str, periodicity: int, created_date: date,
+                     next_periodicity_due_date: date, default_time: int):
         """
         Inserts a new habit into the habits table \n
         :param name: the name of the habit
@@ -85,7 +85,7 @@ class Database:
         :param default_time: the default time value which is added on every successful event
         :return: True on successful run, False on database error
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute(
@@ -98,7 +98,7 @@ class Database:
             print(err)
             return False
 
-    def insert_new_event(self, habit_id: int, completed: bool, change_date: date, time: int):
+    def insert_event(self, habit_id: int, completed: bool, change_date: date, time: int):
         """
         Inserts a new event into the habits_events table \n
         :param habit_id: the id of a habit to connect a change event with a specific habit
@@ -107,7 +107,7 @@ class Database:
         :param time: number of the time duration for an event
         :return: True on successful run, False on database error
         """
-        
+
         if time is None:
             time = 0
         try:
@@ -131,7 +131,7 @@ class Database:
         :return: unique_id is returned if a record with the name exists, will be None if no record
         is found or a database error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT unique_id FROM habits WHERE name=?", (name,))
@@ -140,13 +140,13 @@ class Database:
             print(err)
             return None
 
-    def select_get_all_habits_unique_id(self):
+    def select_get_all_habits_unique_ids(self):
         """
         Get all existing habit ids \n
         :return: list of unique_id's is returned if a record with the name exists, will be an empty list if no record is
          found or a database error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT unique_id FROM habits")
@@ -162,7 +162,7 @@ class Database:
         :return: name is returned if a record with the name exists, will be None if no record is found or a database
          error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT name FROM habits WHERE unique_id=?", (unique_id,))
@@ -177,7 +177,7 @@ class Database:
         :param unique_id: the id of a habit
         :return: periodicity as integer is returned, will be None if no record is found or a database error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT periodicity FROM habits WHERE unique_id=?", (unique_id,))
@@ -192,7 +192,7 @@ class Database:
         :param unique_id: the id of a habit
         :return: the date default_time is returned, will be None if no record is found or a database error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT default_time FROM habits WHERE unique_id=?", (unique_id,))
@@ -208,7 +208,7 @@ class Database:
         :return: the date next_periodicity_due_date is returned, will be None if no record is found or a database error
          occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT next_periodicity_due_date FROM habits WHERE unique_id=?", (unique_id,))
@@ -225,7 +225,7 @@ class Database:
         :return: all events for the input id are returned, will be an empty list if no record is found or a database
          error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT * FROM habits_events WHERE habit_id=?", (unique_id,))
@@ -242,7 +242,7 @@ class Database:
         :param next_periodicity_due_date: the last date a habit can be completed
         :return: returns True on successful update, will be false if a database error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute(
@@ -261,7 +261,7 @@ class Database:
         :param unique_id: the id of a habit
         :return: returns True on successful deletion, will be false if a database error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute(
@@ -285,10 +285,10 @@ class Database:
         :return: returns all records from the habits' table which do not have the finished status, will be an empty list
          if no record is found or a database error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
-            cur.execute("SELECT * FROM habits WHERE finished=?", (0,))
+            cur.execute("SELECT * FROM habits WHERE finished=?", (False,))
             return cur.fetchall()
         except Error as err:
             print(err)
@@ -301,7 +301,7 @@ class Database:
         :return: returns all records from the habits' table which have the same periodicity entry, will be an empty list
          if no record is found or a database error occurs
         """
-        
+
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT * FROM habits WHERE periodicity=?", (periodicity,))
@@ -309,3 +309,21 @@ class Database:
         except Error as err:
             print(err)
             return []
+
+    def select_get_all_habits(self):
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute("SELECT * FROM habits")
+            return cur.fetchall()
+        except Error as err:
+            print(err)
+            return False
+
+    def select_structure(self):
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute("SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name")
+            return cur.fetchall()
+        except Error as err:
+            print(err)
+            return False

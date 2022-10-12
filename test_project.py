@@ -6,200 +6,74 @@ from os import remove
 class Tests:
 
     def setup_method(self):
-        """
-        Steps:\n
-        1: Set database filename \n
-        2: Initialize habit objects \n
-        3: Set Terminal clearing to off \n
-        4: assign habit definitions \n
-        5: create habits in the database
-        """
-
-        # 1 set db filename
         self.db_filename = "test.db"
+        self.habit = Habit("dummy object", db_filename=self.db_filename)
+        self.habit.database.initialize_database()
+        self.habit.description = "dummy for testing"
+        self.habit.periodicity = 1
+        self.habit.default_time = 30
+        self.habit.user_mode = False
+        self.habit.manipulate_time(-31)
+        self.test_dummy_create_status = self.habit.create_habit()
 
-        # 2 initialize habit objects
-        self.habit_one = Habit(self.db_filename)
-        self.habit_two = Habit(self.db_filename)
-        self.habit_three = Habit(self.db_filename)
-        self.habit_four = Habit(self.db_filename)
-        self.habit_five = Habit(self.db_filename)
+        self.habit.set_id(self.habit.name)
+        self.habit.set_next_periodicity_due_date(self.habit.unique_id)
+        self.habit.set_default_time(self.habit.unique_id)
+        self.habit.set_periodicity(self.habit.unique_id)
+        self.habit.create_event(True, self.habit.next_periodicity_due_date)
 
-        # 3 set terminal clearing to off
-        self.habit_one.helper_clear_terminal(False)
-        self.habit_two.helper_clear_terminal(False)
-        self.habit_three.helper_clear_terminal(False)
-        self.habit_four.helper_clear_terminal(False)
-        self.habit_five.helper_clear_terminal(False)
+        self.habit_one = Habit("practice guitar", db_filename=self.db_filename)
 
-        # 4 assign habit definitions
-        self.habit_one.name = "practice guitar"
-        self.habit_one.description = "practice guitar for at least 30min"
-        self.habit_one.periodicity = "daily"
+    def test_dummy_exists_and_has_event(self):
+        assert self.habit.is_existing(self.habit.name) is True
+        assert self.habit.get_event_count(self.habit.unique_id) == 1
+
+    def test_create_habit(self):
+        self.habit_one.description = "for at least 30min"
+        self.habit_one.periodicity = 1
         self.habit_one.default_time_value = 30
+        self.habit_one.user_mode = True
+        self.habit_one.create_habit()
+        assert self.habit_one.is_existing(self.habit_one.name) is True
 
-        self.habit_two.name = "sleep 6 hours"
-        self.habit_two.description = "sleep at least 6 hours per day"
-        self.habit_two.periodicity = "daily"
-        self.habit_two.default_time_value = 360
-
-        self.habit_three.name = "read a book"
-        self.habit_three.description = "read every week a little bit in a book"
-        self.habit_three.periodicity = "weekly"
-        self.habit_three.default_time_value = 0
-
-        self.habit_four.name = "do code challenges"
-        self.habit_four.description = "do code challenges for at least 30 min"
-        self.habit_four.periodicity = "daily"
-        self.habit_four.default_time_value = 30
-
-        self.habit_five.name = "study daily"
-        self.habit_five.description = "study daily without interruptions"
-        self.habit_five.periodicity = "daily"
-        self.habit_five.default_time_value = 120
-
-        # 5 create habit records in the database
-        self.habit_one.create(self.habit_one.name, self.habit_one.description, self.habit_one.periodicity,
-                              self.habit_one.default_time_value)
-
-        self.habit_two.create(self.habit_two.name, self.habit_two.description, self.habit_two.periodicity,
-                              self.habit_two.default_time_value)
-
-        self.habit_three.create(self.habit_three.name, self.habit_three.description, self.habit_three.periodicity,
-                                self.habit_three.default_time_value)
-
-        self.habit_four.create(self.habit_four.name, self.habit_four.description, self.habit_four.periodicity,
-                               self.habit_four.default_time_value)
-
-        self.habit_five.create(self.habit_five.name, self.habit_five.description, self.habit_five.periodicity,
-                               self.habit_five.default_time_value)
-
-    def test_create_events(self):
+    def test_is_existing(self):
         """
-        Simulate events for 31 days
+        Look for a habit that was not created yet
         """
+        assert self.habit.is_existing("unknown") is False
 
-        days = 31
+    def test_create_event(self):
+        self.habit.set_id(self.habit.name)
+        self.habit.set_next_periodicity_due_date(self.habit.unique_id)
+        self.habit.set_default_time(self.habit.unique_id)
+        self.habit.set_periodicity(self.habit.unique_id)
+        self.habit.create_event(True, self.habit.next_periodicity_due_date)
 
-        # simulating events
-        print("simulating events for {days} days".format(days=days))
-        for i in range(days):
-            self.habit_one.manipulate_time(+1)
-            answers = [True, False]
-            completion = choices(answers, weights=(25, 75))[0]
-            use_time = choices(answers, weights=(90, 10))[0]
-            if use_time:
-                time_invested = randrange(0, 240)
-            else:
-                time_invested = 0
-            skip_habit = choices(answers, weights=(50, 50))[0]
-            if not skip_habit:
-                self.habit_one.event(self.habit_one.name, completion, time_invested)
-            else:
-                print("skipping")
+        assert self.habit.get_event_count(self.habit.unique_id) == 2
 
-        print("simulating events for {days} days".format(days=days))
-        for i in range(days):
-            self.habit_two.manipulate_time(+1)
-            answers = [True, False]
-            completion = choices(answers, weights=(95, 5))[0]
-            use_time = choices(answers, weights=(25, 75))[0]
-            if use_time:
-                time_invested = randrange(0, 720)
-            else:
-                time_invested = 0
-            skip_habit = choices(answers, weights=(2, 98))[0]
-            if not skip_habit:
-                self.habit_two.event(self.habit_two.name, completion, time_invested)
-            else:
-                print("skipping")
+    def test_create_delayed_event(self):
+        self.habit.manipulate_time(+7)
+        self.habit.set_id(self.habit.name)
+        self.habit.set_next_periodicity_due_date(self.habit.unique_id)
+        self.habit.set_default_time(self.habit.unique_id)
+        self.habit.set_periodicity(self.habit.unique_id)
+        self.habit.create_event_logic(True, self.habit.next_periodicity_due_date)
 
-        print("simulating events for {days} days".format(days=days))
-        for i in range(days):
-            self.habit_three.manipulate_time(+1)
-            answers = [True, False]
-            completion = choices(answers, weights=(10, 90))[0]
-            use_time = choices(answers, weights=(25, 75))[0]
-            if use_time:
-                time_invested = randrange(0, 120)
-            else:
-                time_invested = 0
-            skip_habit = choices(answers, weights=(90, 10))[0]
-            if not skip_habit:
-                self.habit_three.event(self.habit_three.name, completion, time_invested)
-            else:
-                print("skipping")
+        assert self.habit.get_event_count(self.habit.unique_id) == 7
 
-        print("simulating events for {days} days".format(days=days))
-        for i in range(days):
-            self.habit_four.manipulate_time(+1)
-            answers = [True, False]
-            completion = choices(answers, weights=(75, 25))[0]
-            use_time = choices(answers, weights=(75, 25))[0]
-            if use_time:
-                time_invested = randrange(0, 180)
-            else:
-                time_invested = 0
-            skip_habit = choices(answers, weights=(40, 60))[0]
-            if not skip_habit:
-                self.habit_four.event(self.habit_four.name, completion, time_invested)
-            else:
-                print("skipping")
+    def test_analytics(self):
 
-        print("simulating events for {days} days".format(days=days))
-        for i in range(days):
-            self.habit_five.manipulate_time(+1)
-            answers = [True, False]
-            completion = choices(answers, weights=(99, 1))[0]
-            use_time = choices(answers, weights=(95, 5))[0]
-            if use_time:
-                time_invested = randrange(120, 480)
-            else:
-                time_invested = 0
-            skip_habit = choices(answers, weights=(1, 99))[0]
-            if not skip_habit:
-                self.habit_five.event(self.habit_five.name, completion, time_invested)
-            else:
-                print("skipping")
+        assert len(self.habit.analyse_all_active()) == 1
+        assert len(self.habit.analyse_all_active_same_periodicity(1)) == 1
+        assert self.habit.analyse_longest_streak() == (1, 1)
+        assert self.habit.analyse_longest_streak(self.habit.unique_id) == (1, 1)
+        assert self.habit.analyse_time(self.habit.unique_id) == 30
+
+    def test_remove_habit(self):
+        self.habit.remove(self.habit.unique_id)
+        assert self.habit.is_existing(self.habit.name) is False
 
     def teardown_method(self):
-        """
-        Steps:\n
-        1: Test the analyse functions\n
-        2: Test the habit removal function\n
-        3: Close connections to database \n
-        4: Remove database file
-        """
-
-        # Test habit analyse functions
-        self.habit_one.analyse("all")
-        self.habit_one.analyse("all same periodicity", "daily")
-        self.habit_one.analyse("all same periodicity", "weekly")
-        self.habit_one.analyse("longest streak", self.habit_one.name)
-        self.habit_one.analyse("longest streak", self.habit_two.name)
-        self.habit_one.analyse("longest streak", self.habit_three.name)
-        self.habit_one.analyse("longest streak", self.habit_four.name)
-        self.habit_one.analyse("longest streak", self.habit_five.name)
-        self.habit_one.analyse("longest streak of all")
-        self.habit_one.analyse("time", self.habit_one.name)
-        self.habit_one.analyse("time", self.habit_two.name)
-        self.habit_one.analyse("time", self.habit_three.name)
-        self.habit_one.analyse("time", self.habit_four.name)
-        self.habit_one.analyse("time", self.habit_five.name)
-
-        # 2 Test habit removal function
-        self.habit_one.remove(self.habit_one.name, True)
-        self.habit_two.remove(self.habit_two.name, True)
-        self.habit_three.remove(self.habit_three.name, True)
-        self.habit_four.remove(self.habit_four.name, True)
-        self.habit_five.remove(self.habit_five.name, True)
-
-        # 3 Close database connections
+        self.habit.database.close_connection()
         self.habit_one.database.close_connection()
-        self.habit_two.database.close_connection()
-        self.habit_three.database.close_connection()
-        self.habit_four.database.close_connection()
-        self.habit_five.database.close_connection()
-
-        # 3 Remove database file
         remove(self.db_filename)
