@@ -9,8 +9,11 @@ if __name__ == "__main__":
     cli = Cli()
     habit = Habit("")
 
+    # Cli interactive mode means it will clear the terminal and put out wait for any key
     cli.interactive_mode = True
-    habit.user_mode = True
+    # Habit user mode means the date is updated on every create/update
+    habit.user_mode = False
+    # Dev mode is used to opt in developer options into the menu
     cli.dev_mode = True
 
     cli_habit.cli_definitions(cli, habit)

@@ -55,7 +55,7 @@ class Cli:
                                          "number": [0, 1440]}
         self.questions: dict = {"text": ["something", "Any text is valid"],
                                 "choice": ["a choice out of two options", "[y]es or [n]o"],
-                                "number": ["a number out of a range", "0 and 1440"]}
+                                "number": ["a number out of a range", "between 0 and 1440"]}
         self.interactive_mode: bool = True
 
         # Menu Builder
@@ -106,7 +106,7 @@ class Cli:
         valid_input: bool = False
         while not valid_input:
             if question_object in self.questions.keys():
-                print("Please enter {question_type}. Available options are: {questions}."
+                print("Please enter {question_type}.\nAvailable options are: {questions}."
                       .format(question_type=question_type, questions=questions_options))
                 validation_input = input(">")
                 if len(validation_input) < 80:
@@ -130,15 +130,15 @@ class Cli:
                                     validation_input = validation_number
                                     valid_input = True
                                 else:
-                                    print("This number is too high! Please reduce it to a number between "
+                                    print("This number is too high!\nPlease reduce it to a number between "
                                           "{number_lower_limit} and {number_upper_limit}!"
                                           .format(number_lower_limit=option_one, number_upper_limit=option_two))
                             else:
-                                print("This is not a valid number! Please enter a valid Number!")
+                                print("This is not a valid number!\nPlease enter a valid Number!")
                         # Allow only text with a defined max length
                         elif option_identifier == "max_length":
                             if len(validation_input) > option_two:
-                                print("The text is too long! Please reduce the number to the allowed "
+                                print("The text is too long!\nPlease reduce the number to the allowed "
                                       "{allowed_text_length}!".format(allowed_text_length=option_two))
                             else:
                                 valid_input = True
@@ -146,16 +146,16 @@ class Cli:
                         elif validation_input.casefold() in options or options == "any":
                             valid_input = True
                         else:
-                            print("Option not possible! The options are : {questions}".
+                            print("Option not possible!\nThe options are : {questions}".
                                   format(questions=questions_options))
                     elif validation_input == "":
-                        print("You entered nothing! Please type at-least one letter!")
+                        print("You entered nothing!\nPlease type at-least something!")
                     else:
-                        print("Option not possible! The options are : {questions}".format(questions=questions_options))
+                        print("Option not possible!\nThe options are : {questions}".format(questions=questions_options))
                 else:
-                    print("The text you entered is too long! Please reduce it!")
+                    print("The text you entered is too long!\nPlease reduce it!")
             else:
-                print("There is currently no question assigned to this option! Please bring the dev some coffee so "
+                print("There is currently no question assigned to this option!\nPlease bring the dev some coffee so "
                       "he can add this :)")
         return validation_input
 
@@ -191,14 +191,14 @@ class Cli:
                     valid_input = True
                 # KeyError menu_options
                 elif menu_number not in menu_options.keys():
-                    print("There is no option for this number! Please enter the number of an existing option!")
+                    print("There is no option for this number!\nPlease enter the number of an existing option!")
                 # KeyError menu_functions
                 elif menu_number not in menu_functions.keys():
                     print(
-                        "There is currently not function assigned to this option! Please bring the dev some coffee so "
-                        "he can add this function :) \n")
+                        "There is currently not function assigned to this option!\nPlease bring the dev some coffee so "
+                        "he can add this function :)")
             else:
-                print("This was not a number you entered! Please enter a number of an existing option!")
+                print("This was not a number you entered!\nPlease enter a number of an existing option!")
         return valid_input
 
     def helper_wait_for_key(self) -> None:

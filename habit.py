@@ -44,6 +44,7 @@ class Habit:
 
         self.date_format: str = "%Y-%m-%d"
         self.date_today: date = date.today()
+        self.created_date: date = date.today()
         self.next_periodicity_due_date: date = date.today()
         self.next_periodicity_range_start: date = date.today()
         self.initialize_database()
@@ -103,12 +104,12 @@ class Habit:
                 created_date = date.today()
             else:
                 created_date = self.date_today
+            self.created_date = created_date
         if next_periodicity_due_date is None:
-            next_periodicity_due_date = created_date + timedelta(days=self.periodicity)
+            next_periodicity_due_date = self.created_date + timedelta(days=self.periodicity)
+        self.next_periodicity_due_date = next_periodicity_due_date
         create = self.database.create_habit(self.name, self.description, self.periodicity,
-                                            created_date, next_periodicity_due_date, self.default_time)
-        if create is not None:
-            self.set_id(self.name)
+                                            self.created_date, self.next_periodicity_due_date, self.default_time)
         return create
 
     def create_event(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) -> bool:
@@ -139,9 +140,6 @@ class Habit:
             else:
                 change_date = self.date_today
         update_lower_range: date = next_periodicity_due_date - timedelta(days=self.periodicity)
-        # print(update_lower_range)
-        # print(change_date)
-        # print(next_periodicity_due_date)
         if (change_date >= update_lower_range) and (change_date <= next_periodicity_due_date):
             self.create_event(self.completed, self.next_periodicity_due_date, change_date=change_date)
             status = "normal"
