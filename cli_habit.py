@@ -268,7 +268,7 @@ def analyse_habits_same_periodicity(cli, habit):
 def analyse_all_habits_longest_streak(cli, habit):
     highest_habit_id: int
     highest_count_overall: int
-    if habit.analyse_longest_streak() is not ():
+    if habit.analyse_longest_streak() != ():
         highest_habit_id, highest_count_overall = habit.analyse_longest_streak()
         if highest_habit_id == 0 or highest_count_overall == 1 or highest_count_overall == 0:
             print("There is currently no streak ongoing at all!")

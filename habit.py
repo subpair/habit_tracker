@@ -53,10 +53,7 @@ class Habit:
         self.database.initialize_database()
 
     def is_existing(self, habit_name: str) -> bool:
-        if self.database.read_habit_unique_id(habit_name) is not None:
-            return True
-        else:
-            return False
+        return self.database.read_habit_unique_id(habit_name) is not None
 
     def set_id(self, habit_name: str) -> bool:
         unique_id: tuple = self.database.read_habit_unique_id(habit_name)
@@ -108,9 +105,9 @@ class Habit:
         if next_periodicity_due_date is None:
             next_periodicity_due_date = self.created_date + timedelta(days=self.periodicity)
         self.next_periodicity_due_date = next_periodicity_due_date
-        create = self.database.create_habit(self.name, self.description, self.periodicity,
+        create_status = self.database.create_habit(self.name, self.description, self.periodicity,
                                             self.created_date, self.next_periodicity_due_date, self.default_time)
-        return create
+        return create_status
 
     def create_event_update(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) \
             -> bool:
@@ -126,10 +123,10 @@ class Habit:
         else:
             time = self.time
         create = self.database.create_event(self.unique_id, completed, change_date, time)
-        if create is not None:
+        if create_status is not None:
             self.next_periodicity_due_date = next_periodicity_due_date + timedelta(days=self.periodicity)
             self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
-        return create
+        return create_status
 
     def create_event(self, name: str, next_periodicity_due_date: date, change_date: date = None) \
             -> tuple[str, dict]:

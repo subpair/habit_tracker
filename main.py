@@ -7,7 +7,7 @@ import cli_habit
 
 if __name__ == "__main__":
     cli = Cli()
-    habit = Habit("")
+    habit = Habit()
 
     # Cli interactive mode means it will clear the terminal and put out wait for any key
     cli.interactive_mode = True
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     habit.user_mode = False
     # Dev mode is used to opt in developer options into the menu
     cli.dev_mode = True
-
+    # Load all definitions for the interactive mode
     cli_habit.cli_definitions(cli, habit)
 
     try:
