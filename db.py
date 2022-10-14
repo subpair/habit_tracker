@@ -74,7 +74,7 @@ class Database:
             return False
 
     # Insert functions
-    def insert_habit(self, name: str, description: str, periodicity: int, created_date: date,
+    def create_habit(self, name: str, description: str, periodicity: int, created_date: date,
                      next_periodicity_due_date: date, default_time: int) -> bool:
         """
         Inserts a new habit into the habits table \n
@@ -99,7 +99,7 @@ class Database:
             print(err)
             return False
 
-    def insert_event(self, habit_id: int, completed: bool, change_date: date, time: int) -> bool:
+    def create_event(self, habit_id: int, completed: bool, change_date: date, time: int) -> bool:
         """
         Inserts a new event into the habits_events table \n
         :param habit_id: the id of a habit to connect a change event with a specific habit
@@ -125,7 +125,7 @@ class Database:
     # Select functions
     # habits table
 
-    def select_get_habit_unique_id(self, name: str) -> tuple:
+    def read_habit_unique_id(self, name: str) -> tuple:
         """
         Get a single id via a name input \n
         :param name: the name of a habit
@@ -141,7 +141,7 @@ class Database:
             print(err)
             return ()
 
-    def select_get_all_habits_unique_ids(self) -> list:
+    def read_habits_unique_ids(self) -> list:
         """
         Get all existing habit ids \n
         :return: list of unique_id's is returned if a record with the name exists, will be an empty list if no record is
@@ -156,7 +156,7 @@ class Database:
             print(err)
             return []
 
-    def select_get_habit_name(self, unique_id: int) -> tuple:
+    def read_habit_name(self, unique_id: int) -> tuple:
         """
         Get the name via an id input \n
         :param unique_id: the id of a habit
@@ -172,7 +172,7 @@ class Database:
             print(err)
             return ()
 
-    def select_periodicity(self, unique_id: int) -> tuple:
+    def read_habit_periodicity(self, unique_id: int) -> tuple:
         """
         Get the periodicity via an input id \n
         :param unique_id: the id of a habit
@@ -187,7 +187,7 @@ class Database:
             print(err)
             return ()
 
-    def select_get_habit_default_time(self, unique_id: int) -> tuple:
+    def read_habit_default_time(self, unique_id: int) -> tuple:
         """
         Get the default_time via an input id \n
         :param unique_id: the id of a habit
@@ -202,7 +202,7 @@ class Database:
             print(err)
             return ()
 
-    def select_next_periodicity_due_date(self, unique_id: int) -> tuple:
+    def read_next_periodicity_due_date(self, unique_id: int) -> tuple:
         """
         Get the next_periodicity_due_date via an input id \n
         :param unique_id: the id of a habit
@@ -219,7 +219,7 @@ class Database:
             return ()
 
     # habits_events table
-    def select_get_habit_events(self, unique_id: int) -> list:
+    def read_habit_events(self, unique_id: int) -> list:
         """
         Gets all events for a specific habit via an input id \n
         :param unique_id: the id of a habit
@@ -280,7 +280,7 @@ class Database:
             return False
 
     # Analyse functions
-    def analyse_get_all(self) -> list:
+    def read_habits_by_finished(self) -> list:
         """
         Gets all habits that are active \n
         :return: returns all records from the habits' table which do not have the finished status, will be an empty list
@@ -295,7 +295,7 @@ class Database:
             print(err)
             return []
 
-    def analyse_get_same_periodicity(self, periodicity: int) -> list:
+    def read_habits_by_periodicity(self, periodicity: int) -> list:
         """
         Gets all habits with the same periodicity \n
         :param periodicity: an integer of allowed periodicity
@@ -311,7 +311,7 @@ class Database:
             print(err)
             return []
 
-    def select_get_all_habits(self) -> list:
+    def read_habits(self) -> list:
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT * FROM habits")
@@ -320,7 +320,16 @@ class Database:
             print(err)
             return []
 
-    def select_structure(self) -> list:
+    def read_events(self) -> list:
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute("SELECT * FROM habits_events")
+            return cur.fetchall()
+        except Error as err:
+            print(err)
+            return []
+
+    def read_database_structure(self) -> list:
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT name FROM sqlite_schema WHERE type='table' ORDER BY name")

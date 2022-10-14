@@ -57,6 +57,28 @@ class Cli:
                                 "choice": ["a choice out of two options", "[y]es or [n]o"],
                                 "number": ["a number out of a range", "0 and 1440"]}
         self.interactive_mode: bool = True
+
+        # Menu Builder
+        # The Menu consist of:
+        # - %name%_menu_name string ""
+        # contains the name of the menu
+        #
+        # - %name%_menu_options dictionary {integer, string}
+        # holds the number with which the option can be chosen and a description of this option
+        #
+        # - %name%menu_functions dictionary {integer, lambda: function or list of functions in order}
+        # connects the number of the menu_options with a functionality, which is called through a lambda function
+        #
+        # %name% can be anything, but any menu needs these 3 to have something displayed
+        #
+        #
+        #   Example:
+        #       main_menu_name = "first"
+        #       main_menu_options.update({5: "Print Hello world"})
+        #       main_menu_functions.update({5: lambda: [print("Hello "), print("world")]})
+        #       This will override the default menu name and add a new function to the menu, which will print 2 times a
+        #       string when the number 5 is chosen
+
         self.main_menu_name: str = "main"
         self.main_menu_options: dict = {0: "Show menu"}
         self.main_menu_functions: dict = {0: lambda: self.menu()}
@@ -75,12 +97,13 @@ class Cli:
         options = self.validate_functions[validation_type]
         option_one = self.validate_functions[validation_type][0]
         option_two = self.validate_functions[validation_type][1]
+
         question_type = self.questions[question_object][0]
         questions_options = self.questions[question_object][1]
 
         # Validation loop start
         validation_input: str | int | bool = ""
-        valid_input = False
+        valid_input: bool = False
         while not valid_input:
             if question_object in self.questions.keys():
                 print("Please enter {question_type}. Available options are: {questions}."

@@ -1,13 +1,12 @@
 from os import remove
 from datetime import date
-from random import choices, randrange
 from habit import Habit
 
 
 class Tests:
 
     def setup_method(self) -> None:
-        self.db_filename = "test.db"
+        self.db_filename: str = "test.db"
         self.habit = Habit("dummy object", db_filename=self.db_filename)
         self.habit.database.initialize_database()
         self.habit.description = "dummy for testing"
@@ -18,9 +17,11 @@ class Tests:
         self.habit.create_habit()
 
         self.habit.set_id(self.habit.name)
-        self.habit.set_properties(self.habit.unique_id)
-
-        self.habit.create_event(True, self.habit.next_periodicity_due_date)
+        self.habit.set_periodicity(self.habit.unique_id)
+        self.habit.set_next_periodicity_due_date(self.habit.unique_id)
+        self.habit.set_default_time(self.habit.unique_id)
+        self.habit.completed = True
+        self.habit.create_event(self.habit.completed, self.habit.next_periodicity_due_date)
 
         self.habit_one = Habit("practice guitar", db_filename=self.db_filename)
 
@@ -58,7 +59,9 @@ class Tests:
         """
         habit_name = "unknown"
         self.habit_unknown = Habit(habit_name, db_filename=self.db_filename)
-        self.habit_unknown.set_properties(self.habit_unknown.unique_id)
+        self.habit_unknown.set_periodicity(self.habit_unknown.unique_id)
+        self.habit_unknown.set_next_periodicity_due_date(self.habit_unknown.unique_id)
+        self.habit_unknown.set_default_time(self.habit_unknown.unique_id)
         assert self.habit_unknown.periodicity == 0
         assert self.habit_unknown.next_periodicity_due_date == date.today()
         assert self.habit_unknown.default_time == 0
@@ -66,7 +69,8 @@ class Tests:
 
     def test_create_event(self) -> None:
         self.habit.set_id(self.habit.name)
-        self.habit.set_properties(self.habit.unique_id)
+        self.habit.set_periodicity(self.habit.unique_id)
+        self.habit.set_next_periodicity_due_date(self.habit.unique_id)
         self.habit.create_event(True, self.habit.next_periodicity_due_date)
 
         assert self.habit.get_event_count(self.habit.unique_id) == 2
@@ -74,8 +78,9 @@ class Tests:
     def test_create_delayed_event(self) -> None:
         self.habit.manipulate_time(+7)
         self.habit.set_id(self.habit.name)
-        self.habit.set_properties(self.habit.unique_id)
-        self.habit.create_event_logic(True, self.habit.next_periodicity_due_date)
+        self.habit.set_periodicity(self.habit.unique_id)
+        self.habit.set_next_periodicity_due_date(self.habit.unique_id)
+        self.habit.create_event_logic(self.habit.next_periodicity_due_date)
 
         assert self.habit.get_event_count(self.habit.unique_id) == 7
 
@@ -87,7 +92,7 @@ class Tests:
         assert self.habit.analyse_time(self.habit.unique_id) == 30
 
     def test_remove_habit(self) -> None:
-        self.habit.remove(self.habit.unique_id)
+        self.habit.delete(self.habit.unique_id)
         assert self.habit.is_existing(self.habit.name) is False
 
     def teardown_method(self) -> None:
