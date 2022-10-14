@@ -60,40 +60,35 @@ class Habit:
         if unique_id is not None:
             self.unique_id = unique_id[0]
             return True
-        else:
-            return False
+        return False
 
     def set_periodicity(self, habit_id: int) -> bool:
         periodicity: tuple = self.database.read_habit_periodicity(habit_id)
         if periodicity is not None:
             self.periodicity = periodicity[0]
             return True
-        else:
-            return False
+        return False
 
     def set_next_periodicity_due_date(self, habit_id: int) -> bool:
         next_periodicity_due_date: tuple = self.database.read_next_periodicity_due_date(habit_id)
         if next_periodicity_due_date is not None:
             self.next_periodicity_due_date = datetime.strptime(next_periodicity_due_date[0], self.date_format).date()
             return True
-        else:
-            return False
+        return False
 
     def set_default_time(self, habit_id: int) -> bool:
         default_time: tuple = self.database.read_habit_default_time(habit_id)
         if default_time is not None:
             self.default_time = default_time[0]
             return True
-        else:
-            return False
+        return False
 
     def set_name(self, habit_id: int) -> bool:
         name: tuple = self.database.read_habit_name(habit_id)
         if name is not None:
             self.name = name[0]
             return True
-        else:
-            return False
+        return False
 
     def create_habit(self, created_date: date = None, next_periodicity_due_date: date = None) -> bool:
         if created_date is None:
@@ -106,7 +101,7 @@ class Habit:
             next_periodicity_due_date = self.created_date + timedelta(days=self.periodicity)
         self.next_periodicity_due_date = next_periodicity_due_date
         create_status = self.database.create_habit(self.name, self.description, self.periodicity,
-                                            self.created_date, self.next_periodicity_due_date, self.default_time)
+                                                   self.created_date, self.next_periodicity_due_date, self.default_time)
         return create_status
 
     def create_event_update(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) \
@@ -122,7 +117,7 @@ class Habit:
             time = 0
         else:
             time = self.time
-        create = self.database.create_event(self.unique_id, completed, change_date, time)
+        create_status = self.database.create_event(self.unique_id, completed, change_date, time)
         if create_status is not None:
             self.next_periodicity_due_date = next_periodicity_due_date + timedelta(days=self.periodicity)
             self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
@@ -143,7 +138,7 @@ class Habit:
             else:
                 change_date = self.date_today
         update_lower_range: date = next_periodicity_due_date - timedelta(days=self.periodicity)
-        if (change_date >= update_lower_range) and (change_date <= next_periodicity_due_date):
+        if next_periodicity_due_date >= change_date >= update_lower_range:
             self.create_event_update(self.completed, self.next_periodicity_due_date, change_date=change_date)
             status = "normal"
             missed_dates[0] = change_date
@@ -209,8 +204,7 @@ class Habit:
                     highest_count_overall = highest_count
                     highest_habit_id = i[0]
             return highest_habit_id, highest_count_overall
-        else:
-            return ()
+        return ()
 
     def analyse_time(self, habit_id: int) -> int:
         all_events: list = self.database.read_habit_events(habit_id)
@@ -222,8 +216,7 @@ class Habit:
                 else:
                     pass
             return time_summary
-        else:
-            return 0
+        return 0
 
     # Methods currently only used in unit testing
 
