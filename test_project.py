@@ -1,6 +1,7 @@
 from os import remove
 from datetime import date
 from habit import Habit
+from sample_data import SampleData
 
 
 class Tests:
@@ -86,7 +87,17 @@ class Tests:
         self.habit.delete(self.habit.unique_id)
         assert self.habit.is_existing(self.habit.name) is False
 
+    def test_sample_data(self):
+        samples = SampleData(31, "test.db")
+        samples.create_habits()
+        samples.simulate_events()
+
+        assert len(samples.habit_one.database.read_habits()) == 6
+        assert len(samples.habit_one.database.read_events()) > 31
+        samples.closing_connections()
+
     def teardown_method(self) -> None:
         self.habit.database.close_connection()
         self.habit_one.database.close_connection()
         remove(self.db_filename)
+

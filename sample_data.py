@@ -3,7 +3,7 @@ from habit import Habit
 
 
 class SampleData:
-    def __init__(self, duration: int) -> None:
+    def __init__(self, duration: int, db_filename: str = None) -> None:
         """
         Initialize the sampledata object with a duration value for which the simulated events take place \n
         Steps:\n
@@ -14,7 +14,10 @@ class SampleData:
 
         self.duration: int = duration
         # 1 set database filename and initialize database
-        self.db_filename: str = "sample.db"
+        if db_filename is None:
+            self.db_filename: str = "sample.db"
+        else:
+            self.db_filename = db_filename
         self.habit = Habit(db_filename=self.db_filename)
         self.habit.initialize_database()
         self.habit.database.close_connection()
