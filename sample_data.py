@@ -15,15 +15,6 @@ class SampleData:
         self.duration: int = duration
         # 1 set database filename and initialize database
         self.db_filename: str = "sample.db"
-
-
-    def create_habits(self) -> None:
-        """
-        Steps:\n
-        1: Set the values name, description, periodicity and default_time_value for the 5 predefined habits \n
-        2: Negate the duration value of the simulation, so the sample data becomes usable today\n
-        3: Store the habits in the database
-        """
         self.habit = Habit(db_filename=self.db_filename)
         self.habit.initialize_database()
         self.habit.database.close_connection()
@@ -34,6 +25,14 @@ class SampleData:
         self.habit_three = Habit(db_filename=self.db_filename)
         self.habit_four = Habit(db_filename=self.db_filename)
         self.habit_five = Habit(db_filename=self.db_filename)
+
+    def create_habits(self) -> None:
+        """
+        Steps:\n
+        1: Set the values name, description, periodicity and default_time_value for the 5 predefined habits \n
+        2: Negate the duration value of the simulation, so the sample data becomes usable today\n
+        3: Store the habits in the database
+        """
 
         # 1 assigning the habit definitions and manipulating the time value
         self.habit_one.name = "practice guitar"
@@ -88,7 +87,7 @@ class SampleData:
 
         # "practice guitar"
         days = self.duration
-        #print("simulating events for {days} days".format(days=days))
+        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_one.manipulate_time(+1)
             answers = [True, False]
@@ -111,7 +110,7 @@ class SampleData:
 
         # "sleep 6 hours"
         days = self.duration
-        #print("simulating events for {days} days".format(days=days))
+        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_two.manipulate_time(+1)
             answers = [True, False]
@@ -134,7 +133,7 @@ class SampleData:
 
         # "read a book"
         days = self.duration
-        #print("simulating events for {days} days".format(days=days))
+        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_three.manipulate_time(+1)
             answers = [True, False]
@@ -157,7 +156,7 @@ class SampleData:
 
         # "do code challenges"
         days = self.duration
-        #print("simulating events for {days} days".format(days=days))
+        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_four.manipulate_time(+1)
             answers = [True, False]
@@ -180,7 +179,7 @@ class SampleData:
 
         # "study daily"
         days = self.duration
-        #print("simulating events for {days} days".format(days=days))
+        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_five.manipulate_time(+1)
             answers = [True, False]

@@ -33,5 +33,5 @@ class Tests:
         self.cli.helper_wait_for_key()
 
     def teardown_method(self) -> None:
-        #self.cli.helper_clear_terminal()
+        # self.cli.helper_clear_terminal()
         pass

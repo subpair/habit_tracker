@@ -173,7 +173,7 @@ class Cli:
             menu_options = self.main_menu_options
         if menu_functions is None:
             menu_functions = self.main_menu_functions
-
+        self.helper_clear_terminal()
         print("You are in the {current_menu_name} menu.\nThe options are:"
               .format(current_menu_name=menu_name))
         # Displays all available menu options

@@ -89,7 +89,7 @@ class Habit:
         else:
             return False
 
-    def set_name(self, habit_id : int) -> bool:
+    def set_name(self, habit_id: int) -> bool:
         name: tuple = self.database.read_habit_name(habit_id)
         if name is not None:
             self.name = name[0]
