@@ -41,11 +41,11 @@ if __name__ == "__main__":
             print("Sample database loaded!")
             cli.helper_wait_for_key()
 
-            # Main loop with mainmenu as default
-            exit_menu: bool = False
-            while not exit_menu:
-                cli.helper_clear_terminal()
-                cli.menu()
+        # Main loop with mainmenu as default
+        exit_menu: bool = False
+        while not exit_menu:
+            cli.helper_clear_terminal()
+            cli.menu()
 
     # If a user presses CTRL + C the database needs to be closed first before exiting, to avoid file locking
     except KeyboardInterrupt:

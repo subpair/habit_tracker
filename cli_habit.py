@@ -248,7 +248,7 @@ def analyse_habits_all_active(cli, habit):
             print("There are currently {number} habits:".format(number=len(result)))
         helper_format_and_output(result)
     else:
-        print("There are currently no habits! Please create one first!")
+        print("There are currently no habits! Please create at-least one first!")
 
 
 def analyse_habits_same_periodicity(cli, habit):
@@ -268,22 +268,24 @@ def analyse_habits_same_periodicity(cli, habit):
 def analyse_all_habits_longest_streak(cli, habit):
     highest_habit_id: int
     highest_count_overall: int
-    highest_habit_id, highest_count_overall = habit.analyse_longest_streak()
-    if highest_habit_id == 0 or highest_count_overall == 1 or highest_count_overall == 0:
-        print("There is currently no streak ongoing at all!")
+    if habit.analyse_longest_streak() is not ():
+        highest_habit_id, highest_count_overall = habit.analyse_longest_streak()
+        if highest_habit_id == 0 or highest_count_overall == 1 or highest_count_overall == 0:
+            print("There is currently no streak ongoing at all!")
+        else:
+            habit.set_name(highest_habit_id)
+            habit.set_id(habit.name)
+            habit.set_periodicity(habit.unique_id)
+            periodicity = helper_type_conversions(habit.periodicity - 1)
+            cli.helper_clear_terminal()
+            print("Showing the longest streak of all habits:")
+            print(
+                "The habit \"{name}\" is currently your best habit with a run streak of "
+                "\"{highest_count_overall}\" {periodicity} in a row."
+                .format(name=habit.name, highest_count_overall=highest_count_overall,
+                        periodicity=periodicity))
     else:
-        habit.set_name(highest_habit_id)
-        habit.set_id(habit.name)
-        habit.set_periodicity(habit.unique_id)
-        periodicity = helper_type_conversions(habit.periodicity - 1)
-        cli.helper_clear_terminal()
-        print("Showing the longest streak of all habits:")
-        print(
-            "The habit \"{name}\" is currently your best habit with a run streak of "
-            "\"{highest_count_overall}\" {periodicity} in a row."
-            .format(name=habit.name, highest_count_overall=highest_count_overall,
-                    periodicity=periodicity))
-
+        print("There are currently no habits! Please create at-least one first!")
 
 def analyse_habit_longest_streak(cli, habit):
     name = cli.validate("name", "name")

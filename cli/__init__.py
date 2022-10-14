@@ -151,7 +151,8 @@ class Cli:
                     elif validation_input == "":
                         print("You entered nothing!\nPlease type at-least something!")
                     else:
-                        print("Option not possible!\nThe options are : {questions}".format(questions=questions_options))
+                        print("Your input contains an invalid character!\n"
+                              "Please input only text without additional characters!")
                 else:
                     print("The text you entered is too long!\nPlease reduce it!")
             else:
