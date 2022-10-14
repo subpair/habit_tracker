@@ -163,23 +163,20 @@ def update_habit(cli, habit) -> None:
     print("Habit update dialog")
     habit.name = cli.validate("name", "name")
     if habit.is_existing(habit.name):
-        habit.set_id(habit.name)
-        habit.set_periodicity(habit.unique_id)
-        habit.set_next_periodicity_due_date(habit.unique_id)
-        habit.set_default_time(habit.unique_id)
         habit.time = cli.validate("number", "time")
         habit.completed = cli.validate("choice", "completed")
         # This could be changed to make dynamic inserts instead of on next available date
-        create_status = habit.create_event_logic(habit.next_periodicity_due_date)
+        create_status = habit.create_event(habit.name, habit.next_periodicity_due_date)
         completed: str = helper_type_conversions(habit.completed)
         if create_status[0] == "normal":
             cli.helper_clear_terminal()
             habit.next_periodicity_range_start = create_status[1][0]
             print("Successfully updated the habit \"{name}\".\n"
                   "Marked it as \"{completed}\" for date "
-                  "\"{next_periodicity_range_start}\".\n "
+                  "\"{next_periodicity_range_start}\".\n"
                   "Added \"{time}\" minute/s.\n"
-                  "The next routine for this habit needs to be checked until the date \"{next_periodicity_due_date}\"."
+                  "The next routine for this habit needs to be checked until the end of the date "
+                  "\"{next_periodicity_due_date}\"."
                   .format(name=habit.name, completed=completed,
                           next_periodicity_range_start=habit.next_periodicity_range_start, time=habit.time,
                           next_periodicity_due_date=habit.next_periodicity_due_date))
@@ -203,10 +200,13 @@ def update_habit(cli, habit) -> None:
                           "\"{update_lower_range}\""
                           .format(number=missed_number, name=habit.name, completed="failed",
                                   update_lower_range=missed_date))
-            print("Successfully updated the habit \"{name}\" as \"{completed}\" for date "
-                  "\"{next_periodicity_range_start}\" and added \"{time}\" minute/s.\nThe next routine for this habit needs"
-                  " to be checked until the date \"{next_periodicity_due_date}\"."
-                  .format(name=habit.name, completed=habit.completed,
+            print("Successfully updated the habit \"{name}\".\n"
+                  "Marked it as \"{completed}\" for date "
+                  "\"{next_periodicity_range_start}\".\n"
+                  "Added \"{time}\" minute/s.\n"
+                  "The next routine for this habit needs to be checked until the end of the date "
+                  "\"{next_periodicity_due_date}\"."
+                  .format(name=habit.name, completed=completed,
                           next_periodicity_range_start=habit.next_periodicity_range_start, time=habit.time,
                           next_periodicity_due_date=habit.next_periodicity_due_date))
         else:
@@ -286,6 +286,7 @@ def analyse_all_habits_longest_streak(cli, habit):
                         periodicity=periodicity))
     else:
         print("There are currently no habits! Please create at-least one first!")
+
 
 def analyse_habit_longest_streak(cli, habit):
     name = cli.validate("name", "name")

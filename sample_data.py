@@ -103,7 +103,7 @@ class SampleData:
                 self.habit_one.set_periodicity(self.habit_one.unique_id)
                 self.habit_one.set_default_time(self.habit_one.unique_id)
                 self.habit_one.set_next_periodicity_due_date(self.habit_one.unique_id)
-                self.habit_one.create_event_logic(self.habit_one.next_periodicity_due_date)
+                self.habit_one.create_event(self.habit_one.name, self.habit_one.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")
@@ -126,7 +126,7 @@ class SampleData:
                 self.habit_two.set_periodicity(self.habit_two.unique_id)
                 self.habit_two.set_default_time(self.habit_two.unique_id)
                 self.habit_two.set_next_periodicity_due_date(self.habit_two.unique_id)
-                self.habit_two.create_event_logic(self.habit_two.next_periodicity_due_date)
+                self.habit_two.create_event(self.habit_two.name, self.habit_two.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")
@@ -149,7 +149,7 @@ class SampleData:
                 self.habit_three.set_periodicity(self.habit_three.unique_id)
                 self.habit_three.set_default_time(self.habit_three.unique_id)
                 self.habit_three.set_next_periodicity_due_date(self.habit_three.unique_id)
-                self.habit_three.create_event_logic(self.habit_three.next_periodicity_due_date)
+                self.habit_three.create_event(self.habit_three.name, self.habit_three.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")
@@ -172,7 +172,7 @@ class SampleData:
                 self.habit_four.set_periodicity(self.habit_four.unique_id)
                 self.habit_four.set_default_time(self.habit_four.unique_id)
                 self.habit_four.set_next_periodicity_due_date(self.habit_four.unique_id)
-                self.habit_four.create_event_logic(self.habit_four.next_periodicity_due_date)
+                self.habit_four.create_event(self.habit_four.name, self.habit_four.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")
@@ -195,7 +195,7 @@ class SampleData:
                 self.habit_five.set_periodicity(self.habit_five.unique_id)
                 self.habit_five.set_default_time(self.habit_five.unique_id)
                 self.habit_five.set_next_periodicity_due_date(self.habit_five.unique_id)
-                self.habit_five.create_event_logic(self.habit_five.next_periodicity_due_date)
+                self.habit_five.create_event(self.habit_five.name, self.habit_five.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")

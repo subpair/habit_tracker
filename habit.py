@@ -37,8 +37,8 @@ class Habit:
             self.user_mode = user_mode
 
         self.completed: bool = False
-        self.database: Database = Database(self.db_filename)
 
+        self.database = Database(self.db_filename)
         self.time: int = 0
         self.unique_id: int = 0
 
@@ -112,7 +112,8 @@ class Habit:
                                             self.created_date, self.next_periodicity_due_date, self.default_time)
         return create
 
-    def create_event(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) -> bool:
+    def create_event_update(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) \
+            -> bool:
         if change_date is None:
             if self.user_mode:
                 change_date = date.today()
@@ -130,8 +131,13 @@ class Habit:
             self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
         return create
 
-    def create_event_logic(self, next_periodicity_due_date: date, change_date: date = None) \
+    def create_event(self, name: str, next_periodicity_due_date: date, change_date: date = None) \
             -> tuple[str, dict]:
+        if self.is_existing(name):
+            self.set_id(name)
+            self.set_periodicity(self.unique_id)
+            self.set_next_periodicity_due_date(self.unique_id)
+            self.set_default_time(self.unique_id)
         status: str = ""
         missed_dates: dict = {}
         if change_date is None:
@@ -141,7 +147,7 @@ class Habit:
                 change_date = self.date_today
         update_lower_range: date = next_periodicity_due_date - timedelta(days=self.periodicity)
         if (change_date >= update_lower_range) and (change_date <= next_periodicity_due_date):
-            self.create_event(self.completed, self.next_periodicity_due_date, change_date=change_date)
+            self.create_event_update(self.completed, self.next_periodicity_due_date, change_date=change_date)
             status = "normal"
             missed_dates[0] = change_date
         elif change_date < update_lower_range:
@@ -150,7 +156,7 @@ class Habit:
         elif change_date > next_periodicity_due_date:
             status = "with fill"
             update_lower_range, missed_dates = self.create_event_fill(update_lower_range)
-            self.create_event(self.completed, self.next_periodicity_due_date, update_lower_range)
+            self.create_event_update(self.completed, self.next_periodicity_due_date, update_lower_range)
             missed_dates[0] = update_lower_range
         return status, missed_dates
 
@@ -160,7 +166,7 @@ class Habit:
         missed_dates: dict = {}
         for i in range(missed):
             missed_dates[i + 1] = str(update_lower_range)
-            self.create_event(False, self.next_periodicity_due_date, update_lower_range)
+            self.create_event_update(False, self.next_periodicity_due_date, update_lower_range)
             self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
             update_lower_range = self.next_periodicity_due_date - timedelta(days=self.periodicity)
         return update_lower_range, missed_dates

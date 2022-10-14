@@ -15,14 +15,11 @@ class Tests:
         self.habit.user_mode = False
         self.habit.manipulate_time(-31)
         self.habit.create_habit()
-
         self.habit.set_id(self.habit.name)
         self.habit.set_periodicity(self.habit.unique_id)
         self.habit.set_next_periodicity_due_date(self.habit.unique_id)
-        self.habit.set_default_time(self.habit.unique_id)
         self.habit.completed = True
-        self.habit.create_event(self.habit.completed, self.habit.next_periodicity_due_date)
-
+        self.habit.create_event_update(self.habit.completed, self.habit.next_periodicity_due_date)
         self.habit_one = Habit("practice guitar", db_filename=self.db_filename)
 
     def test_dummy_exists_and_has_event(self) -> None:
@@ -68,19 +65,13 @@ class Tests:
         self.habit_unknown.database.close_connection()
 
     def test_create_event(self) -> None:
-        self.habit.set_id(self.habit.name)
-        self.habit.set_periodicity(self.habit.unique_id)
-        self.habit.set_next_periodicity_due_date(self.habit.unique_id)
-        self.habit.create_event(True, self.habit.next_periodicity_due_date)
+        self.habit.create_event_update(True, self.habit.next_periodicity_due_date)
 
         assert self.habit.get_event_count(self.habit.unique_id) == 2
 
     def test_create_delayed_event(self) -> None:
         self.habit.manipulate_time(+7)
-        self.habit.set_id(self.habit.name)
-        self.habit.set_periodicity(self.habit.unique_id)
-        self.habit.set_next_periodicity_due_date(self.habit.unique_id)
-        self.habit.create_event_logic(self.habit.next_periodicity_due_date)
+        self.habit.create_event(self.habit.name, self.habit.next_periodicity_due_date)
 
         assert self.habit.get_event_count(self.habit.unique_id) == 7
 
