@@ -1,6 +1,4 @@
-"""
-Startup of the application, including initialization of the cli and habit objects that are used.
-"""
+"""Startup of the application, including initialization of the cli and habit objects that are used."""
 from os import path
 from cli import Cli
 from habit import Habit

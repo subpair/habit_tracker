@@ -1,19 +1,19 @@
-"""
-Contains all database commands.\n
-"""
+"""Contains all database commands."""
 import sqlite3
 from sqlite3 import connect, Error
 from datetime import date
 
 
 class Database:
-    """
-    Database class for interacting with the database.
-    """
+    """Database class for interacting with the database."""
+
     def __init__(self, file_name: str = None):
         """
+        Initialize the database.
+
         On initialization the database always needs a database file name, if none is given it will default to "main.db".
-        Afterwards the connection is initiated. \n
+        Afterwards the connection is initiated.
+
         :param file_name: name of the database file
         """
         if file_name is None:
@@ -27,7 +27,8 @@ class Database:
     # Connection
     def open_connection(self) -> bool:
         """
-        Opens the database connection \n
+        Open the database connection.
+
         :return: True on success, False on error
         """
         try:
@@ -39,7 +40,8 @@ class Database:
 
     def close_connection(self) -> bool:
         """
-        Closes the database connection \n
+        Close the database connection.
+
         :return: True on success, False on error
         """
         try:
@@ -52,14 +54,18 @@ class Database:
     # Initialization
     def initialize_database(self) -> bool:
         """
-        Initializes the database with two tables: \n
+        Initialize the database with two tables.
+
         >habits
             This table stores the metadata of the habits which includes a name, description, periodicity, default_time,
-            created_date, next_periodicity_due_date, finish_date and the finished status.\n
+            created_date, next_periodicity_due_date, finish_date and the finished status.
+
             Every entry in this table will get also a primary key assigned called unique_id.
+
         >habits_events
             This table stores the events for the habits which includes the habit_id as foreign key imported from the
-            habits table, a completed status, a time value and a change_date.\n
+            habits table, a completed status, a time value and a change_date.
+
         :return: True on successful run, False on database error
         """
         try:
@@ -93,7 +99,8 @@ class Database:
     def create_new_habit(self, name: str, description: str, periodicity: int, created_date: date,
                          next_periodicity_due_date: date, default_time: int) -> bool:
         """
-        Inserts a new habit into the habits table.\n
+        Insert a new habit into the habits table.
+
         :param name: the name of the habit
         :param description: the description of a habit
         :param periodicity: the periodicity of a habit as integer value
@@ -116,7 +123,8 @@ class Database:
 
     def create_new_event(self, habit_id: int, completed: bool, change_date: date, time: int) -> bool:
         """
-        Inserts a new event into the habits_events table.\n
+        Insert a new event into the habits_events table.
+
         :param habit_id: the id of a habit to connect a change event with a specific habit
         :param completed: the status of the habit event
         :param change_date: the date on which the event occurred
@@ -140,7 +148,8 @@ class Database:
     #   habits table
     def read_habit_unique_id(self, name: str) -> tuple:
         """
-        Get a single unique id via a name input from the habits table.\n
+        Get a single unique id via a name input from the habits table.
+
         :param name: the name of a habit
         :return: tuple unique_id is returned if a record with the name exists, will be an empty tuple if no record is
          found or a database error occurs
@@ -155,7 +164,8 @@ class Database:
 
     def read_habits_unique_ids(self) -> list:
         """
-        Get all existing habit unique ids from the habits table.\n
+        Get all existing habit unique ids from the habits table.
+
         :return: list of unique_id's is returned , will be an empty list if no record is found or a database error
          occurs
         """
@@ -169,7 +179,8 @@ class Database:
 
     def read_habit_name(self, unique_id: int) -> tuple:
         """
-        Get the name via an id input from the habits table.\n
+        Get the name via an id input from the habits table.
+
         :param unique_id: the id of a habit
         :return: tuple with str name , will be an empty tuple if no record is found or a database error occurs
         """
@@ -183,7 +194,8 @@ class Database:
 
     def read_habit_periodicity(self, unique_id: int) -> tuple:
         """
-        Get the periodicity via an input id from the habits table.\n
+        Get the periodicity via an input id from the habits table.
+
         :param unique_id: the id of a habit
         :return: tuple with int periodicity, will be an empty tuple  if no record is found or a database error occurs
         """
@@ -197,7 +209,8 @@ class Database:
 
     def read_habit_default_time(self, unique_id: int) -> tuple:
         """
-        Get the default_time via an input id from the habits table.\n
+        Get the default_time via an input id from the habits table.
+
         :param unique_id: the id of a habit
         :return: tuple with date default_time, will be an empty tuple  if no record is found or a database error occurs
         """
@@ -211,7 +224,8 @@ class Database:
 
     def read_next_periodicity_due_date(self, unique_id: int) -> tuple:
         """
-        Get the next_periodicity_due_date via an input id from the habits table.\n
+        Get the next_periodicity_due_date via an input id from the habits table.
+
         :param unique_id: the id of a habit
         :return: tuple with date next_periodicity_due_date, will be an empty tuple  if no record is found or a database
          error occurs
@@ -227,7 +241,8 @@ class Database:
     #   habits_events table
     def read_habit_events(self, unique_id: int) -> list:
         """
-        Gets all events for a specific habit via an input id from the habits_events table.\n
+        Get all events for a specific habit via an input id from the habits_events table.
+
         :param unique_id: the id of a habit
         :return: list with all events for the input id is returned, will be an empty list if no record is found or a
          database error occurs
@@ -243,7 +258,8 @@ class Database:
     # Updating
     def update_next_periodicity_due_date(self, unique_id: int, next_periodicity_due_date: date) -> bool:
         """
-        Updates an entry in the habits table with a new next_periodicity_due_date.\n
+        Update an entry in the habits table with a new next_periodicity_due_date.
+
         :param unique_id: the id of a habit
         :param next_periodicity_due_date: the last date a habit can be completed
         :return: returns True on successful update, will be false if a database error occurs
@@ -262,7 +278,8 @@ class Database:
     # Deletion
     def delete_habit_and_events(self, unique_id: int) -> bool:
         """
-        Deletes a habit entry from the habits table and all its events in the habits_events table from the database.\n
+        Delete a habit entry from the habits table and all its events in the habits_events table from the database.
+
         :param unique_id: the id of a habit
         :return: returns True on successful deletion, will be false if a database error occurs
         """
@@ -285,7 +302,8 @@ class Database:
     # Analyse
     def read_habits_by_not_finished(self) -> list:
         """
-        Gets all habits that are active from the habits table.\n
+        Get all habits that are active from the habits table.
+
         :return: list of all records from the habits table which do not have the finished status, will be an empty list
          if no record is found or a database error occurs
         """
@@ -299,7 +317,8 @@ class Database:
 
     def read_habits_by_periodicity(self, periodicity: int) -> list:
         """
-        Gets all habits with the same periodicity from the habits table\n
+        Get all habits with the same periodicity from the habits table.
+
         :param periodicity: integer of allowed periodicity
         :return: returns all records from the habits table which have the same periodicity entry, will be an empty list
          if no record is found or a database error occurs
@@ -315,7 +334,8 @@ class Database:
     # Development and unittest
     def read_habits(self) -> list:
         """
-        Gets all habits from the habits table.\n
+        Get all habits from the habits table.
+
         :return: list of all records from the habits table, will be an empty list if no record is found or a database
          error occurs
         """
@@ -329,7 +349,8 @@ class Database:
 
     def read_events(self) -> list:
         """
-        Gets all events from the habits_events table.\n
+        Get all events from the habits_events table.
+
         :return: list of all records from the habits_events table, will be an empty list if no record is found or a
          database error occurs
         """
@@ -343,7 +364,8 @@ class Database:
 
     def read_database_structure(self) -> list:
         """
-        Gets the current existing tables in the database.\n
+        Get the current existing tables in the database.
+
         :return: list of all tables from the sqlite_schema table, will be an empty list if no record is found or a
          database error occurs
         """

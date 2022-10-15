@@ -1,20 +1,21 @@
-"""
-Contains a sample data generator.
-"""
+"""Contains a sample data generator."""
 from random import choices, randrange
 from habit import Habit
 
 
 class SampleData:
-    """
-    SampleData class for generating random events
-    """
+    """SampleData class for generating random events."""
+
     def __init__(self, duration: int, db_filename: str = None) -> None:
         """
-        Initialize the sampledata object with a duration value for which the simulated events take place \n
-        Steps:\n
-        1: Set the database filename and initialize the sample database\n
-        2: Initialize 5 predefined habits\n
+        Initialize the sampledata object with a duration value for which the simulated events take place.
+
+        Steps:
+
+        1: Set the database filename and initialize the sample database
+
+        2: Initialize 5 predefined habits
+
         :param duration: time in days of which the sample data is offset
         """
         self.duration: int = duration
@@ -36,10 +37,15 @@ class SampleData:
 
     def create_habits(self) -> None:
         """
-        Steps:\n
+        Create 5 habits with predefined properties.
+
+        Steps
+
         1: Set the values name, description, periodicity, default_time_value and user_mode for the 5 predefined habits
-        and negate the duration value of the simulation, so the sample data becomes usable today\n
+        and negate the duration value of the simulation, so the sample data becomes usable today.
+
         2: Store the habits in the database
+
         """
         # 1 assigning the habit definitions and manipulating the time value
         self.habit_one.name = "practice guitar"
@@ -86,10 +92,14 @@ class SampleData:
 
     def simulate_events(self) -> None:
         """
-        Simulate the 5 defined habits events by putting in random values with different weights \n
-        completed can be either true or false \n
-        time_invested is optional and passed as 0 when not used or a defined range \n
-        also  simulates a skip of the habit e.g. when the user forgot to check the habit
+        Simulate the 5 defined habits events by putting in random values with different weights.
+
+        completed can be either true or false
+
+        time_invested is optional and passed as 0 when not used or a defined range
+
+        also simulates a skip of the habit e.g. when the user forgot to check the habit
+
         """
         # "practice guitar"
         days = self.duration
@@ -207,9 +217,7 @@ class SampleData:
                 # print("skipping")
 
     def closing_connections(self) -> None:
-        """
-        Close the database connections to avoid a file lock
-        """
+        """Close the database connections to avoid a file lock."""
         self.habit_one.database.close_connection()
         self.habit_two.database.close_connection()
         self.habit_three.database.close_connection()

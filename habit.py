@@ -1,21 +1,20 @@
-"""
-Contains the habit tracker logic.\n
-"""
+"""Contains the habit tracker logic."""
 from datetime import date, timedelta, datetime
 from db import Database
 
 
 class Habit:
-    """
-    Habit class for the general habit tracker logic.\n
-    """
+    """Habit class for the general habit tracker logic."""
 
     def __init__(self, name: str = None, description: str = None, periodicity: int = None, default_time: int = None,
                  db_filename: str = None, user_mode: bool = None) -> None:
         """
-        Initializing the necessary definition of a habit with name, description, periodicity and default_time_value.\n
-        Saving the current date and setting the date format for date to string conversion\n
-        Connect to the database using db_filename.\n
+        Initialize the necessary definition of a habit with name, description, periodicity and default_time_value.
+
+        Saving the current date and setting the date format for date to string conversion
+
+        Connect to the database using db_filename.
+
         :param name: str name of a habit (default "")
         :param description: str description of a habit (default "")
         :param periodicity: int periodicity of a habit (currently only 1 and 7 is supported) (default 0)
@@ -67,14 +66,13 @@ class Habit:
         self.initialize_database()
 
     def initialize_database(self) -> None:
-        """
-        Calls the database initialization method which creates two tables.\n
-        """
+        """Call the database initialization method which creates two tables."""
         self.database.initialize_database()
 
     def is_existing(self, habit_name: str) -> bool:
         """
-        Checks if there is a database entry for given name.\n
+        Check if there is a database entry for given name.
+
         :param habit_name: str name of a habit
         :return: bool True if there is a record, False if there is none
         """
@@ -82,7 +80,8 @@ class Habit:
 
     def set_id(self, habit_name: str) -> bool:
         """
-        Sets the habit unique id value for given name.\n
+        Set the habit unique id value for given name.
+
         :param habit_name: str name of a habit
         :return: bool True if there is an id found in the database, False if there is none
         """
@@ -94,7 +93,8 @@ class Habit:
 
     def set_periodicity(self, habit_id: int) -> bool:
         """
-        Sets the habit periodicity value for given id.\n
+        Set the habit periodicity value for given id.
+
         :param habit_id: int id of a habit
         :return: bool True if there is a periodicity found in the database, False if there is none
         """
@@ -106,7 +106,8 @@ class Habit:
 
     def set_next_periodicity_due_date(self, habit_id: int) -> bool:
         """
-        Sets the habit next periodicity due date value for given id.\n
+        Set the habit next periodicity due date value for given id.
+
         :param habit_id: int id of a habit
         :return: bool True if there is a habit next periodicity due date found in the database, False if there is none
         """
@@ -118,7 +119,8 @@ class Habit:
 
     def set_default_time(self, habit_id: int) -> bool:
         """
-        Sets the habit default time value for given id.\n
+        Set the habit default time value for given id.
+
         :param habit_id: int id of a habit
         :return: bool True if there is a default time found in the database, False if there is none
         """
@@ -130,7 +132,8 @@ class Habit:
 
     def set_name(self, habit_id: int) -> bool:
         """
-        Sets the habit name value for given id.\n
+        Set the habit name value for given id.
+
         :param habit_id: int id of a habit
         :return: bool True if there is a name found in the database, False if there is none
         """
@@ -142,7 +145,8 @@ class Habit:
 
     def create_habit(self, created_date: date = None, next_periodicity_due_date: date = None) -> bool:
         """
-        Inserts a new habit into the habits table.\n
+        Insert a new habit into the habits table.
+
         :param created_date: date of the change
         :param next_periodicity_due_date: date of next periodicity due date
         :return: bool True if the creation was successful, False if not or a database error occurred
@@ -164,9 +168,13 @@ class Habit:
     def create_event_update(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) \
             -> bool:
         """
-        Inserts a new event into the habits_events table. If the user mode is active a new date will be created, else it
-        will use the date provided. When the time value is 0, default time will be used.\n
-        If completed is False the time value will be set to 0, else it will use the time provided.\n
+        Insert a new event into the habits_events table.
+
+        If the user mode is active a new date will be created, else it will use the date provided. When the time value
+        is 0, default time will be used.
+
+        If completed is False the time value will be set to 0, else it will use the time provided.
+
         :param completed: bool True if the habit was a success, False if not
         :param next_periodicity_due_date: date of next periodicity due date
         :param change_date: date of the change
@@ -192,13 +200,14 @@ class Habit:
     def create_event(self, name: str, next_periodicity_due_date: date, change_date: date = None) \
             -> tuple[str, dict]:
         """
-        The event logic, to decide if it is a simple update, too early to update or an update with additional fills.\n
+        Event logic, to decide if it is a simple update, too early to update or an update with additional fills.
+
         :param name: str habit name
         :param next_periodicity_due_date: date next_periodicity_due_date
         :param change_date: date of change
-        :return: str status and dict missed_dates, status can be "normal","too early" or "with fill". missed_dates
-        always provides on the first (0) key the current periodicity range start as date, on a fill the fills are
-        starting at the second (1) key with their dates as values.
+        :return: str status and dict missed_dates, status can be "normal","too early" or "with fill".
+         missed_dates always provides on the first (0) key the current periodicity range start as date, on a fill the
+         fills are starting at the second (1) key with their dates as values.
         """
         if self.is_existing(name):
             self.set_id(name)
@@ -229,13 +238,14 @@ class Habit:
 
     def create_event_fill(self, update_lower_range: date) -> tuple[date, dict]:
         """
-        Fill events if there are missed events.\n
-        :param update_lower_range:
+        Fill events if there are missed events.
+
+        :param update_lower_range: date of lower range of next periodicity due date
         :return: dict of number of miss and the date when this miss occurred. This dict uses a human-readable format and
-        starts at 1
+         starts at 1
         """
-        missed: int = int(((self.date_today - timedelta(days=self.periodicity)) - update_lower_range)
-                          / timedelta(days=self.periodicity))
+        missed: int = int(((self.date_today - timedelta(days=self.periodicity)) - update_lower_range) / timedelta(
+            days=self.periodicity))
         missed_dates: dict = {}
         for i in range(missed):
             missed_dates[i + 1] = str(update_lower_range)
@@ -246,7 +256,8 @@ class Habit:
 
     def analyse_all_active(self) -> list:
         """
-        Read all habit records from the database that do not have the status finished.\n
+        Read all habit records from the database that do not have the status finished.
+
         :return: list of all habits in format [id, name, description, periodicity, default_time, created_date,
          next_periodicity_due_date]
         """
@@ -255,7 +266,8 @@ class Habit:
 
     def analyse_all_active_same_periodicity(self, periodicity: int) -> list:
         """
-        Read all habit records from the database that do not have the status finished and share the same periodicity.\n
+        Read all habit records from the database that do not have the status finished and share the same periodicity.
+
         :param periodicity: int periodicity (currently 1 or 7)
         :return: list of all habits in format [id, name, description, periodicity, default_time, created_date,
          next_periodicity_due_date]
@@ -265,8 +277,11 @@ class Habit:
 
     def analyse_longest_streak(self, habit_id: int = None) -> tuple:
         """
-        Read all habit events from the habits_events table and calculates the longest streak. If a habit id is provided
-        it will check only the events of this one, if none is provided all habits and their events will be considered.\n
+        Read all habit events from the habits_events table and calculates the longest streak.
+
+        If a habit id is provided it will check only the events of this one, if none is provided all habits and their
+        events will be considered.
+
         :param habit_id: int the id of a habit
         :return: tuple of (highest_habit_id, highest_count_overall) or empty tuple if no streak was found
         """
@@ -302,7 +317,8 @@ class Habit:
 
     def analyse_time(self, habit_id: int) -> int:
         """
-        Read all habit events for the given habit id from the habits_events table and calculates the time summary.\n
+        Read all habit events for the given habit id from the habits_events table and calculates the time summary.
+
         :param habit_id: int the id of a habit
         :return: int time_summary  or -1 if no events were found
         """
@@ -319,7 +335,8 @@ class Habit:
 
     def delete(self, habit_id: int) -> bool:
         """
-        Delete a habit and all its events from the database.\n
+        Delete a habit and all its events from the database.
+
         :param habit_id: int id of a habit
         :return: bool True if the removal was successful, False if not or a database error occurred
         """
@@ -330,6 +347,7 @@ class Habit:
     def get_event_count(self, habit_id: int) -> int:
         """
         Read all events from the database and output the count as a number of these.
+
         :param habit_id: int id of a habit
         :return: int the length of all events
         """
@@ -338,7 +356,8 @@ class Habit:
 
     def manipulate_time(self, offset: int) -> None:
         """
-        Offsets the current date_today by an int to go back in time or into the future
+        Offset the current date_today by an int to go back in time or into the future.
+
         :param offset: int negative or positive number as days
         """
         self.date_today += timedelta(days=offset)

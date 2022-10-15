@@ -1,13 +1,10 @@
-"""
-Cli module for handling user input and validating
-"""
+"""Cli module for handling user input and validating these."""
 from os import system
 
 
 class Cli:
-    """
-    The Cli class consist of a validation, a menu method and two helpers (wait-for-key and clear-terminal).
-    """
+    """The Cli class consist of a validation, a menu method and two helpers (wait-for-key and clear-terminal)."""
+
     # Validation Method
     # This method has 2 properties, a validation function/a type to validate and validation questions
     #
@@ -49,11 +46,16 @@ class Cli:
 
     def __init__(self) -> None:
         """
-        Initializes basic objects for the validator which consist of a dictionary for functions with the identifier item
-        "text" and a question object with the identifier item "text" in it.\n
+        Initialize basic objects for the validator.
+
+        The basic objects consist of a dictionary for functions with the identifier item "text" and a question object
+        with the identifier item "text" in it.
+
         Example Usage: cli.validate("text", "text") will validate input of text and check if it only contains numerical
-        and/or alphabetical content.\n
+        and/or alphabetical content.
+
         the variable interactive_mode is used to control if the helpers (wait-for-key and clear-terminal) are used.
+
         """
         self.validate_functions: dict = {"text": "any",
                                          "choice": ["y", "n"],
@@ -90,9 +92,12 @@ class Cli:
 
     def validate(self, validation_type: str, question_object: str) -> bool | str | int:
         """
-        This function is validating the user input by the combination of the type of input and the objects this
-        type allows.\n
-        The loop will re-ask the user if he gave a wrong answer until he gives the correct answer.\n
+        Validate the user input.
+
+        It validates by the combination of the type of input and the objects this type allows.
+
+        The loop will re-ask the user if he gave a wrong answer until he gives the correct answer.
+
         :param validation_type: The type of the input, this can be any defined option of validate_functions
         :param question_object:  The questions that will be asked
         :return: returns the validated input of the user
@@ -103,13 +108,13 @@ class Cli:
             option_one = self.validate_functions[validation_type][0]
             option_two = self.validate_functions[validation_type][1]
         else:
-            raise Exception(str(validation_type)+" has no validation function")
+            raise Exception(str(validation_type) + " has no validation function")
 
         if question_object in self.questions:
             question_type = self.questions[question_object][0]
             questions_options = self.questions[question_object][1]
         else:
-            raise Exception(str(question_object)+" has no validation question")
+            raise Exception(str(question_object) + " has no validation question")
 
         # Validation loop start
         validation_input: str | int | bool = ""
@@ -172,7 +177,8 @@ class Cli:
 
     def menu(self, menu_name: str = None, menu_options: dict = None, menu_functions: dict = None) -> None:
         """
-        The menu will be created via the parameters and loop until an associated option is found.\n
+        Menu will be created via the parameters and loop until an associated option is found.
+
         :param menu_name: The name text of the menu to be displayed
         :param menu_options: The options the menu does have
         :param menu_functions: The functions for the menu options
@@ -211,15 +217,11 @@ class Cli:
                 print("This was not a number you entered!\nPlease enter a number of an existing option!")
 
     def helper_wait_for_key(self) -> None:
-        """
-        Simple input function with text to give the user the chance to read his last actions\n
-        """
+        """Print text and wait for user input to let the user read the output of his last actions."""
         if self.interactive_mode:
             input("...press enter to continue...\n>")
 
     def helper_clear_terminal(self) -> None:
-        """
-        Clears the terminal for better and clearer visibility\n
-        """
+        """Clear the terminal for better and clearer visibility."""
         if self.interactive_mode:
             system('cls||clear')

@@ -1,12 +1,11 @@
-"""
-Contains definitions of various cli parts and the general flow of the interaction with the cli.
-"""
+"""Contains definitions of various cli parts and the general flow of the interaction with the cli."""
 
 
 # Definitions
 def cli_definitions(cli, habit) -> None:
     """
-    Contains the definitions for the cli interface, including menu-options and -functions.\n
+    Contains the definitions for the cli interface, including menu-options and -functions.
+
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -82,7 +81,8 @@ def cli_definitions(cli, habit) -> None:
 # Helpers
 def helper_type_conversions(argument: str | bool | int) -> str | int:
     """
-    A helper to convert types to a human-readable format or vice versa.\n
+    Convert types to a human-readable format or vice versa.
+
     :param argument: str daily or weekly, bool True or False, int 0, 1, 6 and 7
     :return: str daily returns int 1; str weekly returns int 7; bool True returns str successful;
      bool False returns str failed; int 0 returns str days, int 1 returns str daily; int 6 returns  str weeks;
@@ -113,7 +113,8 @@ def helper_type_conversions(argument: str | bool | int) -> str | int:
 
 def helper_format_and_output(result: list) -> None:
     """
-    Formatting the habit details in a tabular form.\n
+    Format the habit details in a tabular form.
+
     :param result: a list containing: id, name, description, periodicity, default_time_value, created_date
      and next_periodicity_due_date
     """
@@ -142,13 +143,20 @@ def helper_format_and_output(result: list) -> None:
 # General Flow
 def create_habit(cli, habit) -> None:
     """
-    Interactive mode flow for creating a habit.\n
-    Steps:\n
-    1 Ask for name\n
-    2 Ask for description\n
-    3 Ask for periodicity\n
-    4 Ask for default time\n
-    5 Output status of create, on success provide all details, on failure print error message\n
+    Interactive mode flow for creating a habit.
+
+    Steps:
+
+    1 Ask for name
+
+    2 Ask for description
+
+    3 Ask for periodicity
+
+    4 Ask for default time
+
+    5 Output status of create, on success provide all details, on failure print error message
+
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -179,12 +187,18 @@ def create_habit(cli, habit) -> None:
 
 def update_habit(cli, habit) -> None:
     """
-    Interactive mode flow for updating a habit.\n
-    Steps:\n
-    1 Ask for name\n
-    2 Ask for time\n
-    3 Ask if completed\n
-    4 Output status of update, on success provide all details, on failure print error message\n
+    Interactive mode flow for updating a habit.
+
+    Steps:
+
+    1: Ask for name
+
+    2: Ask for time
+
+    3: Ask if completed
+
+    4: Output status of update, on success provide all details, on failure print error message
+
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -247,11 +261,16 @@ def update_habit(cli, habit) -> None:
 
 def delete_habit(cli, habit) -> None:
     """
-    Interactive mode flow for deleting a habit.\n
-    Steps:\n
-    1 Ask for name\n
-    2 Ask if user is sure\n
-    3 Output status of delete, on success provide success message, on failure print error message\n
+    Interactive mode flow for deleting a habit.
+
+    Steps:
+
+    1: Ask for name
+
+    2: Ask if user is sure
+
+    3: Output status of delete, on success provide success message, on failure print error message
+
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -277,7 +296,8 @@ def delete_habit(cli, habit) -> None:
 
 def analyse_habits_all_active(cli, habit) -> None:
     """
-    Interactive mode flow for analysing all active habits, will display all habits in a tabular form.\n
+    Interactive mode flow for analysing all active habits, prints out all in a tabular form.
+
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -296,8 +316,8 @@ def analyse_habits_all_active(cli, habit) -> None:
 
 def analyse_habits_same_periodicity(cli, habit) -> None:
     """
-    Interactive mode flow for analysing all active habits with the same periodicity, will display all habits in a
-    tabular form.\n
+    Interactive mode flow for analysing all active habits with the same periodicity, prints out all in a tabular form.
+
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -317,6 +337,7 @@ def analyse_habits_same_periodicity(cli, habit) -> None:
 def analyse_all_habits_longest_streak(cli, habit) -> None:
     """
     Interactive mode flow for analysing the longest streak of all habits, will print the best habit, and its streak.
+
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -344,8 +365,10 @@ def analyse_all_habits_longest_streak(cli, habit) -> None:
 
 def analyse_habit_longest_streak(cli, habit) -> None:
     """
-    Interactive mode flow for analysing the longest streak of a given habit, takes a name and will print the habit's
-    streak.\n
+    Interactive mode flow for analysing the longest streak of a given habit.
+
+    Takes a name and will print the habits streak.
+
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -373,8 +396,10 @@ def analyse_habit_longest_streak(cli, habit) -> None:
 
 def analyse_habit_time(cli, habit) -> None:
     """
-    Interactive mode flow for analysing the time summary of a given habit, takes a name and will print the habit's
-    time summary in a formatted way as minutes, hours or days.\n
+    Interactive mode flow for analysing the time summary of a given habit.
+
+    Takes a name and will print the habit's time summary in a formatted way as minutes, hours or days.
+
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -404,8 +429,10 @@ def analyse_habit_time(cli, habit) -> None:
 
 def analyze_habits(cli, habit, option: str) -> None:
     """
-    Interactive mode flow for the decision chosen in the analyse submenu, will also run the submenu again after an
-    output has been made\n
+    Interactive mode flow for the decision chosen in the analyse submenu.
+
+    Runs the submenu also again after an output has been made.
+
     :param cli: a cli object
     :param habit: a habit object
     :param option: "all", "all same periodicity", "longest streak of all" , "longest streak" or "time"
