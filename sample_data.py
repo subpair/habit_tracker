@@ -1,26 +1,31 @@
+"""
+Contains a sample data generator.
+"""
 from random import choices, randrange
 from habit import Habit
 
 
 class SampleData:
+    """
+    SampleData class for generating random events
+    """
     def __init__(self, duration: int, db_filename: str = None) -> None:
         """
         Initialize the sampledata object with a duration value for which the simulated events take place \n
         Steps:\n
-        1: Set the database filename\n
+        1: Set the database filename and initialize the sample database\n
         2: Initialize 5 predefined habits\n
         :param duration: time in days of which the sample data is offset
         """
-
         self.duration: int = duration
-        # 1 set database filename and initialize database
+        # 1 Set the database filename and initialize the sample database
         if db_filename is None:
             self.db_filename: str = "sample.db"
         else:
             self.db_filename = db_filename
-        self.habit = Habit(db_filename=self.db_filename)
-        self.habit.initialize_database()
-        self.habit.database.close_connection()
+        self.habit_sample = Habit(db_filename=self.db_filename)
+        self.habit_sample.initialize_database()
+        self.habit_sample.database.close_connection()
 
         # 2 initialize habit objects
         self.habit_one = Habit(db_filename=self.db_filename)
@@ -32,11 +37,10 @@ class SampleData:
     def create_habits(self) -> None:
         """
         Steps:\n
-        1: Set the values name, description, periodicity and default_time_value for the 5 predefined habits \n
-        2: Negate the duration value of the simulation, so the sample data becomes usable today\n
-        3: Store the habits in the database
+        1: Set the values name, description, periodicity, default_time_value and user_mode for the 5 predefined habits
+        and negate the duration value of the simulation, so the sample data becomes usable today\n
+        2: Store the habits in the database
         """
-
         # 1 assigning the habit definitions and manipulating the time value
         self.habit_one.name = "practice guitar"
         self.habit_one.description = "for at least 30min"
@@ -80,15 +84,13 @@ class SampleData:
         self.habit_four.create_habit()
         self.habit_five.create_habit()
 
-    def simulate_events(self) -> int:
+    def simulate_events(self) -> None:
         """
         Simulate the 5 defined habits events by putting in random values with different weights \n
         completed can be either true or false \n
         time_invested is optional and passed as 0 when not used or a defined range \n
         also  simulates a skip of the habit e.g. when the user forgot to check the habit
         """
-
-        creation_count: int = 0
         # "practice guitar"
         days = self.duration
         # print("simulating events for {days} days".format(days=days))
@@ -107,8 +109,7 @@ class SampleData:
                 self.habit_one.set_periodicity(self.habit_one.unique_id)
                 self.habit_one.set_default_time(self.habit_one.unique_id)
                 self.habit_one.set_next_periodicity_due_date(self.habit_one.unique_id)
-                events = self.habit_one.create_event(self.habit_one.name, self.habit_one.next_periodicity_due_date)
-                creation_count += (len(events)+1)
+                self.habit_one.create_event(self.habit_one.name, self.habit_one.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")
@@ -131,8 +132,7 @@ class SampleData:
                 self.habit_two.set_periodicity(self.habit_two.unique_id)
                 self.habit_two.set_default_time(self.habit_two.unique_id)
                 self.habit_two.set_next_periodicity_due_date(self.habit_two.unique_id)
-                events = self.habit_two.create_event(self.habit_two.name, self.habit_two.next_periodicity_due_date)
-                creation_count += (len(events)+1)
+                self.habit_two.create_event(self.habit_two.name, self.habit_two.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")
@@ -155,8 +155,7 @@ class SampleData:
                 self.habit_three.set_periodicity(self.habit_three.unique_id)
                 self.habit_three.set_default_time(self.habit_three.unique_id)
                 self.habit_three.set_next_periodicity_due_date(self.habit_three.unique_id)
-                events = self.habit_three.create_event(self.habit_three.name, self.habit_three.next_periodicity_due_date)
-                creation_count += (len(events)+1)
+                self.habit_three.create_event(self.habit_three.name, self.habit_three.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")
@@ -179,8 +178,7 @@ class SampleData:
                 self.habit_four.set_periodicity(self.habit_four.unique_id)
                 self.habit_four.set_default_time(self.habit_four.unique_id)
                 self.habit_four.set_next_periodicity_due_date(self.habit_four.unique_id)
-                events = self.habit_four.create_event(self.habit_four.name, self.habit_four.next_periodicity_due_date)
-                creation_count += (len(events)+1)
+                self.habit_four.create_event(self.habit_four.name, self.habit_four.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")
@@ -203,18 +201,15 @@ class SampleData:
                 self.habit_five.set_periodicity(self.habit_five.unique_id)
                 self.habit_five.set_default_time(self.habit_five.unique_id)
                 self.habit_five.set_next_periodicity_due_date(self.habit_five.unique_id)
-                events = self.habit_five.create_event(self.habit_five.name, self.habit_five.next_periodicity_due_date)
-                creation_count += (len(events)+1)
+                self.habit_five.create_event(self.habit_five.name, self.habit_five.next_periodicity_due_date)
             else:
                 pass
                 # print("skipping")
-        return creation_count
 
-    def closing_connections(self):
+    def closing_connections(self) -> None:
         """
-        Close the database connections to avoid file locks
+        Close the database connections to avoid a file lock
         """
-
         self.habit_one.database.close_connection()
         self.habit_two.database.close_connection()
         self.habit_three.database.close_connection()

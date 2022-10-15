@@ -1,15 +1,24 @@
+"""
+Unittest for habit module and general application features
+"""
 from os import remove
 from datetime import date,timedelta
 from habit import Habit
 from sample_data import SampleData
 
 
-class Tests:
-
+class TestProject:
+    """
+    Test class for project tests.
+    """
     def setup_method(self) -> None:
+        """
+        Initialize a test habit and create one event for it.
+        Afterwards initialize another habit object which is used in further tests.
+        """
         self.test_db_filename: str = "test.db"
         self.habit = Habit("dummy object", db_filename=self.test_db_filename)
-        self.habit.database.initialize_database()
+        self.habit.initialize_database()
         assert len(self.habit.database.read_database_structure()) == 3
         self.habit.description = "dummy for testing"
         self.habit.periodicity = 1
@@ -25,6 +34,9 @@ class Tests:
         self.habit_one = Habit("practice guitar", db_filename=self.test_db_filename)
 
     def test_dummy_exists_and_has_event(self) -> None:
+        """
+        Test if the dummy habit was created and has one event.
+        """
         assert self.habit.is_existing(self.habit.name) is True
         assert self.habit.get_event_count(self.habit.unique_id) == 1
 
@@ -36,7 +48,7 @@ class Tests:
 
     def test_set_id(self) -> None:
         """
-        Look for a habit which does not exist
+        Test the id assignment and if it is 0 when no record with a given name exists
         """
         habit_name = "unknown"
         self.habit_unknown = Habit(habit_name, db_filename=self.test_db_filename)
@@ -49,7 +61,8 @@ class Tests:
 
     def test_set_properties(self) -> None:
         """
-        Look for a habit which does not exist
+        Test the property assignments of periodicity, next_periodicity_due_date, default_time and name and if they have
+        default values if there are no valid records for them.
         """
         habit_name = "unknown"
         self.habit_unknown = Habit(habit_name, db_filename=self.test_db_filename)
@@ -67,16 +80,19 @@ class Tests:
         assert self.habit.periodicity == 1
 
         self.habit.set_next_periodicity_due_date(self.habit.unique_id)
+        # Because there is already one event, the next periodicity due date will be 2 days later instead of 1
+        next_date = False
         if self.habit.next_periodicity_due_date == self.habit.date_today+timedelta(days=2*self.habit.periodicity):
             next_date = True
-        else:
-            next_date = False
         assert next_date is True
 
         self.habit.set_default_time(self.habit.unique_id)
         assert self.habit.default_time == 30
 
     def test_create_habit(self) -> None:
+        """
+        Test the creation of a new habit.
+        """
         self.habit_one.description = "for at least 30min"
         self.habit_one.periodicity = 1
         self.habit_one.default_time = 30
@@ -85,17 +101,26 @@ class Tests:
         assert self.habit_one.is_existing(self.habit_one.name) is True
 
     def test_create_event_simple(self) -> None:
+        """
+        Test the creation of another event by using the simple event update function.
+        """
         self.habit.create_event_update(True, self.habit.next_periodicity_due_date)
 
         assert self.habit.get_event_count(self.habit.unique_id) == 2
 
     def test_create_delayed_event(self) -> None:
+        """
+        Test the creation of another event by using the event logic function and if the fills are correct.
+        """
         self.habit.manipulate_time(+7)
         self.habit.create_event(self.habit.name, self.habit.next_periodicity_due_date)
 
         assert self.habit.get_event_count(self.habit.unique_id) == 7
 
     def test_analyse(self) -> None:
+        """
+        Test the analyse function and if they all put out the existing event and the correct detail for this.
+        """
         assert len(self.habit.analyse_all_active()) == 1
         assert len(self.habit.analyse_all_active_same_periodicity(1)) == 1
         assert self.habit.analyse_longest_streak() == (1, 1)
@@ -103,20 +128,29 @@ class Tests:
         assert self.habit.analyse_time(self.habit.unique_id) == 30
 
     def test_delete_habit(self) -> None:
+        """
+        Test the deletion of a habit and if the record is not existing anymore.
+        """
         self.habit.delete(self.habit.unique_id)
         assert self.habit.is_existing(self.habit.name) is False
 
     def test_sample_data(self):
+        """
+        Test the sample data and if all 5 sample habits are created and their event data is inserted.
+        """
         samples = SampleData(31, "test.db")
         samples.create_habits()
         samples.simulate_events()
-
+        # There will be 6 events as we have the dummy from this test also
         assert len(samples.habit_one.database.read_habits()) == 5 + 1
-        assert len(samples.habit_one.database.read_events()) > 6
+        # There should be at-least 6 entries. (the real value with current weights is around ~120)
+        assert len(samples.habit_one.database.read_events()) > 5 + 1
         samples.closing_connections()
 
     def teardown_method(self) -> None:
+        """
+        Close the database connections and remove the database file
+        """
         self.habit.database.close_connection()
         self.habit_one.database.close_connection()
         remove(self.test_db_filename)
-
