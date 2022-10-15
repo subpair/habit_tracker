@@ -13,8 +13,6 @@ if __name__ == "__main__":
     cli.interactive_mode = True
     # Habit user mode means the date is updated on every create/update
     habit.user_mode = False
-    # Dev mode is used to opt in developer options into the menu
-    cli.dev_mode = True
     # Load all definitions for the interactive mode
     cli_habit.cli_definitions(cli, habit)
 
@@ -36,8 +34,8 @@ if __name__ == "__main__":
                 samples.simulate_events()
                 print("Loading database...")
             habit.database.close_connection()
-            habit.database.__init__(samples.db_filename)
-
+            habit.database.file_name = "sample.db"
+            habit.database.open_connection()
             print("Sample database loaded!")
             cli.helper_wait_for_key()
 

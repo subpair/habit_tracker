@@ -9,7 +9,9 @@ def cli_definitions(cli, habit) -> None:
                                    "choice": ["y", "n"],
                                    "number": [0, 1440]})
 
-    # question definitions00000000
+    # question definitions
+    cli.main_menu_name = "main"
+
     cli.questions.update({"name": ["the habit name", "Any text is valid up to 20 letters"],
                           "description": ["the description of the habit", "Any text is valid up to 30 letters"],
                           "periodicity": ["the periodicity of the habit", "[daily] and [weekly]"],
@@ -17,8 +19,8 @@ def cli_definitions(cli, habit) -> None:
                           "time": ["a time value", "Any number up to 1440 is valid.\n"
                                                    "This is optional,if you want to skip this enter 0"],
                           "safety": ["if you are sure you want to do this action", "[y]es or [n]o"],
-                          "database": ["if you want to load the sample database or use your own", "[y]es to use sample "
-                                                                                                  "database or [n]o to use your own"]})
+                          "database": ["if you want to load the sample database or use your own",
+                                       "[y]es to use sample database or [n]o to use your own"]})
 
     # main menu definitions
     cli.main_menu_options.update({0: "Show menu",
@@ -58,8 +60,9 @@ def cli_definitions(cli, habit) -> None:
 
     cli.message_error = "An unknown error occurred. Please copy the previous output and send it to developer :)"
 
-    # DEV
-    if cli.dev_mode:
+    # Dev mode is used to opt in developer options into the menu
+    dev_mode = True
+    if dev_mode:
         cli.main_menu_options.update({11: "manipulate time", 12: "show db habits", 13: "show db events"})
         cli.main_menu_functions.update({11: lambda: [habit.manipulate_time(offset=int(input())),
                                                      print(habit.date_today), cli.helper_wait_for_key()],
@@ -105,9 +108,9 @@ def helper_format_and_output(result: list) -> None:
           .format("Name", "Description", "Periodicity", "Def. time", "Start date", "Due date"))
     print("{0:_^100}".format("_"))
     for i in result:
-        name: str = i[1]
-        description: str = i[2]
-        periodicity: str = helper_type_conversions(i[3])
+        name: str = str(i[1])
+        description: str = str(i[2])
+        periodicity: str = str(helper_type_conversions(i[3]))
         default_time_value: str = str(i[4])
         created_date: str = str(i[5])
         next_periodicity_due_date: str = str(i[6])
@@ -167,7 +170,7 @@ def update_habit(cli, habit) -> None:
         habit.completed = cli.validate("choice", "completed")
         # This could be changed to make dynamic inserts instead of on next available date
         create_status = habit.create_event(habit.name, habit.next_periodicity_due_date)
-        completed: str = helper_type_conversions(habit.completed)
+        completed: str = str(helper_type_conversions(habit.completed))
         if create_status[0] == "normal":
             cli.helper_clear_terminal()
             habit.next_periodicity_range_start = create_status[1][0]

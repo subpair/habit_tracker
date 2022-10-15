@@ -163,12 +163,8 @@ class Habit:
             update_lower_range = self.next_periodicity_due_date - timedelta(days=self.periodicity)
         return update_lower_range, missed_dates
 
-    def delete(self, habit_id: int) -> bool:
-        delete = self.database.delete_habit_and_events(habit_id)
-        return delete
-
     def analyse_all_active(self) -> list:
-        result: list = self.database.read_habits_by_finished()
+        result: list = self.database.read_habits_by_not_finished()
         return result
 
     def analyse_all_active_same_periodicity(self, periodicity: int) -> list:
@@ -218,6 +214,9 @@ class Habit:
             return time_summary
         return 0
 
+    def delete(self, habit_id: int) -> bool:
+        delete = self.database.delete_habit_and_events(habit_id)
+        return delete
     # Methods currently only used in unit testing
 
     def get_event_count(self, habit_id: int) -> int:

@@ -13,11 +13,25 @@ class Database:
         """
 
         if file_name is None:
-            file_name = "main.db"
+            self.file_name = "main.db"
+        self.file_name = file_name
         try:
-            self.db_connection: sqlite3.Connection = connect(file_name)
+            self.db_connection: sqlite3.Connection = connect(self.file_name)
         except Error as err:
             print(err)
+
+    def open_connection(self) -> bool:
+        """
+        Close database connection \n
+        :return: True on success, False on error
+        """
+
+        try:
+            self.db_connection: sqlite3.Connection = connect(self.file_name)
+            return True
+        except Error as err:
+            print(err)
+            return False
 
     def close_connection(self) -> bool:
         """
@@ -280,7 +294,7 @@ class Database:
             return False
 
     # Analyse functions
-    def read_habits_by_finished(self) -> list:
+    def read_habits_by_not_finished(self) -> list:
         """
         Gets all habits that are active \n
         :return: returns all records from the habits' table which do not have the finished status, will be an empty list
