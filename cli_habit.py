@@ -79,7 +79,7 @@ def cli_definitions(cli, habit) -> None:
 
 
 # Helpers
-def helper_type_conversions(argument: str | bool | int) -> str | int:
+def helper_type_conversions(argument: str or bool or int) -> str or int:
     """
     Convert types to a human-readable format or vice versa.
 

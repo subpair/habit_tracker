@@ -50,8 +50,8 @@ inserting the habit name.
 
 ## Installation
 
-The only requirement is pytest for unittests, a requirements file is attached, so you can install this by opening a 
-shell and typing in:
+The only requirement is pytest for unittests if you want to run tests, a requirements file is attached, so you can 
+install this by opening a shell and typing in:
 
 ```shell
 pip install -r requirements.txt
