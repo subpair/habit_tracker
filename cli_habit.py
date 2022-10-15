@@ -225,7 +225,7 @@ def update_habit(cli, habit) -> None:
                           next_periodicity_due_date=habit.next_periodicity_due_date))
         elif create_status[0] == "too early":
             cli.helper_clear_terminal()
-            print("You cannot update the habit \"{name}\" at the moment! The next time will be on the "
+            print("You cannot update the habit \"{name}\" at the moment!\nThe next time will be on the "
                   "\"{update_lower_range}\"".format(name=habit.name, update_lower_range=create_status[1][0]))
         elif create_status[0] == "with fill":
             cli.helper_clear_terminal()
@@ -345,7 +345,7 @@ def analyse_all_habits_longest_streak(cli, habit) -> None:
     highest_count_overall: int
     if habit.analyse_longest_streak() != ():
         highest_habit_id, highest_count_overall = habit.analyse_longest_streak()
-        if highest_habit_id == 0 or highest_count_overall == 1 or highest_count_overall == 0:
+        if highest_habit_id == 0 or highest_count_overall in (1, 0):
             print("There is currently no streak ongoing at all!")
         else:
             habit.set_name(highest_habit_id)
@@ -380,7 +380,7 @@ def analyse_habit_longest_streak(cli, habit) -> None:
         highest_habit_id, highest_count_overall = habit.analyse_longest_streak(habit.unique_id)
         if highest_habit_id == 0:
             print("The habit \"{name}\" was not updated yet!".format(name=name))
-        elif 0 == highest_count_overall == 1:
+        elif highest_count_overall in (1, 0):
             print("The habit \"{name}\" does not have a streak currently!".format(name=name))
         else:
             habit.set_periodicity(highest_habit_id)
