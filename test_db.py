@@ -97,7 +97,7 @@ class TestDatabase:
         assert len(self.database.read_habits_by_not_finished()) >= 1
 
     def test_analyse_get_same_periodicity(self) -> None:
-        """Test reading all habits with the periodicity 0 (="daily")"""
+        """Test reading all habits with the periodicity 1 (="daily")"""
         assert len(self.database.read_habits_by_periodicity(1)) >= 1
 
     def test_delete_habit_and_events(self) -> None:

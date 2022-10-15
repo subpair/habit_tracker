@@ -367,7 +367,7 @@ def analyse_habit_longest_streak(cli, habit) -> None:
     """
     Interactive mode flow for analysing the longest streak of a given habit.
 
-    Takes a name and will print the habits streak.
+    Takes a name and will print the habit's streak.
 
     :param cli: a cli object
     :param habit: a habit object

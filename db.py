@@ -57,8 +57,8 @@ class Database:
         Initialize the database with two tables.
 
         >habits
-            This table stores the metadata of the habits which includes a name, description, periodicity, default_time,
-            created_date, next_periodicity_due_date, finish_date and the finished status.
+            This table stores the metadata of the habits, a habit includes the properties name, description,
+            periodicity, default_time,created_date, next_periodicity_due_date, finish_date and the finished status.
 
             Every entry in this table will get also a primary key assigned called unique_id.
 

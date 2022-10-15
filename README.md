@@ -1,11 +1,17 @@
 # My Habit Tracker Application
 
 This program is a backend for a habit tracking application that includes a custom command line interface to use the 
-basic functionalities. 
+basic functionalities.
 
-This program was built with Python 3.10.6.
+It was written for the IU University's course *"DLBDSOOFPP01" - Object-Oriented and Functional Programming with Python*.
+
+This program was built with Python 3.10.
 
 ## What is it?
+
+A habit tracker application is in general like a todo list whose tasks are coupled to specific dates.
+This application can be used to keep track of those and provide you with analytics about how you kept up with those for 
+a specific time range, referred here as a periodicity. 
 
 ### A habits' properties
 A habit consists of \
@@ -14,31 +20,31 @@ A habit consists of \
 -A periodicity/the time range of a task (daily or weekly) \
 -An optional default time value (a number from 0 to 1440)
 
-A habit task can be completed after creation either on the current periodicity it was created or the next periodicity. 
-If the user wants to complete a task after this so-called due date, the application will automatically fill in the time
-in between the current date and the last event record.
+A habit task can be completed after creation either on the current periodicity it was created or the next periodicity.
+If the user wants to complete a task and already exceeded the so-called due date, which is usually the last day of the 
+next periodicity, is already past the application will automatically fill the time between the current date and the 
+last time the task was updated.
 
 #### Data Storage
 This program stores the habits and its events locally in a sqlite database as a file.
 
-A sample database is provided and can be used to get an overview of the program. 
+A sample database is provided and can be used to get an overview of the program and test out all functionalities. 
 
 ### Functionalities
-The current implementation can track daily and weekly habits. 
-#### Create a habit function
+#### Create a habit
 A habit can be created by giving it a name and assigning a short description, a periodicity that can currently be daily 
 or weekly and a default time value that can be used to skip entering a time value on each update.
-#### Update a habit function
+#### Update a habit
 A habit can be updated for the current periodicity via the update function either on the day/week it was created or the 
 day/week after, but once that day/week is over the habit will be marked as failed.
-#### Analyse habits Function
+#### Analyse habits
 For analyses of the stored habits are currently 5 options available: \
 -Show all habits and their data \
 -Show all habits and their data which share the same periodicity (daily or weekly) \
 -Show which habit currently has the longest running streak \
 -Show the streak run for a specific habit \
 -Show how much time you already invested into a habit
-#### Remove a habit Function
+#### Remove a habit
 A function to remove habits is also available and can be used by choosing the corresponding menu-point and 
 inserting the habit name.
 
