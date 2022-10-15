@@ -160,7 +160,7 @@ def create_habit(cli, habit) -> None:
         periodicity: str = cli.validate("periodicity", "periodicity")
         habit.periodicity = helper_type_conversions(periodicity)
         habit.default_time = cli.validate("number", "time")
-        create_status = habit.create_new_habit()
+        create_status = habit.create_habit()
         if create_status:
             cli.helper_clear_terminal()
             habit.set_next_periodicity_due_date(habit.unique_id)
@@ -195,7 +195,7 @@ def update_habit(cli, habit) -> None:
         habit.time = cli.validate("number", "time")
         habit.completed = cli.validate("choice", "completed")
         # This could be changed to make dynamic inserts instead of on next available date
-        create_status = habit.create_new_event(habit.name, habit.next_periodicity_due_date)
+        create_status = habit.create_event(habit.name, habit.next_periodicity_due_date)
         completed: str = str(helper_type_conversions(habit.completed))
         if create_status[0] == "normal":
             cli.helper_clear_terminal()
