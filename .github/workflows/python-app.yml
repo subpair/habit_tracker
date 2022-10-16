@@ -52,10 +52,10 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Analyse with mypy
-        run: mypy
+        run: mypy .
 
       - name: Test with pytest
         run: |
-          pytest
+          pytest .
         env:
           LD_LIBRARY_PATH: /usr/local/lib
