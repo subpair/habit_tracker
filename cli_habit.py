@@ -89,7 +89,7 @@ def helper_type_conversions(argument: Union[str, bool, int]) -> Union[str, int]:
      bool False returns str failed; int 0 returns str days, int 1 returns str daily; int 6 returns  str weeks;
      int 7 returns  str weekly
     """
-    val: str | int = 0
+    val: Union[str, int] = 0
     if type(argument) is str:
         if argument == "daily":
             val = 1

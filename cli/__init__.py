@@ -118,7 +118,7 @@ class Cli:
             raise Exception(str(question_object) + " has no validation question")
 
         # Validation loop start
-        validation_input: str | int | bool = ""
+        validation_input: Union[str, int, bool] = ""
         valid_input: bool = False
         while not valid_input:
             if question_object in self.questions.keys():

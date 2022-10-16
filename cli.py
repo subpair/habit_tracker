@@ -1,4 +1,5 @@
 from os import system
+from typing import Union
 
 
 class Cli:
@@ -83,7 +84,7 @@ class Cli:
         self.main_menu_options: dict = {0: "Show menu"}
         self.main_menu_functions: dict = {0: lambda: self.menu()}
 
-    def validate(self, validation_type: str, question_object: str) -> bool | str | int:
+    def validate(self, validation_type: str, question_object: str) -> Union[bool, str, int]:
         """
         This function is validating the user input by the combination of the type of input and the objects this
         type allows.\n
@@ -102,7 +103,7 @@ class Cli:
         questions_options = self.questions[question_object][1]
 
         # Validation loop start
-        validation_input: str | int | bool = ""
+        validation_input: Union[str, int, bool] = ""
         valid_input: bool = False
         while not valid_input:
             if question_object in self.questions.keys():
