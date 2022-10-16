@@ -11,8 +11,8 @@ This program was built with Python 3.10 and is automatically tested for the vers
 
 ## What is it?
 
-A habit tracker application is in general like a todo list whose tasks are coupled to specific dates and repeat for 
-those dates.
+A habit tracker application is in general like a todo list whose tasks are coupled to specific dates and repeat in a 
+set periodicity.
 This application can be used to keep track of those and provide you with analytics about how you kept up with those for 
 a specific time range, referred here as a periodicity. 
 
