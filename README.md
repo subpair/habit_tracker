@@ -7,8 +7,7 @@ It was written for the IU University's course *"DLBDSOOFPP01" - Object-Oriented 
 
 This program was built with Python 3.10 and is automatically tested for the versions 3.7, 3.8, 3.9 and 3.10.
 
-[![Test](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml/badge.svg)]
-(https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml)
+[![Test](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml/badge.svg)](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml)
 
 ## What is it?
 
@@ -153,8 +152,7 @@ This is optional,if you want to skip this enter 0.
 
 1. You will be asked to enter a name for the habit you want to create.
 <br> >The name can be a combination of numbers and letters up to a maximal length of 20.
-<br> >If a habit with the same name already exists the application will display a warning and the creation dialog stops.
-</br>
+<br> >If a habit with the same name already exists the application will display a warning and the creation dialog stops.</br>
 2. You will be asked to enter a description for this habit.
 <br> >The description can be a combination of numbers and letters up to a maximal length of 30.</br>
 3. You will be asked to enter a periodicity.
@@ -324,8 +322,7 @@ Available options are: [y]es or [n]o.
 >y
 ```
 1. You will be asked to enter a name for the habit you want to delete. 
-<br> >If a habit with the name does not exist the application will display a warning and the removal dialog stops.
-</br>
+<br> >If a habit with the name does not exist the application will display a warning and the removal dialog stops.</br>
 2. You will be asked for, safety reasons, if you really want to proceed. 
 3. The habit and all its related event data will be deleted from the database. 
 
