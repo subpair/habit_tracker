@@ -3,6 +3,7 @@ from datetime import date, timedelta, datetime
 from db import Database
 from typing import Tuple
 
+
 class Habit:
     """Habit class for the general habit tracker logic."""
 
