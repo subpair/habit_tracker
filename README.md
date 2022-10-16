@@ -5,15 +5,15 @@ basic functionalities.
 
 It was written for the IU University's course *"DLBDSOOFPP01" - Object-Oriented and Functional Programming with Python*.
 
-This program was built with Python 3.10.
+This program was built with Python 3.10 and has been tested with Python 3.8 and 3.10.
 
 ## What is it?
 
-A habit tracker application is in general like a todo list whose tasks are coupled to specific dates.
-This application can be used to keep track of those and provide you with analytics about how you kept up with those for 
-a specific time range, referred here as a periodicity. 
+A habit tracker application is in general like a todo list whose tasks are coupled to specific dates, which are repeated
+with a defined periodicity.
+This application can be used to keep track of those and provide you with analytics about how you kept up with those. 
 
-### A habits' properties
+### A habit's properties
 A habit consists of \
 -A name (maximal length: 20 Letters) \
 -An description (maximal length: 30 Letters) \
