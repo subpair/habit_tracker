@@ -68,9 +68,10 @@ def cli_definitions(cli, habit) -> None:
     cli.message_error = "An unknown error occurred. Please copy the previous output and send it to developer :)"
 
     # Dev mode is used to opt in developer options into the menu
-    dev_mode = True
+    dev_mode = False
     if dev_mode:
-        cli.main_menu_options.update({11: "manipulate time", 12: "show db habits", 13: "show db events"})
+        cli.main_menu_options.update({11: "manipulate time(+ or - number as days)", 12: "show db habits",
+                                      13: "show db events"})
         cli.main_menu_functions.update({11: lambda: [habit.manipulate_time(offset=int(input())),
                                                      print(habit.date_today), cli.helper_wait_for_key()],
                                         12: lambda: [print(habit.database.read_habits()),

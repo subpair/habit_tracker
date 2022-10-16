@@ -5,35 +5,19 @@ basic functionalities.
 
 It was written for the IU University's course *"DLBDSOOFPP01" - Object-Oriented and Functional Programming with Python*.
 
-This program was built with Python 3.10 and is automatically tested for the versions 3.7, 3.8, 3.9 and 3.10.
+This program was built with Python 3.10 and is automatically tested against the versions 3.7, 3.8, 3.9 and 3.10 on a 
+git push. 
 
 [![Test](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml/badge.svg)](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml)
 
 ## What is it?
 
 A habit tracker application is in general like a todo list whose tasks are coupled to specific dates and repeat in a 
-set periodicity.
+set periodicity. \
 This application can be used to keep track of those and provide you with analytics about how you kept up with those for 
 a specific time range, referred here as a periodicity. 
 
-### A habits' properties
-A habit consists of \
--A name (maximal length: 20 Letters) \
--An description (maximal length: 30 Letters) \
--A periodicity/the time range of a task (daily or weekly) \
--An optional default time value (a number from 0 to 1440)
-
-A habit task can be completed after creation either on the current periodicity it was created or the next periodicity.
-If the user wants to complete a task and already exceeded the so-called due date, which is usually the last day of the 
-next periodicity, the application will automatically fill the time between the current date and the last time the task 
-was updated.
-
-#### Data Storage
-This program stores the habits and its events locally in a sqlite database as a file.
-
-A sample database is provided and can be used to get an overview of the program and test out all functionalities. 
-
-### Functionalities
+### Core Functionalities
 #### Create a habit
 A habit can be created by giving it a name and assigning a short description, a periodicity that can currently be daily 
 or weekly and a default time value that can be used to skip entering a time value on each update.
@@ -50,10 +34,25 @@ For analyses of the stored habits are currently 5 options available: \
 #### Remove a habit
 A function to remove habits is also available and can be used by choosing the corresponding menu-point and 
 inserting the habit name.
+### A habit's properties
+A habit consists of \
+-A name (maximal length: 20 Letters) \
+-An description (maximal length: 30 Letters) \
+-A periodicity/the time range of a task (daily or weekly) \
+-An optional default time value (a number from 0 to 1440)
+
+A habit task can be completed after creation either on the current periodicity it was created or the next periodicity. \
+If the user wants to complete a task and already exceeded the so-called due date, which is usually the last day of the 
+next periodicity, the application will automatically fill the time between the current date and the last time the task 
+was updated.
+
+#### Data Storage
+This program stores the habits and its events locally in a sqlite database as a file.
+A sample database is provided and can be used to get an overview of the program and test out all functionalities. 
 
 ## Installation
 
-The only requirement is pytest for unittests if you want to run tests, a requirements file is attached, so you can 
+The only requirement is pytest for unittests, if you want to run tests, a requirements file is attached, so you can 
 install this by opening a shell and typing in:
 
 ```shell
@@ -89,7 +88,7 @@ be used.
 
 ## Detailed usage with Examples 
 ### Menu
-After initializing the database you will be in the menu.
+After initializing the database you will be in the menu. \
 You will be displayed all options from the main menu by giving a menu number followed by the description of the 
 menu option.\
 The menu can be navigated by typing the corresponding menu number and hitting the enter key.
@@ -229,86 +228,6 @@ Added "30" minute/s.
 The next routine for this habit needs to be checked until the end of the date "2022-10-21".
 ```
 
-
-### Analyse Menu
-The analyse-menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. 
-It is used to gain all information that are currently available about the saved habits.
-```console
-You are in the analyse menu.
-The options are:
-0 Show menu
-1 Show all currently tracked habits
-2 Show all habits with the same periodicity
-3 Return the longest run streak of all defined habits
-4 Return the longest run streak for a given habit
-5 Return the time invested into a given habit
-8 Return to main menu
-```
-0 Shows the menu again \
-1 Shows all habits with all their details in a table\
-2 Shows all habits that share the same periodicity in table after entering the periodicity \
-3 Show the longest running streak of all habits and which habit this is\
-4 Show the longest running streak of a specific habit after entering a habit name\
-5 Show how much time was invested into a specific habit after entering its name\
-8 Return to main menu
-
-#### Show all currently tracked habits
-```console
-Showing all currently tracked habits:
-There are currently 6 habits:
-Name                  Description                     Periodicity  Def. time  Start date  Due date
-____________________________________________________________________________________________________
-practice guitar       for at least 30min              daily        30         2022-09-15  2022-10-16
-sleep 6 hours         at least 6 hours per day        daily        360        2022-09-15  2022-10-17
-read a book           every week a little bit         weekly       0          2022-09-15  2022-10-20
-do code challenges    at least 30 min                 daily        30         2022-09-15  2022-10-15
-study daily           without interruptions           daily        120        2022-09-15  2022-10-17
-do sports             to stay healthy                 daily        30         2022-10-16  2022-10-21  
-```
-
-#### Show all habits with the same periodicity
-```console
-Please enter the periodicity of the habit.
-Available options are: [daily] and [weekly].
->weekly
-```
-
-```console
-Showing all currently tracked habits with the same periodicity of "weekly":
-Name                  Description                     Periodicity  Def. time  Start date  Due date
-____________________________________________________________________________________________________
-read a book           every week a little bit         weekly       0          2022-09-15  2022-10-20
-```
-
-
-#### Return the longest run streak of all defined habits
-```console
-Showing the longest streak of all habits:
-The habit "study daily" is currently your best habit with a run streak of "21" days in a row.
-```
-
-#### Return the longest run streak for a given habit
-```console
-Please enter the habit name.
-Available options are: Any text is valid up to 20 letters.
->sleep 6 hours
-```
-```console
-Showing the longest streak for given habit:
-The habit "sleep 6 hours" best run streak is "10" consecutive days in a row.
-```
-
-#### Return the time invested into a given habit
-```console
-Please enter the habit name.
-Available options are: Any text is valid up to 20 letters.
->sleep 6 hours
-```
-```console
-Showing the time summary for given habit:
-You already spend on the habit "sleep 6 hours" "7.02" day/s.
-```
-
 #### Removal Dialog
 The removal dialog is used to remove a habit and all its related event data completely from the application.
 ```console
@@ -334,6 +253,92 @@ On failure:
 ```console
 The habit "do sborts" does not exist!
 ```
+
+### Analyse Menu
+The analyse-menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. 
+It is used to gain all information that are currently available about the saved habits.
+```console
+You are in the analyse menu.
+The options are:
+0 Show menu
+1 Show all currently tracked habits
+2 Show all habits with the same periodicity
+3 Return the longest run streak of all defined habits
+4 Return the longest run streak for a given habit
+5 Return the time invested into a given habit
+8 Return to main menu
+```
+0 Shows the menu again \
+1 Shows all habits with all their details in a table\
+2 Shows all habits that share the same periodicity in table after entering the periodicity \
+3 Show the longest running streak of all habits and which habit this is\
+4 Show the longest running streak of a specific habit after entering a habit name\
+5 Show how much time was invested into a specific habit after entering its name\
+8 Return to the main menu
+
+#### Show all currently tracked habits
+This displays all habits and their details in a tabulator form.
+```console
+Showing all currently tracked habits:
+There are currently 6 habits:
+Name                  Description                     Periodicity  Def. time  Start date  Due date
+____________________________________________________________________________________________________
+practice guitar       for at least 30min              daily        30         2022-09-15  2022-10-16
+sleep 6 hours         at least 6 hours per day        daily        360        2022-09-15  2022-10-17
+read a book           every week a little bit         weekly       0          2022-09-15  2022-10-20
+do code challenges    at least 30 min                 daily        30         2022-09-15  2022-10-15
+study daily           without interruptions           daily        120        2022-09-15  2022-10-17
+do sports             to stay healthy                 daily        30         2022-10-16  2022-10-21  
+```
+
+#### Show all habits with the same periodicity
+After typing in a periodicity, this displays all habits that share the same periodicity with their details in a tabulator 
+form.
+```console
+Please enter the periodicity of the habit.
+Available options are: [daily] and [weekly].
+>weekly
+```
+
+```console
+Showing all currently tracked habits with the same periodicity of "weekly":
+Name                  Description                     Periodicity  Def. time  Start date  Due date
+____________________________________________________________________________________________________
+read a book           every week a little bit         weekly       0          2022-09-15  2022-10-20
+```
+
+
+#### Return the longest run streak of all defined habits
+This displays the current habit that has the longest run streak and its streak count.
+```console
+Showing the longest streak of all habits:
+The habit "study daily" is currently your best habit with a run streak of "21" days in a row.
+```
+
+#### Return the longest run streak for a given habit
+After entering a name, this displays the current streak count of a given habit.
+```console
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>sleep 6 hours
+```
+```console
+Showing the longest streak for given habit:
+The habit "sleep 6 hours" best run streak is "10" consecutive days in a row.
+```
+
+#### Return the time invested into a given habit
+After entering a name, this displays the current time summary for a given habit.
+```console
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>sleep 6 hours
+```
+```console
+Showing the time summary for given habit:
+You already spend on the habit "sleep 6 hours" "7.02" day/s.
+```
+
 
 
 #### Exiting the Application
