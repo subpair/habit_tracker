@@ -130,7 +130,7 @@ class Habit:
         return create
 
     def create_event_logic(self, next_periodicity_due_date: date, change_date: date = None) \
-            -> tuple[str, dict]:
+            -> [str, dict]:
         status: str = ""
         missed_dates: dict = {}
         if change_date is None:
@@ -156,7 +156,7 @@ class Habit:
             missed_dates[0] = update_lower_range
         return status, missed_dates
 
-    def create_event_fill(self, update_lower_range: date) -> tuple[date, dict]:
+    def create_event_fill(self, update_lower_range: date) -> [date, dict]:
         missed: int = int(((self.date_today - timedelta(days=self.periodicity)) - update_lower_range)
                           / timedelta(days=self.periodicity))
         missed_dates: dict = {}

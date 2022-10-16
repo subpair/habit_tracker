@@ -1,3 +1,5 @@
+[![Python package](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml/badge.svg)](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml)
+
 # My Habit Tracker Application
 
 This program is a backend for a habit tracking application with a rudimentary command line interface written 
