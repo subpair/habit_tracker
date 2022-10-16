@@ -84,7 +84,7 @@ class Cli:
         #       main_menu_options.update({5: "Print Hello world"})
         #       main_menu_functions.update({5: lambda: [print("Hello "), print("world")]})
         #       This will override the default menu name and add a new function to the menu, which will print 2 times a
-        #       string when the number 5 is chosen
+        #       string when the number 5 is chosen.
 
         self.main_menu_name: str = "main"
         self.main_menu_options: dict = {0: "Show menu"}
