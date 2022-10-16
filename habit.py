@@ -223,7 +223,7 @@ class Habit:
             else:
                 change_date = self.date_today
         update_lower_range: date = next_periodicity_due_date - timedelta(days=self.periodicity)
-        if next_periodicity_due_date >= change_date >= update_lower_range:
+        if update_lower_range <= change_date <= next_periodicity_due_date:
             self.create_event_update(self.completed, self.next_periodicity_due_date, change_date=change_date)
             status = "normal"
             missed_dates[0] = change_date

@@ -7,7 +7,8 @@ It was written for the IU University's course *"DLBDSOOFPP01" - Object-Oriented 
 
 This program was built with Python 3.10 and is automatically tested for the versions 3.7, 3.8, 3.9 and 3.10.
 
-[![Test](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml/badge.svg)](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml)
+[![Test](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml/badge.svg)]
+(https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml)
 
 ## What is it?
 
@@ -76,8 +77,9 @@ On launch the program will ask you to select if you want to use this sample data
 
 ```console
 Interactive mode activated
-Do you want to use sample data and load this database?
-Please enter if you are sure you want to do this action. Available options are: [y]es or [n]o.
+Do you want to use a sample database or your own?
+Please enter if you want to load the sample database or use your own.
+Available options are: [y]es to use sample database or [n]o to use your own.
 >y
 ```
 
@@ -94,8 +96,9 @@ menu option.\
 The menu can be navigated by typing the corresponding menu number and hitting the enter key.
 
 ```console
-You are in the Main menu.
+You are in the main menu.
 The options are:
+0 Show menu
 1 Create a habit
 2 Update a habit
 3 Analyse habits
@@ -103,7 +106,7 @@ The options are:
 9 Exit the application
 >
 ```
-
+0 Shows the menu again \
 1 Launches the creation dialog \
 2 Launches the update/completion dialog \
 3 Launches the submenu analyses \
@@ -118,31 +121,40 @@ On a wrong answer or a non-available selection the user will be informed. \
 Example for non-available selection:
 ```console
 >10
-There is no option for this number! Please enter the number of an existing option!
+There is no option for this number!
+Please enter the number of an existing option!
 ```
 Example for a wrong input type:
 ````console
 >do something
-Invalid input! Please enter a number for an existing option!
+This was not a number you entered!
+Please enter a number of an existing option!
 ````
 
 #### Creation Dialog
 
 Example Dialog:
 ```console
-Habit Creating Dialog
-Please enter the habit name. Available options are: Any text is valid up to 20 letters.
->my first habit
-Please enter the description of the habit. Available options are: Any text is valid up to 30 letters.
->the first one
-Please enter the periodicity of the habit. Available options are: [daily] and [weekly].
+Habit creating dialog
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>do sports
+Please enter the description of the habit.
+Available options are: Any text is valid up to 30 letters.
+>to stay healthy
+Please enter the periodicity of the habit.
+Available options are: [daily] and [weekly].
 >daily
-Please enter a time value. Available options are: Any number up to 1440 is valid. This is optional, if you want to skip this enter 0.
->1
+Please enter a time value.
+Available options are: Any number up to 1440 is valid.
+This is optional,if you want to skip this enter 0.
+>30
 ```
 
 1. You will be asked to enter a name for the habit you want to create.
-<br> >The name can be a combination of numbers and letters up to a maximal length of 20.</br>
+<br> >The name can be a combination of numbers and letters up to a maximal length of 20.
+<br> >If a habit with the same name already exists the application will display a warning and the creation dialog stops.
+</br>
 2. You will be asked to enter a description for this habit.
 <br> >The description can be a combination of numbers and letters up to a maximal length of 30.</br>
 3. You will be asked to enter a periodicity.
@@ -155,28 +167,36 @@ passed and be added. To leave this out 0 can be entered</br>
 
 Example for on success:
 ```console
-Successfully created habit "my first habit" with the description "the first one" and a "daily" periodicity.
-The first time it needs to be checked is until the end of the "2022-10-06" and "1" minutes are added by default.
+Successfully created the habit with details:
+Name                  Description                     Periodicity  Def. time  Start date  Due date  
+____________________________________________________________________________________________________
+do sports             to stay healthy                 daily        30         2022-10-16  2022-10-17
 ```
 
 Example for an already existing entry:
 ```console
-A habit with the name "my first habit" already exists! Please choose another name!
+A habit with the name "do sports" already exists!
+Please choose another name!
 ```
 
 #### Update Dialog
 The update dialog is used to mark a habit for the specified periodicity either as success or failed.
 ```console
-Habit Update Dialog
-Please enter the habit name. Available options are: Any text is valid up to 20 letters.
->my first habit
-Please enter a time value. Available options are: Any number up to 1440 is valid. This is optional, if you want to 
-skip this enter 0.
->10
-Please enter if you completed this habit. Available options are: [y]es or [n]o.
+Habit update dialog
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>do sports
+Please enter a time value.
+Available options are: Any number up to 1440 is valid.
+This is optional,if you want to skip this enter 0.
+>0
+Please enter if you completed this habit.
+Available options are: [y]es or [n]o.
 >y
 ```
-1. You will be asked to enter a name for the habit you want to update. 
+1. You will be asked to enter a name for the habit you want to update.
+<br> >If a habit with the name does not exist the application will display a warning and the update dialog stops.
+</br>
 2. You will be asked to enter a time value. This option is optional and can be skipped by putting in 0.
 <br> > If 0 is entered the application will use the default time value set on the creation of the habit.</br>
 3. You will be asked to choose if you completed this habit.
@@ -185,33 +205,41 @@ happened. Afterwards you will be displayed the details of the current update.
 
 Example for on success:
 ```console
-Successfully updated the habit "my first habit" as "success" for date "2022-10-05" and added "10" minutes.
-The next routine for this habit needs to be checked until "2022-10-07".
-...press any key to continue...
+Successfully updated the habit "do sports".
+Marked it as "successful" for date "2022-10-16".
+Added "30" minute/s.
+The next routine for this habit needs to be checked until the end of the date "2022-10-18".
 ```
 
 Example for on failure:
 ```console
-The habit "my first hebit" does not exist!
-...press any key to continue...
+The habit "sports" does not exist!
+```
+Example for trying to update a habit too early:
+```console
+You cannot update the habit "do sports" at the moment!
+The next time will be on the "2022-10-17"
 ```
 
 Example for a fill if a day was skipped:
 ```console
-Detected 1. break of the habit "my first habit". Marking as "failure" for date "2022-10-14"
-Detected 2. break of the habit "my first habit". Marking as "failure" for date "2022-10-15"
-Detected 3. break of the habit "my first habit". Marking as "failure" for date "2022-10-16"
-Detected 4. break of the habit "my first habit". Marking as "failure" for date "2022-10-17"
-Detected 5. break of the habit "my first habit". Marking as "failure" for date "2022-10-18"
-Detected 6. break of the habit "my first habit". Marking as "failure" for date "2022-10-19"
-The habit was broken 6 times! 
+The habit was broken 2 times!
+Detected 1. break of the habit "do sports". Marking as "failed" for date "2022-10-17"
+Detected 2. break of the habit "do sports". Marking as "failed" for date "2022-10-18"
+Successfully updated the habit "do sports".
+Marked it as "successful" for date "2022-10-19".
+Added "30" minute/s.
+The next routine for this habit needs to be checked until the end of the date "2022-10-21".
 ```
+
+
 ### Analyse Menu
 The analyse-menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. 
 It is used to gain all information that are currently available about the saved habits.
 ```console
-You are in the Analyse menu.
+You are in the analyse menu.
 The options are:
+0 Show menu
 1 Show all currently tracked habits
 2 Show all habits with the same periodicity
 3 Return the longest run streak of all defined habits
@@ -219,6 +247,7 @@ The options are:
 5 Return the time invested into a given habit
 8 Return to main menu
 ```
+0 Shows the menu again \
 1 Shows all habits with all their details in a table\
 2 Shows all habits that share the same periodicity in table after entering the periodicity \
 3 Show the longest running streak of all habits and which habit this is\
@@ -230,69 +259,84 @@ The options are:
 ```console
 Showing all currently tracked habits:
 There are currently 6 habits:
-Name                  Description                          Periodicity  Default time  Creation date    Next due date
-________________________________________________________________________________________________________________________
-practice guitar         practice guitar for at least 30min      daily              30   2022-09-04      2022-10-07     
-sleep 6 hours           sleep at least 6 hours per day          daily             360   2022-09-04      2022-10-07     
-read a book             read every week a little bit in a book  weekly              0   2022-09-04      2022-10-16     
-do code challenges      do code challenges for at least 30 min  daily              30   2022-09-04      2022-10-07     
-study daily             study daily without interruptions       daily             120   2022-09-04      2022-10-07     
-my first habit          the first one                           daily               1   2022-10-05      2022-10-06     
+Name                  Description                     Periodicity  Def. time  Start date  Due date
+____________________________________________________________________________________________________
+practice guitar       for at least 30min              daily        30         2022-09-15  2022-10-16
+sleep 6 hours         at least 6 hours per day        daily        360        2022-09-15  2022-10-17
+read a book           every week a little bit         weekly       0          2022-09-15  2022-10-20
+do code challenges    at least 30 min                 daily        30         2022-09-15  2022-10-15
+study daily           without interruptions           daily        120        2022-09-15  2022-10-17
+do sports             to stay healthy                 daily        30         2022-10-16  2022-10-21  
 ```
 
 #### Show all habits with the same periodicity
 ```console
-Please enter the periodicity of the habit. Available options are: [daily] and [weekly].
->daily
+Please enter the periodicity of the habit.
+Available options are: [daily] and [weekly].
+>weekly
 ```
 
 ```console
 Showing all currently tracked habits with the same periodicity of "weekly":
-Name                  Description                          Periodicity  Default time  Creation date    Next due date 
-________________________________________________________________________________________________________________________
-read a book             read every week a little bit in a book  weekly              0   2022-09-04      2022-10-16   
+Name                  Description                     Periodicity  Def. time  Start date  Due date
+____________________________________________________________________________________________________
+read a book           every week a little bit         weekly       0          2022-09-15  2022-10-20
 ```
 
 
 #### Return the longest run streak of all defined habits
 ```console
 Showing the longest streak of all habits:
-The habit "study daily" is currently your best habit with a run streak of "32" days in a row.
+The habit "study daily" is currently your best habit with a run streak of "21" days in a row.
 ```
 
 #### Return the longest run streak for a given habit
 ```console
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>sleep 6 hours
+```
+```console
 Showing the longest streak for given habit:
-The habit "sleep 6 hours" best run streak is "13" consecutive days in a row.
+The habit "sleep 6 hours" best run streak is "10" consecutive days in a row.
 ```
 
 #### Return the time invested into a given habit
 ```console
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>sleep 6 hours
+```
+```console
 Showing the time summary for given habit:
-You already spend on the habit "sleep 6 hours" "7.47" days.
+You already spend on the habit "sleep 6 hours" "7.02" day/s.
 ```
 
 #### Removal Dialog
 The removal dialog is used to remove a habit and all its related event data completely from the application.
 ```console
-Habit Removal Dialog
-Please enter the habit name. Available options are: Any text is valid up to 20 letters.
->my first habit
-Please enter if you are sure you want to do this action. Available options are: [y]es or [n]o.
+Habit removal dialog
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>do sports
+Please enter if you are sure you want to do this action.
+Available options are: [y]es or [n]o.
 >y
 ```
 1. You will be asked to enter a name for the habit you want to delete. 
+<br> >If a habit with the name does not exist the application will display a warning and the removal dialog stops.
+</br>
 2. You will be asked for, safety reasons, if you really want to proceed. 
 3. The habit and all its related event data will be deleted from the database. 
 
 On Success:
 ```console
-Successfully removed the habit "my first habit".
+Successfully removed the habit "do sports".
 ```
 
 On failure:
 ```console
-The habit "my first abit" does not exist!
+The habit "do sborts" does not exist!
 ```
 
 
@@ -300,7 +344,7 @@ The habit "my first abit" does not exist!
 If this is chosen the database connection will be properly closed and the application will exit.
 
 
-### Tests
+### Unit Tests
 
 A test suite is included which uses the same method for generating data as the sample data set. The data set simulates 
 31 days with 5 predefined habits and random values assigned to them. \
@@ -309,7 +353,4 @@ You can run this by typing in:
 ```shell
 pytest .
 ```
-or with output
-```shell
-pytest . -s
-```
+
