@@ -193,8 +193,7 @@ Available options are: [y]es or [n]o.
 >y
 ```
 1. You will be asked to enter a name for the habit you want to update.
-<br> >If a habit with the name does not exist the application will display a warning and the update dialog stops.
-</br>
+<br> >If a habit with the name does not exist the application will display a warning and the update dialog stops.</br>
 2. You will be asked to enter a time value. This option is optional and can be skipped by putting in 0.
 <br> > If 0 is entered the application will use the default time value set on the creation of the habit.</br>
 3. You will be asked to choose if you completed this habit.
@@ -251,8 +250,8 @@ The options are:
 3 Show the longest running streak of all habits and which habit this is\
 4 Show the longest running streak of a specific habit after entering a habit name\
 5 Show how much time was invested into a specific habit after entering its name\
-8 Return to main menu \
-\
+8 Return to main menu
+
 #### Show all currently tracked habits
 ```console
 Showing all currently tracked habits:
