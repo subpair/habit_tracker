@@ -1,5 +1,6 @@
 """Cli module for handling user input and validating these."""
 from os import system
+from typing import Union
 
 
 class Cli:
@@ -90,7 +91,7 @@ class Cli:
         self.main_menu_options: dict = {0: "Show menu"}
         self.main_menu_functions: dict = {0: lambda: self.menu()}
 
-    def validate(self, validation_type: str, question_object: str) -> bool | str | int:
+    def validate(self, validation_type: str, question_object: str) -> Union[bool, str, int]:
         """
         Validate the user input.
 

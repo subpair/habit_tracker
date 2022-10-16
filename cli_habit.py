@@ -1,5 +1,5 @@
+from typing import Union
 """Contains definitions of various cli parts and the general flow of the interaction with the cli."""
-import types
 
 
 # Definitions
@@ -80,7 +80,7 @@ def cli_definitions(cli, habit) -> None:
 
 
 # Helpers
-def helper_type_conversions(argument: str | bool | int) -> str | int:
+def helper_type_conversions(argument: Union[str, bool, int]) -> Union[str, int]:
     """
     Convert types to a human-readable format or vice versa.
 
