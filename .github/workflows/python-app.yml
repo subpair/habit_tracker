@@ -19,7 +19,7 @@ jobs:
           wget https://sqlite.org/2022/sqlite-autoconf-3380500.tar.gz
           tar -xvf sqlite-autoconf-3380500.tar.gz
       - name: configure sqlite for build process
-        run: /configure
+        run: ./configure
         working-directory: sqlite-autoconf-3380500
 
       - name: build the sqlite version
