@@ -1,4 +1,5 @@
 """Contains definitions of various cli parts and the general flow of the interaction with the cli."""
+import types
 
 
 # Definitions
@@ -79,7 +80,7 @@ def cli_definitions(cli, habit) -> None:
 
 
 # Helpers
-def helper_type_conversions(argument: str or bool or int) -> str or int:
+def helper_type_conversions(argument: str | bool | int) -> str | int:
     """
     Convert types to a human-readable format or vice versa.
 

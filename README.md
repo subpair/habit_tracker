@@ -7,7 +7,7 @@ It was written for the IU University's course *"DLBDSOOFPP01" - Object-Oriented 
 
 This program was built with Python 3.10 and is automatically tested for the versions 3.7, 3.8, 3.9 and 3.10.
 
-[![Python package](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml/badge.svg)](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml)
+[![Test](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml/badge.svg)](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml)
 
 ## What is it?
 
@@ -25,8 +25,8 @@ A habit consists of \
 
 A habit task can be completed after creation either on the current periodicity it was created or the next periodicity.
 If the user wants to complete a task and already exceeded the so-called due date, which is usually the last day of the 
-next periodicity, is already past the application will automatically fill the time between the current date and the 
-last time the task was updated.
+next periodicity, the application will automatically fill the time between the current date and the last time the task 
+was updated.
 
 #### Data Storage
 This program stores the habits and its events locally in a sqlite database as a file.

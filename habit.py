@@ -1,4 +1,5 @@
 """Contains the habit tracker logic."""
+import types
 from datetime import date, timedelta, datetime
 from db import Database
 
@@ -198,7 +199,7 @@ class Habit:
         return create_status
 
     def create_event(self, name: str, next_periodicity_due_date: date, change_date: date = None) \
-            -> [str, dict]:
+            -> tuple[str, dict]:
         """
         Event logic, to decide if it is a simple update, too early to update or an update with additional fills.
 
@@ -236,7 +237,7 @@ class Habit:
             missed_dates[0] = update_lower_range
         return status, missed_dates
 
-    def create_event_fill(self, update_lower_range: date) -> [date, dict]:
+    def create_event_fill(self, update_lower_range: date) -> tuple[date, dict]:
         """
         Fill events if there are missed events.
 
