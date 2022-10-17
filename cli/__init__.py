@@ -1,6 +1,7 @@
 """Cli module for handling user input and validating these."""
 from os import system
 from typing import Union
+from datetime import datetime, date
 
 
 class Cli:
@@ -17,6 +18,7 @@ class Cli:
     # There are 3 predefined special naming identifiers, which can be used to further specify the validation process:
     #   -choice : only allows one option, either option_one and option_two
     #   -number : allows a number between a range of option_one and option_two
+    #   -date   : allows a valid date in form of YYYY-MM-DD
     #   -any : accepts any text input
     #   If a number is used a range(from,to) needs to be defined of which numbers are allowed
     # There is also 1 predefined special identifier for the first option parameter:
@@ -60,10 +62,12 @@ class Cli:
         """
         self.validate_functions: dict = {"text": "any",
                                          "choice": ["y", "n"],
-                                         "number": [0, 1440]}
+                                         "number": [0, 1440],
+                                         "date": ["date"]}
         self.questions: dict = {"text": ["something", "Any text is valid"],
                                 "choice": ["a choice out of two options", "[y]es or [n]o"],
-                                "number": ["a number out of a range", "between 0 and 1440"]}
+                                "number": ["a number out of a range", "between 0 and 1440"],
+                                "date": ["a date", "a valid date"]}
         self.interactive_mode: bool = True
 
         # Menu Builder
@@ -91,7 +95,10 @@ class Cli:
         self.main_menu_options: dict = {0: "Show menu"}
         self.main_menu_functions: dict = {0: lambda: self.menu()}
 
-    def validate(self, validation_type: str, question_object: str) -> Union[bool, str, int]:
+        self.date_format: str = "%Y-%m-%d"
+        self.date_input = date.today()
+
+    def validate(self, validation_type: str, question_object: str) -> Union[bool, str, int, date]:
         """
         Validate the user input.
 
@@ -118,7 +125,7 @@ class Cli:
             raise Exception(str(question_object) + " has no validation question")
 
         # Validation loop start
-        validation_input: Union[str, int, bool] = ""
+        validation_input: Union[str, int, bool, date] = ""
         valid_input: bool = False
         while not valid_input:
             if question_object in self.questions.keys():
@@ -166,6 +173,15 @@ class Cli:
                                   format(questions=questions_options))
                     elif validation_input == "":
                         print("You entered nothing!\nPlease type at-least something!")
+                    elif validation_type.casefold() == "date":
+                        try:
+                            validation_date = datetime.strptime(validation_input, self.date_format).date()
+                            validation_input = validation_date
+                            print(str(validation_input) + " is a valid date")
+                            valid_input = True
+                        except ValueError:
+                            print("This is not a valid date!\nPlease enter a valid date!")
+                            valid_input = False
                     else:
                         print("Your input contains an invalid character!\n"
                               "Please input only text without additional characters!")

@@ -3,7 +3,7 @@ from os import path
 from cli import Cli
 from habit import Habit
 from sample_data import SampleData
-import cli_habit
+from cli_habit import cli_definitions
 
 if __name__ == "__main__":
     cli = Cli()
@@ -15,20 +15,20 @@ if __name__ == "__main__":
     habit.user_mode = True
 
     # Load all definitions for the interactive mode
-    cli_habit.cli_definitions(cli, habit)
+    cli_definitions(cli, habit)
 
     try:
         # Ask if sample data should be generated and the application loaded into the sample database
         print("Do you want to use a sample database or your own?")
         use_sample_data = cli.validate("choice", "database")
         if use_sample_data:
-            generate_samples = False
+            GENERATE_SAMPLES = False
             # Only generate new sample data if the database was not created yet
             if not path.isfile("sample.db"):
-                generate_samples = True
+                GENERATE_SAMPLES = True
             samples = SampleData(31)
             cli.helper_clear_terminal()
-            if generate_samples:
+            if GENERATE_SAMPLES:
                 print("Generating habits...")
                 samples.create_habits()
                 print("Generating events...")

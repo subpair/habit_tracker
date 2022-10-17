@@ -1,5 +1,5 @@
-from typing import Union
 """Contains definitions of various cli parts and the general flow of the interaction with the cli."""
+from typing import Union
 
 
 # Definitions
@@ -18,7 +18,8 @@ def cli_definitions(cli, habit) -> None:
                                    "description": ["max_length", 30],
                                    "periodicity": ["daily", "weekly"],
                                    "choice": ["y", "n"],
-                                   "number": [0, 1440]})
+                                   "number": [0, 1440],
+                                   "date": ["date", "date"]})
 
     # question definitions
     cli.questions.update({"name": ["the habit name", "Any text is valid up to 20 letters"],
@@ -29,7 +30,8 @@ def cli_definitions(cli, habit) -> None:
                                                    "This is optional,if you want to skip this enter 0"],
                           "safety": ["if you are sure you want to do this action", "[y]es or [n]o"],
                           "database": ["if you want to load the sample database or use your own",
-                                       "[y]es to use sample database or [n]o to use your own"]})
+                                       "[y]es to use sample database or [n]o to use your own"],
+                          "date": ["a valid date", "a valid date in the form YYYY-MM-DD (e.g. 2022-01-31)"]})
 
     # main menu definitions
     cli.main_menu_name = "main"
@@ -71,13 +73,14 @@ def cli_definitions(cli, habit) -> None:
     dev_mode = False
     if dev_mode:
         cli.main_menu_options.update({11: "manipulate time(+ or - number as days)", 12: "show db habits",
-                                      13: "show db events"})
+                                      13: "show db events", 14: "check date validator"})
         cli.main_menu_functions.update({11: lambda: [habit.manipulate_time(offset=int(input())),
                                                      print(habit.date_today), cli.helper_wait_for_key()],
                                         12: lambda: [print(habit.database.read_habits()),
                                                      cli.helper_wait_for_key()],
                                         13: lambda: [print(habit.database.read_events()),
-                                                     cli.helper_wait_for_key()]})
+                                                     cli.helper_wait_for_key()],
+                                        14: lambda: [cli.validate("date", "date"), cli.helper_wait_for_key()]})
         habit.user_mode = False
 
 
@@ -209,9 +212,12 @@ def update_habit(cli, habit) -> None:
     print("Habit update dialog")
     habit.name = cli.validate("name", "name")
     if habit.is_existing(habit.name):
+        # update_date = cli.validate("date", "date")
         habit.time = cli.validate("number", "time")
         habit.completed = cli.validate("choice", "completed")
         # This could be changed to make dynamic inserts instead of on next available date
+        habit.set_id(habit.name)
+        habit.set_next_periodicity_due_date(habit.unique_id)
         create_status = habit.create_event(habit.name, habit.next_periodicity_due_date)
         completed: str = str(helper_type_conversions(habit.completed))
         if create_status[0] == "normal":

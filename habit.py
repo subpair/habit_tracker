@@ -1,7 +1,7 @@
 """Contains the habit tracker logic."""
 from datetime import date, timedelta, datetime
-from db import Database
 from typing import Tuple
+from db import Database
 
 
 class Habit:
