@@ -87,6 +87,7 @@ class Database:
                 completed BOOLEAN DEFAULT FALSE,
                 time INTEGER DEFAULT 0 NOT NULL,
                 change_date TIMESTAMP DATE NOT NULL,
+                periodicity_date TIMESTAMP DATE NOT NULL,
                 FOREIGN KEY (habit_id) REFERENCES habits(unique_id))""")
 
             self.db_connection.commit()
@@ -121,7 +122,7 @@ class Database:
             print(err)
             return False
 
-    def create_new_event(self, habit_id: int, completed: bool, change_date: date, time: int) -> bool:
+    def create_new_event(self, habit_id: int, completed: bool, change_date: date, time: int, periodicity_date: date) -> bool:
         """
         Insert a new event into the habits_events table.
 
@@ -136,8 +137,9 @@ class Database:
         try:
             cur = self.db_connection.cursor()
             cur.execute(
-                "INSERT INTO habits_events (habit_id, completed, time, change_date) VALUES (?, ?, ?, ?)",
-                (habit_id, completed, time, change_date))
+                "INSERT INTO habits_events (habit_id, completed, time, change_date, periodicity_date) VALUES "
+                "(?, ?, ?, ?, ?)",
+                (habit_id, completed, time, change_date, periodicity_date))
             self.db_connection.commit()
             return True
         except Error as err:

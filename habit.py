@@ -192,7 +192,8 @@ class Habit:
             time = 0
         else:
             time = self.time
-        create_status = self.database.create_new_event(self.unique_id, completed, change_date, time)
+        create_status = self.database.create_new_event(self.unique_id, completed, change_date, time,
+                                                       self.next_periodicity_due_date)
         if create_status is not None:
             self.next_periodicity_due_date = next_periodicity_due_date + timedelta(days=self.periodicity)
             self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)

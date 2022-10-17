@@ -24,7 +24,8 @@ class TestDatabase:
                                                              self.next_periodicity_due_date, 0)
         assert create_habit_status is True
 
-        create_event_status = self.database.create_new_event(1, True, self.date_today, 0)
+        create_event_status = self.database.create_new_event(1, True, self.date_today, 0,
+                                                             self.next_periodicity_due_date)
         assert create_event_status is True
 
     def test_connection(self) -> None:
@@ -47,7 +48,8 @@ class TestDatabase:
 
     def test_create_event(self) -> None:
         """Test the creation of a habit event record"""
-        create_event_status = self.database.create_new_event(1, True, self.date_today, 0)
+        create_event_status = self.database.create_new_event(1, True, self.date_today, 0,
+                                                             self.next_periodicity_due_date)
         assert create_event_status is True
 
     def test_read_habit_unique_id(self) -> None:
