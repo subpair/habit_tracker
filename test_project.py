@@ -21,7 +21,7 @@ class TestProject:
         self.habit.description = "dummy for testing"
         self.habit.periodicity = 1
         self.habit.default_time = 30
-        self.habit.user_mode = False
+        self.habit.generate_new_dates = False
         self.habit.manipulate_time(-31)
         self.habit.create_habit()
         self.habit.set_id(self.habit.name)
@@ -87,7 +87,7 @@ class TestProject:
         self.habit_one.description = "for at least 30min"
         self.habit_one.periodicity = 1
         self.habit_one.default_time = 30
-        self.habit_one.user_mode = True
+        self.habit_one.generate_new_dates = True
         self.habit_one.create_habit()
         assert self.habit_one.is_existing(self.habit_one.name) is True
 

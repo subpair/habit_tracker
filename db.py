@@ -13,7 +13,6 @@ class Database:
 
         On initialization the database always needs a database file name, if none is given it will default to "main.db".
         Afterwards the connection is initiated.
-
         :param file_name: name of the database file
         """
         if file_name is None:
@@ -59,13 +58,10 @@ class Database:
         >habits
             This table stores the metadata of the habits, a habit includes the properties name, description,
             periodicity, default_time,created_date, next_periodicity_due_date, finish_date and the finished status.
-
             Every entry in this table will get also a primary key assigned called unique_id.
-
         >habits_events
             This table stores the events for the habits which includes the habit_id as foreign key imported from the
             habits table, a completed status, a time value and a change_date.
-
         :return: True on successful run, False on database error
         """
         try:
@@ -122,7 +118,8 @@ class Database:
             print(err)
             return False
 
-    def create_new_event(self, habit_id: int, completed: bool, change_date: date, time: int, periodicity_date: date) -> bool:
+    def create_new_event(self, habit_id: int, completed: bool, change_date: date, time: int, periodicity_date: date) \
+            -> bool:
         """
         Insert a new event into the habits_events table.
 
@@ -130,6 +127,7 @@ class Database:
         :param completed: the status of the habit event
         :param change_date: the date on which the event occurred
         :param time: number of the time duration for an event
+        :param periodicity_date: the next periodicity date for which the event occurred
         :return: True on successful run, False on database error
         """
         if time is None:
@@ -252,6 +250,24 @@ class Database:
         try:
             cur = self.db_connection.cursor()
             cur.execute("SELECT * FROM habits_events WHERE habit_id=?", (unique_id,))
+            return cur.fetchall()
+        except Error as err:
+            print(err)
+            return []
+
+    def read_last_periodicity_habit_events(self, unique_id: int, periodicity_date: date) -> list:
+        """
+        Get all events for a specific habit via an input id from the habits_events table.
+
+        :param unique_id: the id of a habit
+        :param periodicity_date: date of periodicity_date
+        :return: list with all events for the input id is returned, will be an empty list if no record is found or a
+         database error occurs
+        """
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute("SELECT * FROM habits_events WHERE habit_id=? AND periodicity_date=?",
+                        (unique_id, periodicity_date))
             return cur.fetchall()
         except Error as err:
             print(err)

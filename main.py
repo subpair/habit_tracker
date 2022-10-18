@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # Cli interactive mode means it will use helpers for clearing the terminal and "wait for key".
     cli.interactive_mode = True
     # Habit user mode means the date is updated on every create/update call.
-    habit.user_mode = True
+    habit.generate_new_dates = True
 
     # Load all definitions for the interactive mode
     cli_definitions(cli, habit)

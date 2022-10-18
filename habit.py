@@ -1,6 +1,6 @@
 """Contains the habit tracker logic."""
-from datetime import date, timedelta, datetime
 from typing import Tuple
+from datetime import date, timedelta, datetime
 from db import Database
 
 
@@ -8,7 +8,7 @@ class Habit:
     """Habit class for the general habit tracker logic."""
 
     def __init__(self, name: str = None, description: str = None, periodicity: int = None, default_time: int = None,
-                 db_filename: str = None, user_mode: bool = None) -> None:
+                 db_filename: str = None, generate_new_dates: bool = None) -> None:
         """
         Initialize the necessary definition of a habit with name, description, periodicity and default_time_value.
 
@@ -21,7 +21,7 @@ class Habit:
         :param periodicity: int periodicity of a habit (currently only 1 and 7 is supported) (default 0)
         :param default_time: int default time of a habit (default 0)
         :param db_filename: str name of the database file (default main.db)
-        :param user_mode: bool, if True it will generate a new date on every create/update event
+        :param generate_new_dates: bool, if True it will generate a new date on every create/update event
         """
         if name is None:
             self.name: str = ""
@@ -48,10 +48,10 @@ class Habit:
         else:
             self.db_filename = db_filename
 
-        if user_mode is None:
-            self.user_mode: bool = True
+        if generate_new_dates is None:
+            self.generate_new_dates: bool = True
         else:
-            self.user_mode = user_mode
+            self.generate_new_dates = generate_new_dates
 
         self.completed: bool = False
 
@@ -153,7 +153,7 @@ class Habit:
         :return: bool True if the creation was successful, False if not or a database error occurred
         """
         if created_date is None:
-            if self.user_mode:
+            if self.generate_new_dates:
                 created_date = date.today()
             else:
                 created_date = self.date_today
@@ -182,7 +182,7 @@ class Habit:
         :return: bool True if the creation was successful, False if not or a database error occurred
         """
         if change_date is None:
-            if self.user_mode:
+            if self.generate_new_dates:
                 change_date = date.today()
             else:
                 change_date = self.date_today
@@ -193,7 +193,7 @@ class Habit:
         else:
             time = self.time
         create_status = self.database.create_new_event(self.unique_id, completed, change_date, time,
-                                                       self.next_periodicity_due_date)
+                                                       next_periodicity_due_date)
         if create_status is not None:
             self.next_periodicity_due_date = next_periodicity_due_date + timedelta(days=self.periodicity)
             self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
@@ -219,7 +219,7 @@ class Habit:
         status: str = ""
         missed_dates: dict = {}
         if change_date is None:
-            if self.user_mode:
+            if self.generate_new_dates:
                 change_date = date.today()
             else:
                 change_date = self.date_today
@@ -255,6 +255,20 @@ class Habit:
             self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
             update_lower_range = self.next_periodicity_due_date - timedelta(days=self.periodicity)
         return update_lower_range, missed_dates
+
+    def check_event_exists(self, habit_id: int, update_date: date):
+        """
+        Check if for a date an event already is existing.
+
+        :param habit_id: int id of a habit
+        :param update_date: date of the update / next periodicity date
+        :return:
+        """
+        self.set_periodicity(habit_id)
+        next_periodicity_due_date = update_date + timedelta(days=self.periodicity)
+        if self.database.read_last_periodicity_habit_events(habit_id, next_periodicity_due_date):
+            return True
+        return False
 
     def analyse_all_active(self) -> list:
         """

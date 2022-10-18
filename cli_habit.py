@@ -67,21 +67,20 @@ def cli_definitions(cli, habit) -> None:
                                      5: lambda: analyze_habits(cli, habit, "time"),
                                      8: lambda: cli.menu()}
 
-    cli.message_error = "An unknown error occurred. Please copy the previous output and send it to developer :)"
+    cli.message_error = "An unknown error occurred. Please copy the previous output and send it to developer."
 
     # Dev mode is used to opt in developer options into the menu
-    dev_mode = False
+    dev_mode = True
     if dev_mode:
         cli.main_menu_options.update({11: "manipulate time(+ or - number as days)", 12: "show db habits",
-                                      13: "show db events", 14: "check date validator"})
+                                      13: "show db events"})
         cli.main_menu_functions.update({11: lambda: [habit.manipulate_time(offset=int(input())),
                                                      print(habit.date_today), cli.helper_wait_for_key()],
                                         12: lambda: [print(habit.database.read_habits()),
                                                      cli.helper_wait_for_key()],
                                         13: lambda: [print(habit.database.read_events()),
-                                                     cli.helper_wait_for_key()],
-                                        14: lambda: [cli.validate("date", "date"), cli.helper_wait_for_key()]})
-        habit.user_mode = False
+                                                     cli.helper_wait_for_key()]})
+        habit.generate_new_dates = False
 
 
 # Helpers
@@ -162,7 +161,6 @@ def create_habit(cli, habit) -> None:
     4 Ask for default time
 
     5 Output status of create, on success provide all details, on failure print error message
-
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -204,7 +202,6 @@ def update_habit(cli, habit) -> None:
     3: Ask if completed
 
     4: Output status of update, on success provide all details, on failure print error message
-
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -279,7 +276,6 @@ def delete_habit(cli, habit) -> None:
     2: Ask if user is sure
 
     3: Output status of delete, on success provide success message, on failure print error message
-
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -377,7 +373,6 @@ def analyse_habit_longest_streak(cli, habit) -> None:
     Interactive mode flow for analysing the longest streak of a given habit.
 
     Takes a name and will print the habit's streak.
-
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -408,7 +403,6 @@ def analyse_habit_time(cli, habit) -> None:
     Interactive mode flow for analysing the time summary of a given habit.
 
     Takes a name and will print the habit's time summary in a formatted way as minutes, hours or days.
-
     :param cli: a cli object
     :param habit: a habit object
     """
@@ -441,7 +435,6 @@ def analyze_habits(cli, habit, option: str) -> None:
     Interactive mode flow for the decision chosen in the analyse submenu.
 
     Runs the submenu also again after an output has been made.
-
     :param cli: a cli object
     :param habit: a habit object
     :param option: "all", "all same periodicity", "longest streak of all" , "longest streak" or "time"
