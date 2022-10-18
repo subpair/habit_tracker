@@ -144,14 +144,27 @@ class Habit:
             return True
         return False
 
-    def create_habit(self, created_date: date = None, next_periodicity_due_date: date = None) -> bool:
+    def create_habit(self, name: str = None, description: str = None, periodicity: int = None, default_time: int = None,
+                     created_date: date = None, next_periodicity_due_date: date = None) -> bool:
         """
         Insert a new habit into the habits table.
 
+        :param name: str habit name
+        :param description: str habit description
+        :param periodicity: int of periodicity
+        :param default_time: int default time
         :param created_date: date of the change
         :param next_periodicity_due_date: date of next periodicity due date
         :return: bool True if the creation was successful, False if not or a database error occurred
         """
+        if name is None:
+            name = self.name
+        if description is None:
+            description = self.description
+        if periodicity is None:
+            periodicity = self.periodicity
+        if default_time is None:
+            default_time = self.default_time
         if created_date is None:
             if self.generate_new_dates:
                 created_date = date.today()
@@ -161,9 +174,8 @@ class Habit:
         if next_periodicity_due_date is None:
             next_periodicity_due_date = self.created_date + timedelta(days=self.periodicity)
         self.next_periodicity_due_date = next_periodicity_due_date
-        create_status = self.database.create_new_habit(self.name, self.description, self.periodicity,
-                                                       self.created_date, self.next_periodicity_due_date,
-                                                       self.default_time)
+        create_status = self.database.create_new_habit(name, description, periodicity,
+                                                       self.created_date, self.next_periodicity_due_date, default_time)
         return create_status
 
     def create_event_update(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) \
@@ -199,7 +211,7 @@ class Habit:
             self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
         return create_status
 
-    def create_event(self, name: str, next_periodicity_due_date: date, change_date: date = None) \
+    def create_event(self, name: str, next_periodicity_due_date: date, completed: bool = None, change_date: date = None) \
             -> Tuple[str, dict]:
         """
         Event logic, to decide if it is a simple update, too early to update or an update with additional fills.

@@ -1,5 +1,7 @@
 """Contains definitions of various cli parts and the general flow of the interaction with the cli."""
 from typing import Union
+from habit import *
+from cli import *
 
 
 # Definitions
@@ -172,7 +174,7 @@ def create_habit(cli, habit) -> None:
         periodicity: str = cli.validate("periodicity", "periodicity")
         habit.periodicity = helper_type_conversions(periodicity)
         habit.default_time = cli.validate("number", "time")
-        create_status = habit.create_habit()
+        create_status = habit.create_habit(habit.name, habit.description, habit.periodicity)
         if create_status:
             cli.helper_clear_terminal()
             habit.set_next_periodicity_due_date(habit.unique_id)
@@ -215,6 +217,7 @@ def update_habit(cli, habit) -> None:
         # This could be changed to make dynamic inserts instead of on next available date
         habit.set_id(habit.name)
         habit.set_next_periodicity_due_date(habit.unique_id)
+        update_date = habit.next_periodicity_due_date
         create_status = habit.create_event(habit.name, habit.next_periodicity_due_date)
         completed: str = str(helper_type_conversions(habit.completed))
         if create_status[0] == "normal":
@@ -227,7 +230,7 @@ def update_habit(cli, habit) -> None:
                   "The next routine for this habit needs to be checked until the end of the date "
                   "\"{next_periodicity_due_date}\"."
                   .format(name=habit.name, completed=completed,
-                          next_periodicity_range_start=habit.next_periodicity_range_start, time=habit.time,
+                          next_periodicity_range_start=update_date, time=habit.time,
                           next_periodicity_due_date=habit.next_periodicity_due_date))
         elif create_status[0] == "too early":
             cli.helper_clear_terminal()

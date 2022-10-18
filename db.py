@@ -74,7 +74,7 @@ class Database:
             default_time INTEGER DEFAULT 0 NOT NULL,
             created_date TIMESTAMP DATE NOT NULL,
             next_periodicity_due_date TIMESTAMP DATE,
-            finish_date TIMESTAMP DEFAULT "31.12.2023" NOT NULL,
+            finish_date TIMESTAMP DEFAULT "31.12.2099" NOT NULL,
             finished BOOLEAN NOT NULL DEFAULT FALSE)""")
 
             cur.execute("""CREATE TABLE IF NOT EXISTS habits_events (
