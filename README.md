@@ -30,25 +30,23 @@ A habit can be created by giving it a name and assigning a short description, a 
 or weekly and a default time value that can be used to skip entering a time value on each update.
 #### Updating a habit
 A habit can be updated for the current periodicity via the update function either on the day/week it was created or the 
-day/week after, but once that day/week is over the habit will be automatically marked as failed for the missed date/s.
+day/week after, but once that day/week is over the habit will be automatically marked as failed for the missed date.\
+A habit task can be completed after creation either on the current periodicity it was created or the next periodicity. \
+If the user wants to complete a task and already exceeded the so-called due date, which is usually the last day of the 
+next periodicity, the application will automatically fill the time between the current date and the last time the task 
+was updated.
 #### Analysing habits
 For analyses of the stored habits are currently 5 options available: \
 -Show all habits and their data \
 -Show all habits and their data which share the same periodicity (daily or weekly) \
 -Show which habit currently has the longest running streak \
--Show the streak run for a specific habit \
+-Show the streak for a specific habit \
 -Show how much time you already invested into a habit
 #### Removing a habit
 A function to remove habits is also available and can be used by choosing the corresponding menu-point and 
 inserting the habit name.
 #### Altering a habit's details
 Used to change the details of a habit such as the name, description or default time value.
-
-
-A habit task can be completed after creation either on the current periodicity it was created or the next periodicity. \
-If the user wants to complete a task and already exceeded the so-called due date, which is usually the last day of the 
-next periodicity, the application will automatically fill the time between the current date and the last time the task 
-was updated.
 
 ### Data Storage
 This application stores the habits and its events locally in a sqlite database as a file.
@@ -167,7 +165,7 @@ This is optional,if you want to skip this enter 0.
 ```
 
 1. You will be asked to enter a name for the habit you want to create.
-<br> >The name can be a combination of numbers and letters up to a maximal length of 20.
+<br> >The name can be a combination of numbers and letters without special symbols up to a maximal length of 20.
 <br> >If a habit with the same name already exists the application will display a warning and the creation dialog stops.</br>
 2. You will be asked to enter a description for this habit.
 <br> >The description can be a combination of numbers and letters up to a maximal length of 30.</br>

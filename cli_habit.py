@@ -471,7 +471,7 @@ def analyse_habit_time(cli: Cli, habit: Habit) -> None:
                 time_summary = round(time_summary / 1440, 2)
             cli.helper_clear_terminal()
             print("Showing the time summary for given habit:")
-            print("You already spend on the habit \"{name}\" \"{time_summary}\" {time_unit}.".format(
+            print("You already spent on the habit \"{name}\" \"{time_summary}\" {time_unit}.".format(
                 name=name, time_summary=time_summary, time_unit=time_unit))
     else:
         print("The habit \"{name}\" does not exist!".format(name=name))
