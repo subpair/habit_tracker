@@ -35,7 +35,7 @@ def cli_definitions(cli: Cli, habit: Habit) -> None:
                           "database": ["if you want to load the sample database or use your own",
                                        "[y]es to use sample database or [n]o to use your own"],
                           "date": ["a valid date", "a valid date in the form YYYY-MM-DD (e.g. 2022-01-31)"],
-                          "alter": ["what do you want to alter", "[name], [description] or [default time]"]})
+                          "alter": ["what you want to alter", "[name], [description] or [default time]"]})
 
     # main menu definitions
     cli.main_menu_name = "main"
@@ -511,7 +511,7 @@ def alter_habit(cli: Cli, habit: Habit) -> None:
             alter_status = habit.alter_default_time(habit.unique_id, new_attribute)
         if alter_status:
             cli.helper_clear_terminal()
-            print("Successfully changed the \"{alter_choice}\" of habit \"{name}\" to \"{new_attribute}\""
+            print("Successfully changed the \"{alter_choice}\" of habit \"{name}\" to \"{new_attribute}\"."
                   .format(alter_choice=alter_choice, name=habit.name, new_attribute=new_attribute))
         else:
             print(cli.message_error)

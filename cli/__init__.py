@@ -224,7 +224,7 @@ class Cli:
     def validate_date(user_input: str) \
             -> Tuple[bool, date]:
         """
-        Check the input string if it is date in the correct format.
+        Check the input string if it is a date in the correct format.
 
         :param user_input: str of user input
         :return: tuple of [bool] if input is valid and [date] of the input from the user if it is a date in the format
