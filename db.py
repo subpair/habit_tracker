@@ -452,3 +452,18 @@ class Database:
         except Error as err:
             print(err)
             return []
+
+    def read_habit_description(self, unique_id: int) -> tuple:
+        """
+        Get the description via an id input from the habits table.
+
+        :param unique_id: int id of a habit
+        :return: tuple with str description , will be an empty tuple if no record is found or a database error occurs
+        """
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute("SELECT description FROM habits WHERE unique_id=?", (unique_id,))
+            return cur.fetchone()
+        except Error as err:
+            print(err)
+            return ()

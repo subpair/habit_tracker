@@ -110,6 +110,23 @@ class TestProject:
         assert self.habit.analyse_longest_streak() == (1, 1)
         assert self.habit.analyse_longest_streak(self.habit.unique_id) == (1, 1)
         assert self.habit.analyse_time(self.habit.unique_id) == 30
+    def test_update_name(self) -> None:
+        """Test updating the next periodicity due date of an existing record"""
+        name: str = "new name"
+        assert self.habit.alter_name(1, name) is True
+        assert self.habit.database.read_habit_name(1)[0] == "new name"
+
+    def test_update_description(self) -> None:
+        """Test updating the next periodicity due date of an existing record"""
+        description: str = "new description"
+        assert self.habit.alter_description(1, description) is True
+        assert self.habit.database.read_habit_description(1)[0] == "new description"
+
+    def test_update_default_time(self) -> None:
+        """Test updating the next periodicity due date of an existing record"""
+        default_time = 45
+        assert self.habit.alter_default_time(1, default_time) is True
+        assert self.habit.database.read_habit_default_time(1)[0] == 45
 
     def test_delete_habit(self) -> None:
         """Test the deletion of a habit and if the record is not existing anymore."""

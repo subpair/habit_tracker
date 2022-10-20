@@ -103,8 +103,8 @@ class TestDatabase:
     def test_update_description(self) -> None:
         """Test updating the next periodicity due date of an existing record"""
         description: str = "new description"
-        assert self.database.update_name(1, description) is True
-        assert self.database.read_habit_name(1)[0] == "new description"
+        assert self.database.update_description(1, description) is True
+        assert self.database.read_habit_description(1)[0] == "new description"
 
     def test_update_default_time(self) -> None:
         """Test updating the next periodicity due date of an existing record"""
