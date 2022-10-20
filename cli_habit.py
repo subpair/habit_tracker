@@ -223,7 +223,8 @@ def update_habit(cli: Cli, habit: Habit) -> None:
         update_date: date = habit.next_periodicity_due_date
         create_status: tuple = habit.create_event(habit.name, habit.next_periodicity_due_date)
         completed: str = str(helper_type_conversions(habit.completed))
-
+        if not habit.completed:
+            habit.time = 0
         # Normal update
         if create_status[0] == "normal":
             cli.helper_clear_terminal()
