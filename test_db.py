@@ -58,7 +58,7 @@ class TestDatabase:
         assert self.database.read_habit_unique_id("unknown") is None
 
     def test_read_habits_unique_ids(self) -> None:
-        """Test reading all ids and checking of one record is found"""
+        """Test reading all ids and checking if one record is found"""
         assert len(self.database.read_habits_unique_ids()) == 1
 
     def test_read_name_by_id(self) -> None:

@@ -16,7 +16,7 @@ class SampleData:
 
         2: Initialize 5 predefined habits
 
-        :param duration: time in days of which the sample data is offset
+        :param duration: int time in days of which the sample data is offset
         """
         self.duration: int = duration
         # 1 Set the database filename and initialize the sample database
@@ -96,14 +96,13 @@ class SampleData:
 
         completed can be either true or false
 
-        time_invested is optional and passed as 0 when not used or a defined range
+        time_invested is optional and passed as 0 when not used or a value from the defined range
 
         also simulates a skip of the habit e.g. when the user forgot to check the habit
 
         """
         # "practice guitar"
         days = self.duration
-        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_one.manipulate_time(+1)
             answers = [True, False]
@@ -116,17 +115,11 @@ class SampleData:
             skip_habit = choices(answers, weights=(50, 50))[0]
             if not skip_habit:
                 self.habit_one.set_id(self.habit_one.name)
-                self.habit_one.set_periodicity(self.habit_one.unique_id)
-                self.habit_one.set_default_time(self.habit_one.unique_id)
                 self.habit_one.set_next_periodicity_due_date(self.habit_one.unique_id)
                 self.habit_one.create_event(self.habit_one.name, self.habit_one.next_periodicity_due_date)
-            else:
-                pass
-                # print("skipping")
 
         # "sleep 6 hours"
         days = self.duration
-        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_two.manipulate_time(+1)
             answers = [True, False]
@@ -139,17 +132,11 @@ class SampleData:
             skip_habit = choices(answers, weights=(2, 98))[0]
             if not skip_habit:
                 self.habit_two.set_id(self.habit_two.name)
-                self.habit_two.set_periodicity(self.habit_two.unique_id)
-                self.habit_two.set_default_time(self.habit_two.unique_id)
                 self.habit_two.set_next_periodicity_due_date(self.habit_two.unique_id)
                 self.habit_two.create_event(self.habit_two.name, self.habit_two.next_periodicity_due_date)
-            else:
-                pass
-                # print("skipping")
 
         # "read a book"
         days = self.duration
-        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_three.manipulate_time(+1)
             answers = [True, False]
@@ -162,17 +149,11 @@ class SampleData:
             skip_habit = choices(answers, weights=(90, 10))[0]
             if not skip_habit:
                 self.habit_three.set_id(self.habit_three.name)
-                self.habit_three.set_periodicity(self.habit_three.unique_id)
-                self.habit_three.set_default_time(self.habit_three.unique_id)
                 self.habit_three.set_next_periodicity_due_date(self.habit_three.unique_id)
                 self.habit_three.create_event(self.habit_three.name, self.habit_three.next_periodicity_due_date)
-            else:
-                pass
-                # print("skipping")
 
         # "do code challenges"
         days = self.duration
-        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_four.manipulate_time(+1)
             answers = [True, False]
@@ -185,17 +166,11 @@ class SampleData:
             skip_habit = choices(answers, weights=(40, 60))[0]
             if not skip_habit:
                 self.habit_four.set_id(self.habit_four.name)
-                self.habit_four.set_periodicity(self.habit_four.unique_id)
-                self.habit_four.set_default_time(self.habit_four.unique_id)
                 self.habit_four.set_next_periodicity_due_date(self.habit_four.unique_id)
                 self.habit_four.create_event(self.habit_four.name, self.habit_four.next_periodicity_due_date)
-            else:
-                pass
-                # print("skipping")
 
         # "study daily"
         days = self.duration
-        # print("simulating events for {days} days".format(days=days))
         for i in range(days):
             self.habit_five.manipulate_time(+1)
             answers = [True, False]
@@ -208,13 +183,8 @@ class SampleData:
             skip_habit = choices(answers, weights=(1, 99))[0]
             if not skip_habit:
                 self.habit_five.set_id(self.habit_five.name)
-                self.habit_five.set_periodicity(self.habit_five.unique_id)
-                self.habit_five.set_default_time(self.habit_five.unique_id)
                 self.habit_five.set_next_periodicity_due_date(self.habit_five.unique_id)
                 self.habit_five.create_event(self.habit_five.name, self.habit_five.next_periodicity_due_date)
-            else:
-                pass
-                # print("skipping")
 
     def closing_connections(self) -> None:
         """Close the database connections to avoid a file lock."""

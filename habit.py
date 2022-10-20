@@ -10,11 +10,9 @@ class Habit:
     def __init__(self, name: str = None, description: str = None, periodicity: int = None, default_time: int = None,
                  db_filename: str = None, generate_new_dates: bool = None) -> None:
         """
-        Initialize the necessary definition of a habit with name, description, periodicity and default_time_value.
+        Initialize the habit object and all its attributes.
 
-        Saving the current date and setting the date format for date to string conversion
-
-        Connect to the database using db_filename.
+        Connects to the database using db_filename and initializes the database.
 
         :param name: str name of a habit (default "")
         :param description: str description of a habit (default "")
@@ -67,7 +65,7 @@ class Habit:
         self.initialize_database()
 
     def initialize_database(self) -> None:
-        """Call the database initialization method which creates two tables."""
+        """Call the database initialization method which creates two tables of habits and habits_events."""
         self.database.initialize_database()
 
     def is_existing(self, habit_name: str) -> bool:
@@ -81,7 +79,7 @@ class Habit:
 
     def set_id(self, habit_name: str) -> bool:
         """
-        Set the habit unique id value for given name.
+        Set the habit unique id value from the database for given name.
 
         :param habit_name: str name of a habit
         :return: bool True if there is an id found in the database, False if there is none
@@ -94,7 +92,7 @@ class Habit:
 
     def set_periodicity(self, habit_id: int) -> bool:
         """
-        Set the habit periodicity value for given id.
+        Set the habit periodicity value from the database for given id.
 
         :param habit_id: int id of a habit
         :return: bool True if there is a periodicity found in the database, False if there is none
@@ -107,7 +105,7 @@ class Habit:
 
     def set_next_periodicity_due_date(self, habit_id: int) -> bool:
         """
-        Set the habit next periodicity due date value for given id.
+        Set the habit next periodicity due date from the database value for given id.
 
         :param habit_id: int id of a habit
         :return: bool True if there is a habit next periodicity due date found in the database, False if there is none
@@ -120,7 +118,7 @@ class Habit:
 
     def set_default_time(self, habit_id: int) -> bool:
         """
-        Set the habit default time value for given id.
+        Set the habit default time value from the database for given id.
 
         :param habit_id: int id of a habit
         :return: bool True if there is a default time found in the database, False if there is none
@@ -133,7 +131,7 @@ class Habit:
 
     def set_name(self, habit_id: int) -> bool:
         """
-        Set the habit name value for given id.
+        Set the habit name value from the database for given id.
 
         :param habit_id: int id of a habit
         :return: bool True if there is a name found in the database, False if there is none
@@ -178,6 +176,63 @@ class Habit:
                                                        self.created_date, self.next_periodicity_due_date, default_time)
         return create_status
 
+    def create_event(self, name: str, next_periodicity_due_date: date, change_date: date = None) \
+            -> Tuple[str, dict]:
+        """
+        Event logic, to decide if it is a simple update, too early to update or an update with additional fills.
+
+        :param name: str habit name
+        :param next_periodicity_due_date: date of next periodicity due date
+        :param change_date: date of change
+        :return: tuple of [str] status and [dict] missed_dates, status can be "normal","too early" or "with fill".
+         missed_dates always provides on the first (0) key the current periodicity range start as date, on a fill the
+         fills are starting at the second (1) key with their dates as values.
+        """
+        self.set_id(name)
+        self.set_periodicity(self.unique_id)
+        self.set_next_periodicity_due_date(self.unique_id)
+        self.set_default_time(self.unique_id)
+        status: str = ""
+        missed_dates: dict = {}
+        if change_date is None:
+            if self.generate_new_dates:
+                change_date = date.today()
+            else:
+                change_date = self.date_today
+        update_lower_range: date = next_periodicity_due_date - timedelta(days=self.periodicity)
+        if update_lower_range <= change_date <= next_periodicity_due_date:
+            self.create_event_update(self.completed, self.next_periodicity_due_date, change_date=change_date)
+            status = "normal"
+            missed_dates[0] = change_date
+        elif change_date < update_lower_range:
+            status = "too early"
+            missed_dates[0] = update_lower_range
+        elif change_date > next_periodicity_due_date:
+            status = "with fill"
+            update_lower_range, missed_dates = self.create_event_fill(update_lower_range)
+            self.create_event_update(self.completed, self.next_periodicity_due_date, update_lower_range)
+            missed_dates[0] = update_lower_range
+        return status, missed_dates
+
+    def create_event_fill(self, update_lower_range: date) -> Tuple[date, dict]:
+        """
+        Fill events if there are missed events.
+
+        :param update_lower_range: date of the lower range of next periodicity due date
+         (next periodicity due date - periodicity days)
+        :return: tuple of [date] of lower range and [dict] of number of miss and the date when this miss occurred. This
+         dict uses a human-readable format and starts at 1
+        """
+        missed: int = int(((self.date_today - timedelta(days=self.periodicity)) - update_lower_range) / timedelta(
+            days=self.periodicity))
+        missed_dates: dict = {}
+        for i in range(missed):
+            missed_dates[i + 1] = str(update_lower_range)
+            self.create_event_update(False, self.next_periodicity_due_date, update_lower_range)
+            self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
+            update_lower_range = self.next_periodicity_due_date - timedelta(days=self.periodicity)
+        return update_lower_range, missed_dates
+
     def create_event_update(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) \
             -> bool:
         """
@@ -211,77 +266,6 @@ class Habit:
             self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
         return create_status
 
-    def create_event(self, name: str, next_periodicity_due_date: date, completed: bool = None, change_date: date = None) \
-            -> Tuple[str, dict]:
-        """
-        Event logic, to decide if it is a simple update, too early to update or an update with additional fills.
-
-        :param name: str habit name
-        :param next_periodicity_due_date: date next_periodicity_due_date
-        :param change_date: date of change
-        :return: str status and dict missed_dates, status can be "normal","too early" or "with fill".
-         missed_dates always provides on the first (0) key the current periodicity range start as date, on a fill the
-         fills are starting at the second (1) key with their dates as values.
-        """
-        if self.is_existing(name):
-            self.set_id(name)
-            self.set_periodicity(self.unique_id)
-            self.set_next_periodicity_due_date(self.unique_id)
-            self.set_default_time(self.unique_id)
-        status: str = ""
-        missed_dates: dict = {}
-        if change_date is None:
-            if self.generate_new_dates:
-                change_date = date.today()
-            else:
-                change_date = self.date_today
-        update_lower_range: date = next_periodicity_due_date - timedelta(days=self.periodicity)
-        if update_lower_range <= change_date <= next_periodicity_due_date:
-            self.create_event_update(self.completed, self.next_periodicity_due_date, change_date=change_date)
-            status = "normal"
-            missed_dates[0] = change_date
-        elif change_date < update_lower_range:
-            status = "too early"
-            missed_dates[0] = update_lower_range
-        elif change_date > next_periodicity_due_date:
-            status = "with fill"
-            update_lower_range, missed_dates = self.create_event_fill(update_lower_range)
-            self.create_event_update(self.completed, self.next_periodicity_due_date, update_lower_range)
-            missed_dates[0] = update_lower_range
-        return status, missed_dates
-
-    def create_event_fill(self, update_lower_range: date) -> Tuple[date, dict]:
-        """
-        Fill events if there are missed events.
-
-        :param update_lower_range: date of lower range of next periodicity due date
-        :return: dict of number of miss and the date when this miss occurred. This dict uses a human-readable format and
-         starts at 1
-        """
-        missed: int = int(((self.date_today - timedelta(days=self.periodicity)) - update_lower_range) / timedelta(
-            days=self.periodicity))
-        missed_dates: dict = {}
-        for i in range(missed):
-            missed_dates[i + 1] = str(update_lower_range)
-            self.create_event_update(False, self.next_periodicity_due_date, update_lower_range)
-            self.database.update_next_periodicity_due_date(self.unique_id, self.next_periodicity_due_date)
-            update_lower_range = self.next_periodicity_due_date - timedelta(days=self.periodicity)
-        return update_lower_range, missed_dates
-
-    def check_event_exists(self, habit_id: int, update_date: date):
-        """
-        Check if for a date an event already is existing.
-
-        :param habit_id: int id of a habit
-        :param update_date: date of the update / next periodicity date
-        :return:
-        """
-        self.set_periodicity(habit_id)
-        next_periodicity_due_date = update_date + timedelta(days=self.periodicity)
-        if self.database.read_last_periodicity_habit_events(habit_id, next_periodicity_due_date):
-            return True
-        return False
-
     def analyse_all_active(self) -> list:
         """
         Read all habit records from the database that do not have the status finished.
@@ -305,7 +289,7 @@ class Habit:
 
     def analyse_longest_streak(self, habit_id: int = None) -> tuple:
         """
-        Read all habit events from the habits_events table and calculates the longest streak.
+        Read all habit events from the habits_events table and calculate the longest streak.
 
         If a habit id is provided it will check only the events of this one, if none is provided all habits and their
         events will be considered.
@@ -386,6 +370,21 @@ class Habit:
         """
         Offset the current date_today by an int to go back in time or into the future.
 
-        :param offset: int negative or positive number as days
+        :param offset: int with operator (+/-) number as days (example: +1 or -1)
         """
         self.date_today += timedelta(days=offset)
+
+    # Currently not used, for future features
+    def check_event_exists(self, habit_id: int, update_date: date) -> bool:
+        """
+        Check if for a date an event already is existing.
+
+        :param habit_id: int id of a habit
+        :param update_date: date of the update / next periodicity date
+        :return: bool True if there is an event found in the database, False if there is none
+        """
+        self.set_periodicity(habit_id)
+        next_periodicity_due_date = update_date + timedelta(days=self.periodicity)
+        if self.database.read_last_periodicity_habit_events(habit_id, next_periodicity_due_date):
+            return True
+        return False

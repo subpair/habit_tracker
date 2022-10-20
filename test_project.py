@@ -25,7 +25,6 @@ class TestProject:
         self.habit.manipulate_time(-31)
         self.habit.create_habit()
         self.habit.set_id(self.habit.name)
-        self.habit.set_periodicity(self.habit.unique_id)
         self.habit.set_next_periodicity_due_date(self.habit.unique_id)
         self.habit.completed = True
         self.habit.create_event_update(self.habit.completed, self.habit.next_periodicity_due_date)

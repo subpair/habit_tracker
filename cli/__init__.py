@@ -1,6 +1,6 @@
 """Cli module for handling user input and validating these."""
 from os import system
-from typing import Union
+from typing import Union, Tuple
 from datetime import datetime, date
 
 
@@ -15,7 +15,7 @@ class Cli:
     # The first parameter is used to define the naming of the option pool for identification.
     # The second parameter defines the options it accepts, which can be either use the predefined conventions or be a
     # pool of strings to compare
-    # There are 3 predefined special naming identifiers, which can be used to further specify the validation process:
+    # There are 4 predefined special naming identifiers, which can be used to further specify the validation process:
     #   -choice : only allows one option, either option_one and option_two
     #   -number : allows a number between a range of option_one and option_two
     #   -date   : allows a valid date in form of YYYY-MM-DD
@@ -25,7 +25,7 @@ class Cli:
     #   -max_length : allows a text with a defined maximum length of option_two
     #   this is needed as some text might have a max length defined, but we want different of these validators where
     #   e.g. name is allowed only 20 letters, but a description can have up to 40
-    #   On an invalid input the user will be re-asked until he enters a valid input
+    # On an invalid input the user will be re-asked until he enters a valid input
     #
     #   Example:
     #   validate_functions.update({"choice": ["yellow", "red"],
@@ -40,12 +40,13 @@ class Cli:
     # - questions dictionary {string or number, list[string, string]}
     # The first parameter is an identifier with which the question are called.
     # The second parameter will be printed out the user in the form of "Please enter %text%." , where %text% is the
-    # first object in the list and next to it"The options are : %text2%" , where %text2% is the second object in
-    # the list
+    # first object in the list and next to it will be "The options are : %text2%" , where %text2% is the second object
+    # in the list
     #
     #   Example:
     #   questions.update({"color": ["which color do you rather like", "[yellow] or [red]"]})
     #   Will ask the User "Please enter which color do you rather like? Available options are: [yellow] or [red]"
+    # Both can be mixed - there can be any validator used with any question
 
     def __init__(self) -> None:
         """
@@ -95,9 +96,6 @@ class Cli:
         self.main_menu_options: dict = {0: "Show menu"}
         self.main_menu_functions: dict = {0: lambda: self.menu()}
 
-        self.date_format: str = "%Y-%m-%d"
-        self.date_input = date.today()
-
     def validate(self, validation_type: str, question_object: str) -> Union[bool, str, int, date]:
         """
         Validate the user input.
@@ -106,9 +104,10 @@ class Cli:
 
         The loop will re-ask the user if he gave a wrong answer until he gives the correct answer.
 
-        :param validation_type: The type of the input, this can be any defined option of validate_functions
-        :param question_object:  The questions that will be asked
-        :return: returns the validated input of the user
+        :param validation_type: str the type of the input, this can be any defined option of validate_functions
+        :param question_object:  str he questions that will be asked, this can be any defined option of questions
+        :return: validated input of the user in the needed format, choice will give a bool of True or False, number will
+         give an int number, date will give a date and all other will return a str
         """
         if validation_type in self.validate_functions:
             option_identifier = self.validate_functions[validation_type.casefold()][0]
@@ -128,77 +127,126 @@ class Cli:
         validation_input: Union[str, int, bool, date] = ""
         valid_input: bool = False
         while not valid_input:
-            if question_object in self.questions.keys():
-                print("Please enter {question_type}.\nAvailable options are: {questions}."
-                      .format(question_type=question_type, questions=questions_options))
-                validation_input = input(">")
-                if len(validation_input) < 80:
-                    validation_input_no_whitespaces = validation_input.replace(" ", "")
-                    if validation_input_no_whitespaces.isalnum():
-                        # Allow only a choice between two options
-                        if validation_type.casefold() == "choice":
-                            if validation_input.casefold() == option_one:
-                                validation_input = True
-                                valid_input = True
-                            elif validation_input.casefold() == option_two:
-                                validation_input = False
-                                valid_input = True
-                            else:
-                                print("This is not a valid answer!")
-                        # Allow only numbers between a range of two options
-                        elif validation_type.casefold() == "number":
-                            if validation_input.isnumeric():
-                                validation_number = int(validation_input)
-                                if option_one <= validation_number <= option_two:
-                                    validation_input = validation_number
-                                    valid_input = True
-                                else:
-                                    print("This number is too high!\nPlease reduce it to a number between "
-                                          "{number_lower_limit} and {number_upper_limit}!"
-                                          .format(number_lower_limit=option_one, number_upper_limit=option_two))
-                            else:
-                                print("This is not a valid number!\nPlease enter a valid Number!")
-                        # Allow only text with a defined max length
-                        elif option_identifier == "max_length":
-                            if len(validation_input) > option_two:
-                                print("The text is too long!\nPlease reduce the number to the allowed "
-                                      "{allowed_text_length}!".format(allowed_text_length=option_two))
-                            else:
-                                valid_input = True
-                        # Generic option that accepts every input
-                        elif validation_input.casefold() in options or options == "any":
-                            valid_input = True
+            print("Please enter {question_type}.\nAvailable options are: {questions}."
+                  .format(question_type=question_type, questions=questions_options))
+            validation_input = input(">")
+            if len(validation_input) < 80:
+                validation_input_no_whitespaces = validation_input.replace(" ", "")
+                if validation_input_no_whitespaces.isalnum():
+                    # Allow only a choice between two options
+                    if validation_type.casefold() == "choice":
+                        valid_input, validation_input = self.validate_choice(validation_input, option_one,
+                                                                             option_two)
+                    # Allow only numbers between a range of two options
+                    elif validation_type.casefold() == "number":
+                        valid_input, validation_input = self.validate_number(validation_input, option_one,
+                                                                             option_two)
+                    # Allow only text with a defined max length
+                    elif option_identifier == "max_length":
+                        if len(validation_input) > option_two:
+                            print("The text is too long!\nPlease reduce the number to the allowed "
+                                  "{allowed_text_length}!".format(allowed_text_length=option_two))
                         else:
-                            print("Option not possible!\nThe options are : {questions}".
-                                  format(questions=questions_options))
-                    elif validation_input == "":
-                        print("You entered nothing!\nPlease type at-least something!")
-                    elif validation_type.casefold() == "date":
-                        try:
-                            validation_date = datetime.strptime(validation_input, self.date_format).date()
-                            validation_input = validation_date
-                            print(str(validation_input) + " is a valid date")
                             valid_input = True
-                        except ValueError:
-                            print("This is not a valid date!\nPlease enter a valid date!")
-                            valid_input = False
+                    # Generic option that accepts every input
+                    elif validation_input.casefold() in options or options == "any":
+                        valid_input = True
                     else:
-                        print("Your input contains an invalid character!\n"
-                              "Please input only text without additional characters!")
+                        print("Option not possible!\nThe options are : {questions}".
+                              format(questions=questions_options))
+                elif validation_input == "":
+                    print("You entered nothing!\nPlease type at-least something!")
+                elif validation_type.casefold() == "date":
+                    valid_input, validation_input = self.validate_date(validation_input)
                 else:
-                    print("The text you entered is too long!\nPlease reduce it!")
+                    print("Your input contains an invalid character!\n"
+                          "Please input only text without additional characters!")
             else:
-                print("There is currently no question assigned to this option!\nPlease bring the dev some coffee so "
-                      "he can add this :)")
+                print("The text you entered is too long!\nPlease reduce it!")
         return validation_input
+
+    @staticmethod
+    def validate_choice(user_input: str, option_one: str, option_two: str) \
+            -> Tuple[bool, bool]:
+        """
+        Check the input string if it is one of the both available options.
+
+        :param user_input: str of user input
+        :param option_one: str of option one
+        :param option_two: str of option two
+        :return: tuple of [bool] if input is valid and [bool] of True if validation_input is option_one or False if it
+        is option_two
+        """
+        validation_input = False
+        if user_input.casefold() == option_one:
+            validation_input = True
+            valid_input = True
+        elif user_input.casefold() == option_two:
+            validation_input = False
+            valid_input = True
+        else:
+            print("This is not a valid answer!")
+            valid_input = False
+        return valid_input, validation_input
+
+    @staticmethod
+    def validate_number(user_input: str, option_one: int, option_two: int) \
+            -> Tuple[bool, int]:
+        """
+
+        Check the input string if it is a number in the range between or exactly one of the both available options.
+
+        :param user_input: str of user input
+        :param option_one: int of option one / begin of range
+        :param option_two: int of option two / end of range
+        :return: tuple of [bool] if input is valid and [int] of the number from validation_input if it is in range of or
+         exactly option_one and/or option_two
+        """
+        validation_input = 0
+        if user_input.isnumeric():
+            validation_number = int(user_input)
+            if option_one <= validation_number <= option_two:
+                validation_input = validation_number
+                valid_input = True
+            else:
+                print("This number is too high!\nPlease reduce it to a number between "
+                      "{number_lower_limit} and {number_upper_limit}!"
+                      .format(number_lower_limit=option_one, number_upper_limit=option_two))
+                valid_input = False
+        else:
+            print("This is not a valid number!\nPlease enter a valid Number!")
+            valid_input = False
+        return valid_input, validation_input
+
+    @staticmethod
+    def validate_date(user_input: str) \
+            -> Tuple[bool, date]:
+        """
+        Check the input string if it is date in the correct format.
+
+        :param user_input: str of user input
+        :return: tuple of [bool] if input is valid and [date] of the input from the user if it is a date in the format
+         "YYYY-MM-DD"
+        """
+        date_format: str = "%Y-%m-%d"
+        validation_input = date.today()
+        try:
+            validation_date = datetime.strptime(user_input, date_format).date()
+            validation_input = validation_date
+            print(str(validation_input) + " is a valid date")
+            valid_input = True
+        except ValueError:
+            print("This is not a valid date!\nPlease enter a valid date!")
+            valid_input = False
+        return valid_input, validation_input
 
     def menu(self, menu_name: str = None, menu_options: dict = None, menu_functions: dict = None) -> None:
         """
-        Menu will be created via the parameters and loop until an associated option is found.
+        Menu that is created via the parameters and loops until an associated option is found.
 
-        :param menu_name: The name text of the menu to be displayed
-        :param menu_options: The options the menu does have
-        :param menu_functions: The functions for the menu options
+        :param menu_name: str the name text of the menu to be displayed
+        :param menu_options: dict of the options the menu does have
+        :param menu_functions: dict The functions for the menu options
         """
         if menu_name is None:
             menu_name = self.main_menu_name
@@ -228,7 +276,7 @@ class Cli:
                 # KeyError menu_functions
                 elif menu_number not in menu_functions.keys():
                     print(
-                        "There is currently not function assigned to this option!\nPlease bring the dev some coffee so "
+                        "There is currently no function assigned to this option!\nPlease bring the dev some coffee so "
                         "he can add this function :)")
             else:
                 print("This was not a number you entered!\nPlease enter a number of an existing option!")
