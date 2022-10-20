@@ -110,6 +110,7 @@ class TestProject:
         assert self.habit.analyse_longest_streak() == (1, 1)
         assert self.habit.analyse_longest_streak(self.habit.unique_id) == (1, 1)
         assert self.habit.analyse_time(self.habit.unique_id) == 30
+
     def test_update_name(self) -> None:
         """Test updating the next periodicity due date of an existing record"""
         name: str = "new name"
