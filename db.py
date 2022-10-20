@@ -1,6 +1,5 @@
 """Contains all database commands."""
-import sqlite3
-from sqlite3 import connect, Error
+from sqlite3 import connect, Error, Connection
 from datetime import date
 
 
@@ -20,7 +19,7 @@ class Database:
             self.file_name = "main.db"
         self.file_name = str(file_name)
         try:
-            self.db_connection: sqlite3.Connection = connect(self.file_name)
+            self.db_connection: Connection = connect(self.file_name)
         except Error as err:
             print(err)
 
