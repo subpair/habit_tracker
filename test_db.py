@@ -1,6 +1,6 @@
 """Unittest for database"""
 from os import remove
-from datetime import datetime
+from datetime import datetime, date
 from db import Database
 
 
@@ -91,8 +91,26 @@ class TestDatabase:
 
     def test_update_next_periodicity_due_date(self) -> None:
         """Test updating the next periodicity due date of an existing record"""
-        next_periodicity_due_date = datetime.strptime("2022-10-13", self.date_format).date()
+        next_periodicity_due_date: date = datetime.strptime("2022-10-13", self.date_format).date()
         assert self.database.update_next_periodicity_due_date(1, next_periodicity_due_date) is True
+
+    def test_update_name(self) -> None:
+        """Test updating the next periodicity due date of an existing record"""
+        name: str = "new name"
+        assert self.database.update_name(1, name) is True
+        assert self.database.read_habit_name(1)[0] == "new name"
+
+    def test_update_description(self) -> None:
+        """Test updating the next periodicity due date of an existing record"""
+        description: str = "new description"
+        assert self.database.update_name(1, description) is True
+        assert self.database.read_habit_name(1)[0] == "new description"
+
+    def test_update_default_time(self) -> None:
+        """Test updating the next periodicity due date of an existing record"""
+        default_time = 45
+        assert self.database.update_default_time(1, default_time) is True
+        assert self.database.read_habit_default_time(1)[0] == 45
 
     def test_analyse_get_all(self) -> None:
         """Test reading all habits with the status finished False"""

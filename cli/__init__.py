@@ -96,6 +96,8 @@ class Cli:
         self.main_menu_options: dict = {0: "Show menu"}
         self.main_menu_functions: dict = {0: lambda: self.menu()}
 
+        self.message_error = "An unknown error occurred. Please copy the previous output and send it to developer."
+
     def validate(self, validation_type: str, question_object: str) -> Union[bool, str, int, date]:
         """
         Validate the user input.

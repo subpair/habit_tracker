@@ -345,6 +345,39 @@ class Habit:
             return time_summary
         return -1
 
+    def alter_name(self, habit_id: int, habit_name: str) -> bool:
+        """
+        Alter the name field of a habit record in the database.
+
+        :param habit_id: int the id of a habit
+        :param habit_name: str habit name
+        :return: bool True if the alteration was successful, False if not or a database error occurred
+        """
+        status = self.database.update_name(habit_id, habit_name)
+        return status
+
+    def alter_description(self, habit_id: int, habit_description: str) -> bool:
+        """
+        Alter the description field of a habit record in the database.
+
+        :param habit_id: int the id of a habit
+        :param habit_description: str habit description
+        :return: bool True if the alteration was successful, False if not or a database error occurred
+        """
+        status = self.database.update_description(habit_id, habit_description)
+        return status
+
+    def alter_default_time(self, habit_id: int, default_time: int) -> bool:
+        """
+        Alter the default time field of a habit record in the database.
+
+        :param habit_id: int the id of a habit
+        :param default_time: int default time of a habit
+        :return: bool True if the alteration was successful, False if not or a database error occurred
+        """
+        status = self.database.update_default_time(habit_id, default_time)
+        return status
+
     def delete(self, habit_id: int) -> bool:
         """
         Delete a habit and all its events from the database.

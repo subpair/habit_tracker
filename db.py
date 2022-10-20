@@ -294,6 +294,63 @@ class Database:
             print(err)
             return False
 
+    def update_name(self, unique_id: int, name: str) -> bool:
+        """
+        Update an entry in the habits table with a new name.
+
+        :param unique_id: int id of a habit
+        :param name: str of new name
+        :return: bool True on successful update, will be false if a database error occurs
+        """
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute(
+                "UPDATE habits SET name=? WHERE unique_id=?",
+                (name, unique_id))
+            self.db_connection.commit()
+            return True
+        except Error as err:
+            print(err)
+            return False
+
+    def update_description(self, unique_id: int, description: str) -> bool:
+        """
+        Update an entry in the habits table with a new description.
+
+        :param unique_id: int id of a habit
+        :param description: str of new description
+        :return: bool True on successful update, will be false if a database error occurs
+        """
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute(
+                "UPDATE habits SET description=? WHERE unique_id=?",
+                (description, unique_id))
+            self.db_connection.commit()
+            return True
+        except Error as err:
+            print(err)
+            return False
+
+    def update_default_time(self, unique_id: int, default_time: int) -> bool:
+        """
+        Update an entry in the habits table with a new default_time value.
+
+        :param unique_id: int id of a habit
+        :param default_time: int of new default time value
+        :return: bool True on successful update, will be false if a database error occurs
+        """
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute(
+                "UPDATE habits SET default_time=? WHERE unique_id=?",
+                (default_time, unique_id))
+            self.db_connection.commit()
+            return True
+        except Error as err:
+            print(err)
+            return False
+
     # Deletion
     def delete_habit_and_events(self, unique_id: int) -> bool:
         """

@@ -41,6 +41,8 @@ For analyses of the stored habits are currently 5 options available: \
 #### Removing a habit
 A function to remove habits is also available and can be used by choosing the corresponding menu-point and 
 inserting the habit name.
+#### Altering a habit's details
+Used to change the details of a habit such as the name, description or default time value.
 
 
 A habit task can be completed after creation either on the current periodicity it was created or the next periodicity. \
@@ -79,8 +81,8 @@ python main.py
 ```
 
 ### Start
-You will be guided through the first steps of the application launch and can decide to let it generate a sample dataset or 
-not. \
+You will be guided through the first steps of the application launch and can decide to let it generate a sample dataset 
+or not. \
 The sample data set contains 5 predefined habits with 4 weeks of tracking data which is randomly generated. \
 On launch the application will ask you to select if you want to use this sample data or start normal.
 
@@ -103,7 +105,7 @@ and instead use the existing sample database.
 ## Detailed usage with Examples 
 ### Menu
 After the database is loaded you will land in the menu. \
-You will be displayed all options from the main menu by beeing displayed a menu number followed by the description of 
+You will be displayed all options from the main menu by being displayed a menu number followed by the description of 
 the menu option.\
 The menu can be navigated by typing the corresponding menu number and hitting the enter key.
 
@@ -115,6 +117,7 @@ The options are:
 2 Update a habit
 3 Analyse habits
 4 Delete a habit
+5 Alter a habit
 9 Exit the application
 >
 ```
@@ -123,10 +126,11 @@ The options are:
 2 Launches the update/completion dialog \
 3 Launches the submenu analyses \
 4 Launches the removal dialog \
+5 Launches the alter dialog \
 9 Exit the application gracefully
 
 All dialogs repeat themselves until a correct answer is chosen, the escape sequence "ctrl + c" can be anytime pressed \
-and the application will terminate gracefully by closing the database connection and exiting, so the application can be \
+and the application will terminate gracefully by closing the database connection and exiting, so the application can be 
 re-opened at anytime to start again from the main menu. \
 \
 Example for non-available selection:
@@ -244,32 +248,6 @@ Added "30" minute/s.
 The next routine for this habit needs to be checked until the end of the date "2022-10-24".
 ```
 
-#### Removal Dialog
-The removal dialog is used to remove a habit and all its related event data completely from the application.
-```console
-Habit removal dialog
-Please enter the habit name.
-Available options are: Any text is valid up to 20 letters.
->do sports
-Please enter if you are sure you want to do this action.
-Available options are: [y]es or [n]o.
->y
-```
-1. You will be asked to enter a name for the habit you want to delete. 
-<br> >If a habit with the name does not exist the application will display a warning and the removal dialog stops.</br>
-2. You will be asked for, safety reasons, if you really want to proceed. 
-3. The habit and all its related event data will be deleted from the database. 
-
-On Success:
-```console
-Successfully removed the habit "do sports".
-```
-
-On failure:
-```console
-The habit "do sborts" does not exist!
-```
-
 ### Analyse Menu
 The analyse-menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. 
 It is used to gain all information that are currently available about the saved habits.
@@ -352,6 +330,62 @@ Available options are: Any text is valid up to 20 letters.
 ```console
 Showing the time summary for given habit:
 You already spend on the habit "sleep 6 hours" "7.02" day/s.
+```
+
+#### Removal Dialog
+The removal dialog is used to remove a habit and all its related event data completely from the application.
+```console
+Habit removal dialog
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>do sports
+Please enter if you are sure you want to do this action.
+Available options are: [y]es or [n]o.
+>y
+```
+1. You will be asked to enter a name for the habit you want to delete. 
+<br> >If a habit with the name does not exist the application will display a warning and the removal dialog stops.</br>
+2. You will be asked for, safety reasons, if you really want to proceed. 
+3. The habit and all its related event data will be deleted from the database. 
+
+On Success:
+```console
+Successfully removed the habit "do sports".
+```
+
+On failure:
+```console
+The habit "do sborts" does not exist!
+```
+
+#### Alter Dialog
+The alter dialog is used to change details of a habit such as the name, description or default time.
+```console
+Habit alter dialog
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>test
+Please enter what do you want to alter.
+Available options are: [name], [description] or [default time].
+>name
+Please enter the habit name.
+Available options are: Any text is valid up to 20 letters.
+>not anymore test
+```
+1. You will be asked to enter a name for the habit you want to alter. 
+<br> >If a habit with the name does not exist the application will display a warning and the alter dialog stops.</br>
+2. You will be asked what you want to change, currently you can change the name, description and default time. 
+3. A success message will be shown if the alteration was successful. 
+
+On Success:
+```console
+Successfully changed the "name" of habit "test" to "not anymore test"
+...press enter to continue...
+```
+
+On failure:
+```console
+The habit "test" does not exist!
 ```
 
 ### Exiting the Application

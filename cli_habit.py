@@ -6,7 +6,7 @@ from cli import Cli
 
 
 # Definitions
-def cli_definitions(cli, habit) -> None:
+def cli_definitions(cli: Cli, habit: Habit) -> None:
     """
     Contains the definitions for the cli interface, including menu-options and -functions.
 
@@ -21,7 +21,8 @@ def cli_definitions(cli, habit) -> None:
                                    "periodicity": ["daily", "weekly"],
                                    "choice": ["y", "n"],
                                    "number": [0, 1440],
-                                   "date": ["date", "date"]})
+                                   "date": ["date", "date"],
+                                   "alter": ["name", "description", "default time"]})
 
     # question definitions
     cli.questions.update({"name": ["the habit name", "Any text is valid up to 20 letters"],
@@ -33,7 +34,8 @@ def cli_definitions(cli, habit) -> None:
                           "safety": ["if you are sure you want to do this action", "[y]es or [n]o"],
                           "database": ["if you want to load the sample database or use your own",
                                        "[y]es to use sample database or [n]o to use your own"],
-                          "date": ["a valid date", "a valid date in the form YYYY-MM-DD (e.g. 2022-01-31)"]})
+                          "date": ["a valid date", "a valid date in the form YYYY-MM-DD (e.g. 2022-01-31)"],
+                          "alter": ["what do you want to alter", "[name], [description] or [default time]"]})
 
     # main menu definitions
     cli.main_menu_name = "main"
@@ -42,34 +44,34 @@ def cli_definitions(cli, habit) -> None:
                                   2: "Update a habit",
                                   3: "Analyse habits",
                                   4: "Delete a habit",
+                                  5: "Alter a habit",
                                   9: "Exit the application"})
     cli.main_menu_functions.update({
         0: lambda: cli.menu(),
         1: lambda: create_habit(cli, habit),
         2: lambda: update_habit(cli, habit),
-        3: lambda: cli.menu(cli.submenu_analyse_name, cli.submenu_analyse_options, cli.submenu_analyse_functions),
+        3: lambda: cli.menu(submenu_analyse_name, submenu_analyse_options, submenu_analyse_functions),
         4: lambda: delete_habit(cli, habit),
+        5: lambda: alter_habit(cli, habit),
         9: lambda: [print("Exiting."), habit.database.close_connection(), exit()]})
 
     # analyse menu definitions
-    cli.submenu_analyse_name = "analyse"
-    cli.submenu_analyse_options = {0: "Show menu",
-                                   1: "Show all currently tracked habits",
-                                   2: "Show all habits with the same periodicity",
-                                   3: "Return the longest run streak of all defined habits",
-                                   4: "Return the longest run streak for a given habit",
-                                   5: "Return the time invested into a given habit",
-                                   8: "Return to main menu"}
-    cli.submenu_analyse_functions = {0: lambda: cli.menu(cli.submenu_analyse_name, cli.submenu_analyse_options,
-                                                         cli.submenu_analyse_functions),
-                                     1: lambda: analyze_habits(cli, habit, "all"),
-                                     2: lambda: analyze_habits(cli, habit, "all same periodicity"),
-                                     3: lambda: analyze_habits(cli, habit, "longest streak of all"),
-                                     4: lambda: analyze_habits(cli, habit, "longest streak"),
-                                     5: lambda: analyze_habits(cli, habit, "time"),
-                                     8: lambda: cli.menu()}
-
-    cli.message_error = "An unknown error occurred. Please copy the previous output and send it to developer."
+    submenu_analyse_name: str = "analyse"
+    submenu_analyse_options: dict = {0: "Show menu",
+                                     1: "Show all currently tracked habits",
+                                     2: "Show all habits with the same periodicity",
+                                     3: "Return the longest run streak of all defined habits",
+                                     4: "Return the longest run streak for a given habit",
+                                     5: "Return the time invested into a given habit",
+                                     8: "Return to main menu"}
+    submenu_analyse_functions: dict = {0: lambda: cli.menu(submenu_analyse_name, submenu_analyse_options,
+                                                           submenu_analyse_functions),
+                                       1: lambda: analyze_habits(cli, habit, "all"),
+                                       2: lambda: analyze_habits(cli, habit, "all same periodicity"),
+                                       3: lambda: analyze_habits(cli, habit, "longest streak of all"),
+                                       4: lambda: analyze_habits(cli, habit, "longest streak"),
+                                       5: lambda: analyze_habits(cli, habit, "time"),
+                                       8: lambda: cli.menu()}
 
     # Dev mode is used to opt in developer options into the menu
     dev_mode = False
@@ -148,7 +150,7 @@ def helper_format_and_output(result: list) -> None:
 
 
 # General Flow
-def create_habit(cli, habit) -> None:
+def create_habit(cli: Cli, habit: Habit) -> None:
     """
     Interactive mode flow for creating a habit.
 
@@ -169,12 +171,12 @@ def create_habit(cli, habit) -> None:
     """
     cli.helper_clear_terminal()
     print("Habit creating dialog")
-    habit.name = cli.validate("name", "name")
+    habit.name = str(cli.validate("name", "name"))
     if not habit.is_existing(habit.name):
-        habit.description = cli.validate("description", "description")
-        periodicity: str = cli.validate("periodicity", "periodicity")
-        habit.periodicity = helper_type_conversions(periodicity)
-        habit.default_time = cli.validate("number", "time")
+        habit.description = str(cli.validate("description", "description"))
+        periodicity: str = str(cli.validate("periodicity", "periodicity"))
+        habit.periodicity = int(helper_type_conversions(periodicity))
+        habit.default_time = int(str(cli.validate("number", "time")))  # mypy is only happy with this construct...
         create_status = habit.create_habit(habit.name, habit.description, habit.periodicity)
         if create_status:
             cli.helper_clear_terminal()
@@ -192,7 +194,7 @@ def create_habit(cli, habit) -> None:
     cli.helper_wait_for_key()
 
 
-def update_habit(cli, habit) -> None:
+def update_habit(cli: Cli, habit: Habit) -> None:
     """
     Interactive mode flow for updating a habit.
 
@@ -212,14 +214,14 @@ def update_habit(cli, habit) -> None:
     """
     cli.helper_clear_terminal()
     print("Habit update dialog")
-    habit.name = cli.validate("name", "name")
+    habit.name = str(cli.validate("name", "name"))
     if habit.is_existing(habit.name):
-        habit.time = cli.validate("number", "time")
-        habit.completed = cli.validate("choice", "completed")
+        habit.time = int(str(cli.validate("number", "time")))  # mypy is only happy with this construct....
+        habit.completed = bool(cli.validate("choice", "completed"))
         habit.set_id(habit.name)
         habit.set_next_periodicity_due_date(habit.unique_id)
-        update_date = habit.next_periodicity_due_date
-        create_status = habit.create_event(habit.name, habit.next_periodicity_due_date)
+        update_date: date = habit.next_periodicity_due_date
+        create_status: tuple = habit.create_event(habit.name, habit.next_periodicity_due_date)
         completed: str = str(helper_type_conversions(habit.completed))
 
         # Normal update
@@ -278,7 +280,7 @@ def update_habit(cli, habit) -> None:
     cli.helper_wait_for_key()
 
 
-def delete_habit(cli, habit) -> None:
+def delete_habit(cli: Cli, habit: Habit) -> None:
     """
     Interactive mode flow for deleting a habit.
 
@@ -295,9 +297,9 @@ def delete_habit(cli, habit) -> None:
     """
     cli.helper_clear_terminal()
     print("Habit removal dialog")
-    habit.name = cli.validate("name", "name")
+    habit.name = str(cli.validate("name", "name"))
     if habit.is_existing(habit.name):
-        safety_ask: bool = cli.validate("choice", "safety")
+        safety_ask: bool = bool(cli.validate("choice", "safety"))
         if safety_ask:
             habit.set_id(habit.name)
             delete_status = habit.delete(habit.unique_id)
@@ -313,7 +315,7 @@ def delete_habit(cli, habit) -> None:
     cli.helper_wait_for_key()
 
 
-def analyze_habits(cli, habit, option: str) -> None:
+def analyze_habits(cli: Cli, habit: Habit, option: str) -> None:
     """
     Interactive mode flow for the decision chosen in the analyse submenu.
 
@@ -339,10 +341,9 @@ def analyze_habits(cli, habit, option: str) -> None:
     elif option == "time":
         analyse_habit_time(cli, habit)
     cli.helper_wait_for_key()
-    cli.menu(cli.submenu_analyse_name, cli.submenu_analyse_options, cli.submenu_analyse_functions)
 
 
-def analyse_habits_all_active(cli, habit) -> None:
+def analyse_habits_all_active(cli: Cli, habit: Habit) -> None:
     """
     Interactive mode flow for analysing all active habits, prints out all in a tabular form.
 
@@ -362,15 +363,15 @@ def analyse_habits_all_active(cli, habit) -> None:
         print("There are currently no habits! Please create at-least one first!")
 
 
-def analyse_habits_same_periodicity(cli, habit) -> None:
+def analyse_habits_same_periodicity(cli: Cli, habit: Habit) -> None:
     """
     Interactive mode flow for analysing all active habits with the same periodicity, prints out all in a tabular form.
 
     :param cli: a cli object
     :param habit: a habit object
     """
-    periodicity: str = cli.validate("periodicity", "periodicity")
-    habit.periodicity = helper_type_conversions(periodicity)
+    periodicity: str = str(cli.validate("periodicity", "periodicity"))
+    habit.periodicity = int(helper_type_conversions(periodicity))
     same_periodicity_habits: list = habit.analyse_all_active_same_periodicity(habit.periodicity)
     if same_periodicity_habits:
         cli.helper_clear_terminal()
@@ -382,7 +383,7 @@ def analyse_habits_same_periodicity(cli, habit) -> None:
               .format(periodicity=periodicity))
 
 
-def analyse_all_habits_longest_streak(cli, habit) -> None:
+def analyse_all_habits_longest_streak(cli: Cli, habit: Habit) -> None:
     """
     Interactive mode flow for analysing the longest streak of all habits, prints the best habit and its streak.
 
@@ -411,7 +412,7 @@ def analyse_all_habits_longest_streak(cli, habit) -> None:
         print("There are currently no habits! Please create at-least one first!")
 
 
-def analyse_habit_longest_streak(cli, habit) -> None:
+def analyse_habit_longest_streak(cli: Cli, habit: Habit) -> None:
     """
     Interactive mode flow for analysing the longest streak of a given habit.
 
@@ -420,7 +421,7 @@ def analyse_habit_longest_streak(cli, habit) -> None:
     :param cli: a cli object
     :param habit: a habit object
     """
-    name = cli.validate("name", "name")
+    name = str(cli.validate("name", "name"))
     if habit.is_existing(name):
         habit.set_id(name)
         highest_habit_id: int
@@ -442,7 +443,7 @@ def analyse_habit_longest_streak(cli, habit) -> None:
         print("The habit \"{name}\" does not exist!".format(name=name))
 
 
-def analyse_habit_time(cli, habit) -> None:
+def analyse_habit_time(cli: Cli, habit: Habit) -> None:
     """
     Interactive mode flow for analysing the time summary of a given habit.
 
@@ -451,7 +452,7 @@ def analyse_habit_time(cli, habit) -> None:
     :param cli: a cli object
     :param habit: a habit object
     """
-    name = cli.validate("name", "name")
+    name = str(cli.validate("name", "name"))
     if habit.is_existing(name):
         habit.set_id(name)
         time_summary: float = habit.analyse_time(habit.unique_id)
@@ -473,3 +474,46 @@ def analyse_habit_time(cli, habit) -> None:
                 name=name, time_summary=time_summary, time_unit=time_unit))
     else:
         print("The habit \"{name}\" does not exist!".format(name=name))
+
+
+def alter_habit(cli: Cli, habit: Habit) -> None:
+    """
+    Interactive mode flow for altering a habit's details.
+
+    Steps:
+
+    1: Ask for habit's name
+
+    2: Ask what the user wants to change, either the name, description or default time
+
+    3: Output status of alteration, on success provide success message, on failure print error message
+
+    :param cli: a cli object
+    :param habit: a habit object
+    """
+    cli.helper_clear_terminal()
+    print("Habit alter dialog")
+    habit.name = str(cli.validate("name", "name"))
+    habit.set_id(habit.name)
+    if habit.is_existing(habit.name):
+        alter_status: bool = False
+        new_attribute: Union[str, int] = ""
+        alter_choice: str = str(cli.validate("alter", "alter"))
+        if alter_choice == "name":
+            new_attribute = str(cli.validate("name", "name"))
+            alter_status = habit.alter_name(habit.unique_id, new_attribute)
+        elif alter_choice == "description":
+            new_attribute = str(cli.validate("description", "description"))
+            alter_status = habit.alter_description(habit.unique_id, new_attribute)
+        elif alter_choice == "default time":
+            new_attribute = int(str(cli.validate("number", "time")))  # mypy is only happy with this construct...
+            alter_status = habit.alter_default_time(habit.unique_id, new_attribute)
+        if alter_status:
+            cli.helper_clear_terminal()
+            print("Successfully changed the \"{alter_choice}\" of habit \"{name}\" to \"{new_attribute}\""
+                  .format(alter_choice=alter_choice, name=habit.name, new_attribute=new_attribute))
+        else:
+            print(cli.message_error)
+    else:
+        print("The habit \"{name}\" does not exist!".format(name=habit.name))
+    cli.helper_wait_for_key()
