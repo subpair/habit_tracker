@@ -8,7 +8,7 @@ jobs:
     name: Testing
     # Test on ubuntu latest for best variance
     runs-on: ubuntu-latest
-    # Make tests on 4 different Versions of Python
+    # Test on 4 different Versions of Python
     strategy:
       matrix:
         python-version: [ "3.7", "3.8", "3.9", "3.10" ]
