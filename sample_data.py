@@ -106,7 +106,7 @@ class SampleData:
         for i in range(days):
             self.habit_one.manipulate_time(+1)
             answers = [True, False]
-            self.habit_one.completed = choices(answers, weights=(25, 75))[0]
+            self.habit_one.completed = choices(answers, weights=(50, 50))[0]
             use_time = choices(answers, weights=(90, 10))[0]
             if use_time:
                 self.habit_one.time = randrange(0, 240)
@@ -129,7 +129,7 @@ class SampleData:
                 self.habit_two.time = randrange(0, 720)
             else:
                 self.habit_two.time = 0
-            skip_habit = choices(answers, weights=(2, 98))[0]
+            skip_habit = choices(answers, weights=(1, 99))[0]
             if not skip_habit:
                 self.habit_two.set_id(self.habit_two.name)
                 self.habit_two.set_next_periodicity_due_date(self.habit_two.unique_id)
@@ -146,7 +146,7 @@ class SampleData:
                 self.habit_three.time = randrange(0, 120)
             else:
                 self.habit_three.time = 0
-            skip_habit = choices(answers, weights=(50, 50))[0]
+            skip_habit = choices(answers, weights=(5, 95))[0]
             if not skip_habit:
                 self.habit_three.set_id(self.habit_three.name)
                 self.habit_three.set_next_periodicity_due_date(self.habit_three.unique_id)

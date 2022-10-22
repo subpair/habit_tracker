@@ -574,7 +574,7 @@ def alter_habit_task(cli: Cli, habit: Habit):
         event_data: tuple = habit.get_event_data(habit.change_id)
         completed_status: bool = bool(event_data[2])
         time: int = event_data[3]
-        completed: bool = bool(helper_type_conversions(completed_status))
+        completed: str = str(helper_type_conversions(completed_status))
         cli.helper_clear_terminal()
         print("There was a task found for the date {periodicity_date}.\nIt was marked as {completed} and a "
               "time of {time} minutes was recorded.".format(periodicity_date=task_date, completed=completed, time=time))
