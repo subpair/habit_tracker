@@ -22,7 +22,8 @@ def cli_definitions(cli: Cli, habit: Habit) -> None:
                                    "choice": ["y", "n"],
                                    "number": [0, 1440],
                                    "date": ["date", "date"],
-                                   "alter": ["name", "description", "default time"]})
+                                   "alter": ["name", "description", "default time", "task"],
+                                   "task": ["completion", "time"]})
 
     # question definitions
     cli.questions.update({"name": ["the habit name", "Any text is valid up to 20 letters"],
@@ -35,7 +36,9 @@ def cli_definitions(cli: Cli, habit: Habit) -> None:
                           "database": ["if you want to load the sample database or use your own",
                                        "[y]es to use sample database or [n]o to use your own"],
                           "date": ["a valid date", "a valid date in the form YYYY-MM-DD (e.g. 2022-01-31)"],
-                          "alter": ["what you want to alter", "[name], [description] or [default time]"]})
+                          "alter": ["what you want to alter", "[name], [description], [default time] or an existing "
+                                                              "[task] record"],
+                          "task": ["what you want to alter", "[completion] status or the [time] of the record"]})
 
     # main menu definitions
     cli.main_menu_name = "main"
@@ -74,7 +77,7 @@ def cli_definitions(cli: Cli, habit: Habit) -> None:
                                        8: lambda: cli.menu()}
 
     # Dev mode is used to opt in developer options into the menu
-    dev_mode = False
+    dev_mode = True
     if dev_mode:
         cli.main_menu_options.update({11: "manipulate time(+ or - number as days)", 12: "show db habits",
                                       13: "show db events"})
@@ -85,6 +88,7 @@ def cli_definitions(cli: Cli, habit: Habit) -> None:
                                         13: lambda: [print(habit.database.read_events()),
                                                      cli.helper_wait_for_key()]})
         habit.generate_new_dates = False
+        cli.interactive_mode = False
 
 
 # Helpers
@@ -99,9 +103,9 @@ def helper_type_conversions(argument: Union[str, bool, int]) -> Union[str, int]:
     """
     val: Union[str, int] = 0
     if type(argument) is str:
-        if argument == "daily":
+        if argument.casefold() == "daily":
             val = 1
-        elif argument == "weekly":
+        elif argument.casefold() == "weekly":
             val = 7
     if type(argument) is bool:
         if argument:
@@ -171,6 +175,7 @@ def create_habit(cli: Cli, habit: Habit) -> None:
     """
     cli.helper_clear_terminal()
     print("Habit creating dialog")
+    print("{0:_^100}".format("_"))
     habit.name = str(cli.validate("name", "name"))
     if not habit.is_existing(habit.name):
         habit.description = str(cli.validate("description", "description"))
@@ -180,7 +185,6 @@ def create_habit(cli: Cli, habit: Habit) -> None:
         create_status = habit.create_habit(habit.name, habit.description, habit.periodicity)
         if create_status:
             cli.helper_clear_terminal()
-            habit.set_next_periodicity_due_date(habit.unique_id)
             print("Successfully created the habit with details:")
             create_details = [(habit.unique_id,
                                habit.name, habit.description, habit.periodicity, habit.default_time,
@@ -214,6 +218,7 @@ def update_habit(cli: Cli, habit: Habit) -> None:
     """
     cli.helper_clear_terminal()
     print("Habit update dialog")
+    print("{0:_^100}".format("_"))
     habit.name = str(cli.validate("name", "name"))
     if habit.is_existing(habit.name):
         habit.time = int(str(cli.validate("number", "time")))  # mypy is only happy with this construct....
@@ -281,41 +286,6 @@ def update_habit(cli: Cli, habit: Habit) -> None:
     cli.helper_wait_for_key()
 
 
-def delete_habit(cli: Cli, habit: Habit) -> None:
-    """
-    Interactive mode flow for deleting a habit.
-
-    Steps:
-
-    1: Ask for habit's name
-
-    2: Ask if user is sure
-
-    3: Output status of delete, on success provide success message, on failure print error message
-
-    :param cli: a cli object
-    :param habit: a habit object
-    """
-    cli.helper_clear_terminal()
-    print("Habit removal dialog")
-    habit.name = str(cli.validate("name", "name"))
-    if habit.is_existing(habit.name):
-        safety_ask: bool = bool(cli.validate("choice", "safety"))
-        if safety_ask:
-            habit.set_id(habit.name)
-            delete_status = habit.delete(habit.unique_id)
-            if delete_status:
-                cli.helper_clear_terminal()
-                print("Successfully removed the habit \"{name}\".".format(name=habit.name))
-            else:
-                print(cli.message_error)
-        else:
-            print("Removal was aborted.")
-    else:
-        print("The habit \"{name}\" does not exist!".format(name=habit.name))
-    cli.helper_wait_for_key()
-
-
 def analyze_habits(cli: Cli, habit: Habit, option: str) -> None:
     """
     Interactive mode flow for the decision chosen in the analyse submenu.
@@ -326,6 +296,8 @@ def analyze_habits(cli: Cli, habit: Habit, option: str) -> None:
     :param habit: a habit object
     :param option: str "all", "all same periodicity", "longest streak of all" , "longest streak" or "time"
     """
+    print("Habit analyse dialog")
+    print("{0:_^100}".format("_"))
     # "Show all currently tracked habits"
     if option == "all":
         analyse_habits_all_active(cli, habit)
@@ -428,9 +400,7 @@ def analyse_habit_longest_streak(cli: Cli, habit: Habit) -> None:
         highest_habit_id: int
         highest_count_overall: int
         highest_habit_id, highest_count_overall = habit.analyse_longest_streak(habit.unique_id)
-        if highest_habit_id == 0:
-            print("The habit \"{name}\" was not updated yet!".format(name=name))
-        elif highest_count_overall in (1, 0):
+        if highest_count_overall in (1, 0):
             print("The habit \"{name}\" does not have a streak currently!".format(name=name))
         else:
             habit.set_periodicity(highest_habit_id)
@@ -477,6 +447,42 @@ def analyse_habit_time(cli: Cli, habit: Habit) -> None:
         print("The habit \"{name}\" does not exist!".format(name=name))
 
 
+def delete_habit(cli: Cli, habit: Habit) -> None:
+    """
+    Interactive mode flow for deleting a habit.
+
+    Steps:
+
+    1: Ask for habit's name
+
+    2: Ask if user is sure
+
+    3: Output status of delete, on success provide success message, on failure print error message
+
+    :param cli: a cli object
+    :param habit: a habit object
+    """
+    cli.helper_clear_terminal()
+    print("Habit removal dialog")
+    print("{0:_^100}".format("_"))
+    habit.name = str(cli.validate("name", "name"))
+    if habit.is_existing(habit.name):
+        safety_ask: bool = bool(cli.validate("choice", "safety"))
+        if safety_ask:
+            habit.set_id(habit.name)
+            delete_status = habit.delete(habit.unique_id)
+            if delete_status:
+                cli.helper_clear_terminal()
+                print("Successfully removed the habit \"{name}\".".format(name=habit.name))
+            else:
+                print(cli.message_error)
+        else:
+            print("Removal was aborted.")
+    else:
+        print("The habit \"{name}\" does not exist!".format(name=habit.name))
+    cli.helper_wait_for_key()
+
+
 def alter_habit(cli: Cli, habit: Habit) -> None:
     """
     Interactive mode flow for altering a habit's details.
@@ -485,7 +491,8 @@ def alter_habit(cli: Cli, habit: Habit) -> None:
 
     1: Ask for habit's name
 
-    2: Ask what the user wants to change, either the name, description or default time
+    2: Ask what the user wants to change, either the name, description, default time or a task record of a habit, if he
+    decides to change a task he can either change the completion status or the time of the record
 
     3: Output status of alteration, on success provide success message, on failure print error message
 
@@ -494,27 +501,89 @@ def alter_habit(cli: Cli, habit: Habit) -> None:
     """
     cli.helper_clear_terminal()
     print("Habit alter dialog")
+    print("{0:_^100}".format("_"))
     habit.name = str(cli.validate("name", "name"))
     habit.set_id(habit.name)
     if habit.is_existing(habit.name):
         alter_status: bool = False
-        new_attribute: Union[str, int] = ""
+        new_attribute: Union[str, int, bool] = ""
+        alter_task_choice: str = ""
+        record_exists: bool = False
+        task_date: date = date.today()
+        name_duplicate: bool = False
         alter_choice: str = str(cli.validate("alter", "alter"))
-        if alter_choice == "name":
+        if alter_choice.casefold() == "name":
             new_attribute = str(cli.validate("name", "name"))
-            alter_status = habit.alter_name(habit.unique_id, new_attribute)
-        elif alter_choice == "description":
+            if habit.is_existing(new_attribute):
+                name_duplicate = True
+            else:
+                alter_status = habit.alter_name(habit.unique_id, new_attribute)
+        elif alter_choice.casefold() == "description":
             new_attribute = str(cli.validate("description", "description"))
             alter_status = habit.alter_description(habit.unique_id, new_attribute)
-        elif alter_choice == "default time":
+        elif alter_choice.casefold() == "default time":
             new_attribute = int(str(cli.validate("number", "time")))  # mypy is only happy with this construct...
             alter_status = habit.alter_default_time(habit.unique_id, new_attribute)
-        if alter_status:
+        elif alter_choice.casefold() == "task":
+            record_exists, alter_task_choice, task_date, new_attribute, alter_status = alter_habit_task(cli, habit)
+        if alter_status and alter_choice.casefold() != "task":
             cli.helper_clear_terminal()
             print("Successfully changed the \"{alter_choice}\" of habit \"{name}\" to \"{new_attribute}\"."
                   .format(alter_choice=alter_choice, name=habit.name, new_attribute=new_attribute))
+        elif alter_status and alter_choice.casefold() == "task" and record_exists:
+            cli.helper_clear_terminal()
+            print("Successfully changed the \"{alter_task_choice}\" value of habit \"{name}\".\nThe value was changed "
+                  "for the date \"{periodicity_date}\" to \"{new_attribute}\"."
+                  .format(alter_task_choice=alter_task_choice, name=habit.name, periodicity_date=task_date,
+                          new_attribute=new_attribute))
+        elif alter_choice.casefold() == "task" and record_exists is False:
+            print("There was no record found for this date!\nPlease keep in mind that the next periodicity date is a "
+                  "due date and is therefor most times 1 periodicity ahead!")
+        elif name_duplicate:
+            print("There is already a habit with this name!\nPlease choose another name!")
         else:
             print(cli.message_error)
     else:
         print("The habit \"{name}\" does not exist!".format(name=habit.name))
     cli.helper_wait_for_key()
+
+
+def alter_habit_task(cli: Cli, habit: Habit):
+    """
+    Interactive mode flow for altering a habit's task record.
+
+    Steps:
+
+    1: Ask for which date's a record should be searched for.
+
+    2: If the record exists, ask the user what exactly he wants to change, either completion status or the time
+
+    :param cli: a cli object
+    :param habit: a habit object
+    :return: record_exists bool if there is a record for given task, alter_task_choice str what the user wanted to
+     change for given task, task_date date the user specified the task is, new_attribute str or int the new value the
+     user has set, alter_status bool the status of the alteration
+    """
+    alter_task_choice: str = ""
+    new_attribute: Union[str, int, bool] = 0
+    alter_status: bool = False
+    date_input = cli.validate("date", "date")
+    task_date: date = datetime.strptime(str(date_input), habit.date_format).date()
+    record_exists = habit.set_change_id(habit.unique_id, task_date)
+    if record_exists:
+        event_data: tuple = habit.get_event_data(habit.change_id)
+        completed_status: bool = bool(event_data[2])
+        time: int = event_data[3]
+        completed: bool = bool(helper_type_conversions(completed_status))
+        cli.helper_clear_terminal()
+        print("There was a task found for the date {periodicity_date}.\nIt was marked as {completed} and a "
+              "time of {time} minutes was recorded.".format(periodicity_date=task_date, completed=completed, time=time))
+        alter_task_choice = str(cli.validate("task", "task"))
+        if alter_task_choice.casefold() == "completion":
+            new_attribute = bool(cli.validate("choice", "completed"))
+            alter_status = habit.alter_event_completion(habit.change_id, new_attribute)
+            new_attribute = helper_type_conversions(new_attribute)
+        elif alter_task_choice.casefold() == "time":
+            new_attribute = int(str(cli.validate("number", "time")))  # mypy is only happy with this construct...
+            alter_status = habit.alter_event_time(habit.change_id, new_attribute)
+    return record_exists, alter_task_choice, task_date, new_attribute, alter_status

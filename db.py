@@ -239,6 +239,24 @@ class Database:
             return ()
 
     #   habits_events table
+    def read_habits_events_change_id(self, unique_id: int, periodicity_date: date) -> tuple:
+        """
+        Get the existing habit event change id from the habits table for an existing habit with a specific date.
+
+        :param unique_id: int id of a habit
+        :param periodicity_date: date of the records periodicity date
+        :return: tuple of change id is returned , will be an empty tuple if no record is found or a database error
+         occurs
+        """
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute("SELECT change_id FROM habits_events WHERE habit_id=? AND periodicity_date=?",
+                        (unique_id, periodicity_date))
+            return cur.fetchone()
+        except Error as err:
+            print(err)
+            return ()
+
     def read_habit_events(self, unique_id: int) -> list:
         """
         Get all events for a specific habit via an input id from the habits_events table.
@@ -255,7 +273,24 @@ class Database:
             print(err)
             return []
 
-    def read_last_periodicity_habit_events(self, unique_id: int, periodicity_date: date) -> tuple:
+    def read_habit_event_record(self, change_id: int) -> tuple:
+        """
+        Get the event for the specified id and periodicity date.
+
+        :param change_id: int id of a habit
+        :return: tuple with the event for the input id and periodicity date is returned, will be an empty tuple if no
+         record is found or a database error occurs
+        """
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute("SELECT * FROM habits_events WHERE change_id=?",
+                        (change_id,))
+            return cur.fetchone()
+        except Error as err:
+            print(err)
+            return ()
+
+    def read_all_habits_event_records(self, unique_id: int, periodicity_date: date) -> tuple:
         """
         Get the event for the specified id and periodicity date.
 
@@ -350,7 +385,47 @@ class Database:
             print(err)
             return False
 
-    # Deletion
+    def update_habits_event_completion(self, change_id: int, completed: bool, change_date: date) -> bool:
+        """
+        Update an entry in the habits event table with a new completed value.
+
+        :param change_id: int of existing habit event record
+        :param completed: bool new completion status of the habit task record
+        :param change_date: date on which the event occurred
+        :return: bool True on successful update, will be false if a database error occurs
+        """
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute(
+                "UPDATE habits_events SET completed=?, change_date=? WHERE change_id=?",
+                (completed, change_date, change_id))
+            self.db_connection.commit()
+            return True
+        except Error as err:
+            print(err)
+            return False
+
+    def update_habits_event_time(self, change_id: int, time: int, change_date: date) -> bool:
+        """
+        Update an entry in the habits event table with a new time value.
+
+        :param change_id: int of existing habit event record
+        :param time: int new time of the habit task record
+        :param change_date: date on which the event occurred
+        :return: bool True on successful update, will be false if a database error occurs
+        """
+        try:
+            cur = self.db_connection.cursor()
+            cur.execute(
+                "UPDATE habits_events SET time=?, change_date=? WHERE change_id=?",
+                (time, change_date, change_id))
+            self.db_connection.commit()
+            return True
+        except Error as err:
+            print(err)
+            return False
+
+    # Deleting
     def delete_habit_and_events(self, unique_id: int) -> bool:
         """
         Delete a habit entry from the habits table and all its events in the habits_events table from the database.

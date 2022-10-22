@@ -46,7 +46,8 @@ For analyses of the stored habits are currently 5 options available: \
 A function to remove habits is also available and can be used by choosing the corresponding menu-point and 
 inserting the habit name.
 #### Altering a habit's details
-Used to change the details of a habit such as the name, description or default time value.
+Used to change the details of a habit such as the name, description, default time value or to change the details of an 
+existing task record such as the completion status or time value.
 
 ### Data Storage
 This application stores the habits and its events locally in a sqlite database as a file.
@@ -357,14 +358,15 @@ The habit "do sborts" does not exist!
 ```
 
 #### Alter Dialog
-The alter dialog is used to change details of a habit such as the name, description or default time.
+The alter dialog is used to change details of a habit such as the name, description or default time, or to change for an 
+already updated task the completion status or time value.
 ```console
 Habit alter dialog
 Please enter the habit name.
 Available options are: Any text is valid up to 20 letters.
 >test
 Please enter what do you want to alter.
-Available options are: [name], [description] or [default time].
+Available options are: [name], [description], [default time] or an existing [task] record.
 >name
 Please enter the habit name.
 Available options are: Any text is valid up to 20 letters.
@@ -372,8 +374,32 @@ Available options are: Any text is valid up to 20 letters.
 ```
 1. You will be asked to enter a name for the habit you want to alter. 
 <br> >If a habit with the name does not exist the application will display a warning and the alter dialog stops.</br>
-2. You will be asked what you want to change, currently you can change the name, description and default time. 
-3. A success message will be shown if the alteration was successful. 
+2. You will be asked what you want to change, currently you can change the name, description, default time or an 
+existing event record. 
+3. If you choose to change a task, you can enter a date for the record you want to change, hereby the periodicity due 
+date needs to be entered. \
+In the next step you can choose to either change the completion status or time value of the record.
+4. A success message will be shown if the alteration was successful. 
+
+Changing a task record's details:
+```console
+Please enter what you want to alter.
+Available options are: [name], [description], [default time] or an existing [task] record.
+>task
+Please enter a valid date.
+Available options are: a valid date in the form YYYY-MM-DD (e.g. 2022-01-31).
+>2022-10-23
+There was a task found for the date 2022-10-23.
+It was marked as successful and a time of 0 minutes was recorded.
+Please enter what you want to alter.
+Available options are: [completion] status or [time] of the record.
+>completion
+Please enter if you completed this habit.
+Available options are: [y]es or [n]o.
+>n
+Successfully changed the "completion" value of habit "test".
+The value was changed for the date "2022-10-23" to "failed".
+```
 
 On Success:
 ```console

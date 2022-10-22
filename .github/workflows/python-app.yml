@@ -51,19 +51,56 @@ jobs:
       # Linters/Code Analysers
       - name: Lint with flake8
         run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+          flake8 cli_habit.py --max-line-length=120
+          flake8 db.py --max-line-length=120
+          flake8 habit.py --max-line-length=120
+          flake8 main.py --max-line-length=120
+          flake8 sample_data.py --max-line-length=120
+          flake8 test_cli.py --max-line-length=120
+          flake8 test_db.py --max-line-length=120
+          flake8 test_project.py --max-line-length=120
+          flake8 .\cli\__init__.py --max-line-length=120
+          flake8 . --count --show-source --statistics --max-line-length=120
+
 
       - name: Analyse with mypy
-        run: mypy .
+        run: |
+          python -m mypy cli_habit.py
+          python -m mypy db.py
+          python -m mypy habit.py
+          python -m mypy main.py
+          python -m mypy sample_data.py
+          python -m mypy test_cli.py
+          python -m mypy test_db.py
+          python -m mypy test_project.py
+          python -m mypy .\cli\__init__.py
+          python -m mypy .
 
       - name: Analyse with pycodestyle
-        run: python -m pycodestyle --select E,W . --max-line-length=120
+        run: |
+          python -m pycodestyle --select E,W cli_habit.py --max-line-length=120
+          python -m pycodestyle --select E,W db.py --max-line-length=120
+          python -m pycodestyle --select E,W habit.py --max-line-length=120
+          python -m pycodestyle --select E,W main.py --max-line-length=120
+          python -m pycodestyle --select E,W sample_data.py --max-line-length=120
+          python -m pycodestyle --select E,W test_cli.py --max-line-length=120
+          python -m pycodestyle --select E,W test_db.py --max-line-length=120
+          python -m pycodestyle --select E,W test_project.py --max-line-length=120
+          python -m pycodestyle --select E,W .\cli\__init__.py --max-line-length=120
+          python -m pycodestyle --select E,W . --max-line-length=120
 
       - name: Analyse with pydocstyle
-        run: python -m pydocstyle .
+        run: | 
+          python -m pydocstyle cli_habit.py
+          python -m pydocstyle db.py
+          python -m pydocstyle habit.py
+          python -m pydocstyle main.py
+          python -m pydocstyle sample_data.py
+          python -m pydocstyle test_cli.py
+          python -m pydocstyle test_db.py
+          python -m pydocstyle test_project.py
+          python -m pydocstyle .\cli\__init__.py
+          python -m pydocstyle .
 
       # Run pytest as last action
       - name: Test with pytest

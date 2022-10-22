@@ -53,9 +53,10 @@ class Habit:
 
         self.completed: bool = False
 
-        self.database = Database(self.db_filename)
+        self.database: Database = Database(self.db_filename)
         self.time: int = 0
         self.unique_id: int = 0
+        self.change_id: int = 0
 
         self.date_format: str = "%Y-%m-%d"
         self.date_today: date = date.today()
@@ -94,7 +95,7 @@ class Habit:
         """
         Set the habit periodicity value from the database for given id.
 
-        :param habit_id: int id of a habit
+        :param habit_id: int unique id of a habit
         :return: bool True if there is a periodicity found in the database, False if there is none
         """
         periodicity: tuple = self.database.read_habit_periodicity(habit_id)
@@ -107,7 +108,7 @@ class Habit:
         """
         Set the habit next periodicity due date from the database value for given id.
 
-        :param habit_id: int id of a habit
+        :param habit_id: int unique id of a habit
         :return: bool True if there is a habit next periodicity due date found in the database, False if there is none
         """
         next_periodicity_due_date: tuple = self.database.read_next_periodicity_due_date(habit_id)
@@ -120,7 +121,7 @@ class Habit:
         """
         Set the habit default time value from the database for given id.
 
-        :param habit_id: int id of a habit
+        :param habit_id: int unique id of a habit
         :return: bool True if there is a default time found in the database, False if there is none
         """
         default_time: tuple = self.database.read_habit_default_time(habit_id)
@@ -133,12 +134,26 @@ class Habit:
         """
         Set the habit name value from the database for given id.
 
-        :param habit_id: int id of a habit
+        :param habit_id: int unique id of a habit
         :return: bool True if there is a name found in the database, False if there is none
         """
         name: tuple = self.database.read_habit_name(habit_id)
         if name is not None:
             self.name = name[0]
+            return True
+        return False
+
+    def set_change_id(self, habit_id: int, periodicity_date: date) -> bool:
+        """
+        Set the habit name value from the database for given id.
+
+        :param habit_id: int unique id of a habit
+        :param periodicity_date: date of the records periodicity date
+        :return: bool True if there is a name found in the database, False if there is none
+        """
+        change_id: tuple = self.database.read_habits_events_change_id(habit_id, periodicity_date)
+        if change_id is not None:
+            self.change_id = change_id[0]
             return True
         return False
 
@@ -169,6 +184,8 @@ class Habit:
             else:
                 created_date = self.date_today
             self.created_date = created_date
+        self.set_id(self.name)
+        self.set_next_periodicity_due_date(self.unique_id)
         if next_periodicity_due_date is None:
             next_periodicity_due_date = self.created_date + timedelta(days=self.periodicity)
         self.next_periodicity_due_date = next_periodicity_due_date
@@ -218,13 +235,17 @@ class Habit:
         """
         Fill events if there are missed events.
 
+        Calculates the number of times to fill by subtracting the next periodicity date from the current date and
+        divides that by the negative periodicity value.
+
         :param update_lower_range: date of the lower range of next periodicity due date
          (next periodicity due date - periodicity days)
         :return: tuple of [date] of lower range and [dict] of number of miss and the date when this miss occurred. This
          dict uses a human-readable format and starts at 1
         """
-        missed: int = int(((self.date_today - timedelta(days=self.periodicity)) - update_lower_range) / timedelta(
-            days=self.periodicity))
+        # A negative sign here is needed for the periodicity, a positive division can give us 0 and no iterations
+        # (using days it will calculate: 1day / 7 = 0 but 1day / -7 = -1)
+        missed: int = -((self.date_today - self.next_periodicity_due_date) / -int(self.periodicity)).days
         missed_dates: dict = {}
         for i in range(missed):
             missed_dates[i + 1] = str(update_lower_range)
@@ -378,11 +399,66 @@ class Habit:
         status = self.database.update_default_time(habit_id, default_time)
         return status
 
+    def alter_event_completion(self, change_id: int, completed: bool, change_date: date = None) -> bool:
+        """
+        Alter the default time field of a habit record in the database.
+
+        :param change_id: int the id of a habit
+        :param completed: bool new completion status of the habit task record
+        :param change_date: date of the change
+        :return: bool True if the alteration was successful, False if not or a database error occurred
+        """
+        if change_date is None:
+            if self.generate_new_dates:
+                change_date = date.today()
+            else:
+                change_date = self.date_today
+        status = self.database.update_habits_event_completion(change_id, completed, change_date)
+        return status
+
+    def alter_event_time(self, change_id: int, time: int, change_date: date = None) -> bool:
+        """
+        Alter the default time field of a habit record in the database.
+
+        :param change_id: int the id of a habit
+        :param time: int new time of the habit task record
+        :param change_date: date of the change
+        :return: bool True if the alteration was successful, False if not or a database error occurred
+        """
+        if change_date is None:
+            if self.generate_new_dates:
+                change_date = date.today()
+            else:
+                change_date = self.date_today
+        status = self.database.update_habits_event_time(change_id, time, change_date)
+        return status
+
+    def get_events(self, change_id: int, periodicity_date: date) -> tuple:
+        """
+        Get a single existing event record.
+
+        :param change_id: int the unique id of a habit
+        :param periodicity_date: date the date of next periodicity date
+        :return: tuple data of the event record (change_id, habit_id, completed, time, change_date, periodicity_date)
+        """
+        result: tuple = self.database.read_all_habits_event_records(change_id, periodicity_date)
+        return result
+
+    def get_event_data(self, change_id: int) -> tuple:
+        """
+        Get a single existing event record.
+
+        :param change_id: int the change id of a habit's event record
+        :return: tuple data of the event record (change_id, habit_id, completed, time, change_date, periodicity_date)
+        """
+        result: tuple = self.database.read_habit_event_record(change_id)
+        return result
+
     def delete(self, habit_id: int) -> bool:
         """
         Delete a habit and all its events from the database.
 
-        :param habit_id: int id of a habit
+        :param habit_id: int unique id of a habit
         :return: bool True if the removal was successful, False if not or a database error occurred
         """
         delete = self.database.delete_habit_and_events(habit_id)
@@ -393,7 +469,7 @@ class Habit:
         """
         Read all events from the database and output the count as a number of these.
 
-        :param habit_id: int id of a habit
+        :param habit_id: int unique id of a habit
         :return: int the length of all events
         """
         habit_events: list = self.database.read_habit_events(habit_id)
@@ -412,12 +488,12 @@ class Habit:
         """
         Check if for a date an event already is existing.
 
-        :param habit_id: int id of a habit
+        :param habit_id: int unique id of a habit
         :param update_date: date of the update / next periodicity date
         :return: bool True if there is an event found in the database, False if there is none
         """
         self.set_periodicity(habit_id)
         next_periodicity_due_date = update_date + timedelta(days=self.periodicity)
-        if self.database.read_last_periodicity_habit_events(habit_id, next_periodicity_due_date):
+        if self.database.read_all_habits_event_records(habit_id, next_periodicity_due_date):
             return True
         return False

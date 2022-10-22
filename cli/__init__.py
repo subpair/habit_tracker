@@ -112,7 +112,7 @@ class Cli:
          give an int number, date will give a date and all other will return a str
         """
         if validation_type in self.validate_functions:
-            option_identifier = self.validate_functions[validation_type.casefold()][0]
+            option_identifier = self.validate_functions[validation_type][0]
             options = self.validate_functions[validation_type]
             option_one = self.validate_functions[validation_type][0]
             option_two = self.validate_functions[validation_type][1]
@@ -137,12 +137,10 @@ class Cli:
                 if validation_input_no_whitespaces.isalnum():
                     # Allow only a choice between two options
                     if validation_type.casefold() == "choice":
-                        valid_input, validation_input = self.validate_choice(validation_input, option_one,
-                                                                             option_two)
+                        valid_input, validation_input = self.validate_choice(validation_input, option_one, option_two)
                     # Allow only numbers between a range of two options
                     elif validation_type.casefold() == "number":
-                        valid_input, validation_input = self.validate_number(validation_input, option_one,
-                                                                             option_two)
+                        valid_input, validation_input = self.validate_number(validation_input, option_one, option_two)
                     # Allow only text with a defined max length
                     elif option_identifier == "max_length":
                         if len(validation_input) > option_two:
@@ -154,15 +152,14 @@ class Cli:
                     elif validation_input.casefold() in options or options == "any":
                         valid_input = True
                     else:
-                        print("Option not possible!\nThe options are : {questions}".
-                              format(questions=questions_options))
+                        print("The option you entered is not valid!")
                 elif validation_input == "":
                     print("You entered nothing!\nPlease type at-least something!")
                 elif validation_type.casefold() == "date":
                     valid_input, validation_input = self.validate_date(validation_input)
                 else:
-                    print("Your input contains an invalid character!\n"
-                          "Please input only text without additional characters!")
+                    print("Your input contains an invalid character!\nPlease input only text without additional "
+                          "characters!")
             else:
                 print("The text you entered is too long!\nPlease reduce it!")
         return validation_input
@@ -235,7 +232,6 @@ class Cli:
         try:
             validation_date = datetime.strptime(user_input, date_format).date()
             validation_input = validation_date
-            print(str(validation_input) + " is a valid date")
             valid_input = True
         except ValueError:
             print("This is not a valid date!\nPlease enter a valid date!")

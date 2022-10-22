@@ -6,8 +6,8 @@ from sample_data import SampleData
 from cli_habit import cli_definitions
 
 if __name__ == "__main__":
-    cli = Cli()
-    habit = Habit()
+    cli: Cli = Cli()
+    habit: Habit = Habit()
 
     # Cli interactive mode means it will use helpers for clearing the terminal and "wait for key".
     cli.interactive_mode = True
@@ -26,7 +26,7 @@ if __name__ == "__main__":
             # Only generate new sample data if the database was not created yet
             if not path.isfile("sample.db"):
                 GENERATE_SAMPLES = True
-            samples = SampleData(31)
+            samples: SampleData = SampleData(31)
             cli.helper_clear_terminal()
             if GENERATE_SAMPLES:
                 print("Generating habits...")
