@@ -413,6 +413,9 @@ class Habit:
                 change_date = date.today()
             else:
                 change_date = self.date_today
+        if completed is False:
+            time = 0
+            self.alter_event_time(change_id, time, change_date)
         status = self.database.update_habits_event_completion(change_id, completed, change_date)
         return status
 
