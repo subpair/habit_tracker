@@ -35,7 +35,7 @@ def cli_definitions(cli: Cli, habit: Habit) -> None:
                           "safety": ["if you are sure you want to do this action", "[y]es or [n]o"],
                           "database": ["if you want to load the sample database or use your own",
                                        "[y]es to use sample database or [n]o to use your own"],
-                          "date": ["a valid date", "a valid date in the form YYYY-MM-DD (e.g. 2022-01-31)"],
+                          "date": ["a valid date", "a valid date in the form YYYY-MM-DD (e.g.: 2022-01-31)"],
                           "alter": ["what you want to alter", "[name], [description], [default time] or an existing "
                                                               "[task] record"],
                           "task": ["what you want to alter", "[completion] status or the [time] of the record"]})
