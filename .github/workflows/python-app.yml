@@ -59,7 +59,7 @@ jobs:
           flake8 test_cli.py --max-line-length=120
           flake8 test_db.py --max-line-length=120
           flake8 test_project.py --max-line-length=120
-          flake8 .\cli\__init__.py --max-line-length=120
+          flake8 ./cli/__init__.py --max-line-length=120
           flake8 . --count --show-source --statistics --max-line-length=120
 
 
@@ -73,7 +73,7 @@ jobs:
           python -m mypy test_cli.py
           python -m mypy test_db.py
           python -m mypy test_project.py
-          python -m mypy .\cli\__init__.py
+          python -m mypy ./cli/__init__.py
           python -m mypy .
 
       - name: Analyse with pycodestyle
@@ -86,7 +86,7 @@ jobs:
           python -m pycodestyle --select E,W test_cli.py --max-line-length=120
           python -m pycodestyle --select E,W test_db.py --max-line-length=120
           python -m pycodestyle --select E,W test_project.py --max-line-length=120
-          python -m pycodestyle --select E,W .\cli\__init__.py --max-line-length=120
+          python -m pycodestyle --select E,W ./cli/__init__.py --max-line-length=120
           python -m pycodestyle --select E,W . --max-line-length=120
 
       - name: Analyse with pydocstyle
@@ -99,7 +99,7 @@ jobs:
           python -m pydocstyle test_cli.py
           python -m pydocstyle test_db.py
           python -m pydocstyle test_project.py
-          python -m pydocstyle .\cli\__init__.py
+          python -m pydocstyle ./cli/__init__.py
           python -m pydocstyle .
 
       # Run pytest as last action
