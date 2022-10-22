@@ -77,7 +77,7 @@ def cli_definitions(cli: Cli, habit: Habit) -> None:
                                        8: lambda: cli.menu()}
 
     # Dev mode is used to opt in developer options into the menu
-    dev_mode = True
+    dev_mode = False
     if dev_mode:
         cli.main_menu_options.update({11: "manipulate time(+ or - number as days)", 12: "show db habits",
                                       13: "show db events"})
