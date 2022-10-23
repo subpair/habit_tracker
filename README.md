@@ -20,7 +20,7 @@ the set periodicity.
 ### A habit's properties
 A habit consists of \
 -A name (maximal length: 20 Letters) \
--An description (maximal length: 30 Letters) \
+-A description (maximal length: 30 Letters) \
 -A periodicity/the time range of a task (daily or weekly) \
 -An optional default time value (a number from 0 to 1440)
 
@@ -30,17 +30,14 @@ A habit can be created by giving it a name and assigning a short description, a 
 or weekly and a default time value that can be used to skip entering a time value on each update.
 #### Updating a habit
 A habit can be updated for the current periodicity via the update function either on the day/week it was created or the 
-day/week after, but once that day/week is over the habit will be automatically marked as failed for the missed date.\
-A habit task can be completed after creation either on the current periodicity it was created or the next periodicity. \
-If the user wants to complete a task and already exceeded the so-called due date, which is usually the last day of the 
-next periodicity, the application will automatically fill the time between the current date and the last time the task 
-was updated.
+day/week after, which is called the due date. Once the due date is over the habit will be automatically marked as failed 
+for the missed date/s.\
 #### Analysing habits
 For analyses of the stored habits are currently 5 options available: \
 -Show all habits and their data \
 -Show all habits and their data which share the same periodicity (daily or weekly) \
--Show which habit currently has the longest running streak \
--Show the streak for a specific habit \
+-Show which of all habits currently has the longest running streak \
+-Show the highest streak for a specific habit \
 -Show how much time you already invested into a habit
 #### Removing a habit
 A function to remove habits is also available and can be used by choosing the corresponding menu-point and 
@@ -50,7 +47,7 @@ Used to change the details of a habit such as the name, description, default tim
 existing task record such as the completion status or time value.
 
 ### Data Storage
-This application stores the habits and its events locally in a sqlite database as a file.
+This application stores the habits and its events locally in a sqlite database as a file. \
 A sample database is provided and can be used to get an overview of the application and test out all functionalities. 
 
 ## Installation
@@ -149,7 +146,7 @@ Please enter a number of an existing option!
 
 Example Dialog:
 ```console
-Habit creating dialog
+Habit creation dialog
 Please enter the habit name.
 Available options are: Any text is valid up to 20 letters.
 >do sports
@@ -233,7 +230,7 @@ You cannot update the habit "do sports" at the moment!
 The next time will be on the "2022-10-17"
 ```
 
-Example for a fill if a day was skipped(7 days later without entering data):
+Example for a fill if some dates were skipped(some days later without entering data):
 ```console
 The habit was broken 5 times!
 Detected 1. break of the habit "do sports". Marking as "failed" for due date "2022-10-18"
@@ -248,8 +245,8 @@ The next routine for this habit needs to be checked until the end of the date "2
 ```
 
 ### Analyse Menu
-The analyse-menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. 
-It is used to gain all information that are currently available about the saved habits.
+The analyse-menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. \ 
+It is used to gain all information that is currently available about the saved habits.
 ```console
 You are in the analyse menu.
 The options are:
@@ -263,14 +260,14 @@ The options are:
 ```
 0 Shows the menu again \
 1 Shows all habits with all their details in a table\
-2 Shows all habits that share the same periodicity in table after entering the periodicity \
+2 Shows all habits that share the same periodicity in a table after entering the periodicity \
 3 Show the longest running streak of all habits and which habit this is\
-4 Show the longest running streak of a specific habit after entering a habit name\
+4 Show the longest running streak of a specific habit after entering a habit's name\
 5 Show how much time was invested into a specific habit after entering its name\
 8 Return to the main menu
 
 #### Show all currently tracked habits
-This displays all habits and their details in a tabulator form.
+This displays all habits and their details in a tabular form.
 ```console
 Showing all currently tracked habits:
 There are currently 6 habits:
@@ -301,7 +298,7 @@ read a book           every week a little bit         weekly       0          20
 
 
 #### Return the longest run streak of all defined habits
-This displays the current habit that has the longest run streak and its streak count.
+This displays the currently highest streak and which habit it is.
 ```console
 Showing the longest streak of all habits:
 The habit "study daily" is currently your best habit with a run streak of "21" days in a row.
@@ -332,7 +329,7 @@ You already spend on the habit "sleep 6 hours" "7.02" day/s.
 ```
 
 #### Removal Dialog
-The removal dialog is used to remove a habit and all its related event data completely from the application.
+The removal dialog is used to remove a habit and all its related event data completely from the database.
 ```console
 Habit removal dialog
 Please enter the habit name.
@@ -344,7 +341,7 @@ Available options are: [y]es or [n]o.
 ```
 1. You will be asked to enter a name for the habit you want to delete. 
 <br> >If a habit with the name does not exist the application will display a warning and the removal dialog stops.</br>
-2. You will be asked for, safety reasons, if you really want to proceed. 
+2. You will be asked, for safety reasons, if you really want to proceed. 
 3. The habit and all its related event data will be deleted from the database. 
 
 On Success:
@@ -357,11 +354,11 @@ On failure:
 The habit "do sborts" does not exist!
 ```
 
-#### Alter Dialog
+#### Alteration Dialog
 The alter dialog is used to change details of a habit such as the name, description or default time, or to change for an 
 already updated task the completion status or time value.
 ```console
-Habit alter dialog
+Habit alteration dialog
 Please enter the habit name.
 Available options are: Any text is valid up to 20 letters.
 >test
@@ -375,8 +372,9 @@ Available options are: Any text is valid up to 20 letters.
 1. You will be asked to enter a name for the habit you want to alter. 
 <br> >If a habit with the name does not exist the application will display a warning and the alter dialog stops.</br>
 2. You will be asked what you want to change, currently you can change the name, description, default time or an 
-existing event record. 
-3. If you choose to change a task, you can enter a date for the record you want to change, hereby the periodicity due 
+existing event record's completion status or time value. 
+3. If you choose to change an event record, you can enter a date for the record you want to change, hereby the 
+periodicity due 
 date needs to be entered. \
 In the next step you can choose to either change the completion status or time value of the record.
 4. A success message will be shown if the alteration was successful. 

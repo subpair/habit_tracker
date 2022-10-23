@@ -174,7 +174,7 @@ def create_habit(cli: Cli, habit: Habit) -> None:
     :param habit: a habit object
     """
     cli.helper_clear_terminal()
-    print("Habit creating dialog")
+    print("Habit creation dialog")
     print("{0:_^100}".format("_"))
     habit.name = str(cli.validate("name", "name"))
     if not habit.is_existing(habit.name):
@@ -500,7 +500,7 @@ def alter_habit(cli: Cli, habit: Habit) -> None:
     :param habit: a habit object
     """
     cli.helper_clear_terminal()
-    print("Habit alter dialog")
+    print("Habit alteration dialog")
     print("{0:_^100}".format("_"))
     habit.name = str(cli.validate("name", "name"))
     habit.set_id(habit.name)
