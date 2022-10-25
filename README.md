@@ -5,8 +5,8 @@ basic functionalities.
 
 It was written for the IU University's course *"DLBDSOOFPP01" - Object-Oriented and Functional programming with Python*.
 
-This application was built with Python 3.10 and is automatically tested against the versions 3.7, 3.8, 3.9 and 3.10 on a 
-git push. 
+This application was built with Python 3.10 and is automatically tested against the versions 3.7, 3.8, 3.9, 3.10 and 
+3.11 on a git push.
 
 [![Test](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml/badge.svg)](https://github.com/subpair/habit_tracker/actions/workflows/python-app.yml)
 
