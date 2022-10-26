@@ -412,3 +412,8 @@ The habit "test" does not exist!
 
 ### Exiting the Application
 If this is chosen the database connection will be properly closed and the application will exit.
+
+# Contributing
+
+If you'd like to contribute, please fork the repository and make changes as you'd like. \
+Pull requests are warmly welcome.
