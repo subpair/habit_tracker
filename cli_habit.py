@@ -30,8 +30,8 @@ def cli_definitions(cli: Cli, habit: Habit) -> None:
                           "description": ["the description of the habit", "Any text is valid up to 30 letters"],
                           "periodicity": ["the periodicity of the habit", "[daily] and [weekly]"],
                           "completed": ["if you completed this habit", "[y]es or [n]o"],
-                          "time": ["a time value", "Any number up to 1440 is valid.\n"
-                                                   "This is optional,if you want to skip this enter 0"],
+                          "time": ["a time value in minutes", "Any number up to 1440 is valid.\n"
+                                                              "This is optional,if you want to skip this enter 0"],
                           "safety": ["if you are sure you want to do this action", "[y]es or [n]o"],
                           "database": ["if you want to load the sample database or use your own",
                                        "[y]es to use sample database or [n]o to use your own"],
