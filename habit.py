@@ -244,7 +244,7 @@ class Habit:
          dict uses a human-readable format and starts at 1
         """
         # A negative sign here is needed for the periodicity, a positive division can give us 0 and no iterations
-        # (using days it will calculate: 1day / 7 = 0 but 1day / -7 = -1)
+        # (using days it will calculate: 1day / 7 = 0 but 1day / -7 = -1, as numbers are rounded down in python)
         missed: int = -((self.date_today - self.next_periodicity_due_date) / -int(self.periodicity)).days
         missed_dates: dict = {}
         for i in range(missed):
