@@ -4,6 +4,7 @@ from cli import Cli
 from habit import Habit
 from sample_data import SampleData
 from cli_habit import cli_definitions
+import readline
 
 if __name__ == "__main__":
     cli: Cli = Cli()
@@ -47,8 +48,13 @@ if __name__ == "__main__":
             cli.helper_clear_terminal()
             cli.menu()
 
-    # If a user presses CTRL + C the database needs to be closed first before exiting, this avoids file locking.
+    # If a user presses CTRL + C or CTRL +D (Linux/Windows CTRL+Z+Return)the database needs to be closed first before
+    # exiting, this avoids file locking.
     except KeyboardInterrupt:
+        print("Got exit key sequence. Closing database connection and exiting.")
+        habit.database.close_connection()
+        exit()
+    except EOFError:
         print("Got exit key sequence. Closing database connection and exiting.")
         habit.database.close_connection()
         exit()
