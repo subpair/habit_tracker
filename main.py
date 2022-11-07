@@ -4,7 +4,7 @@ from cli import Cli
 from habit import Habit
 from sample_data import SampleData
 from cli_habit import cli_definitions
-import readline
+
 
 if __name__ == "__main__":
     cli: Cli = Cli()
