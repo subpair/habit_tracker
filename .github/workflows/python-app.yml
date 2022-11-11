@@ -65,16 +65,16 @@ jobs:
 
       - name: Analyse with mypy
         run: |
-          python -m mypy cli_habit.py
-          python -m mypy db.py
-          python -m mypy habit.py
-          python -m mypy main.py
-          python -m mypy sample_data.py
-          python -m mypy test_cli.py
-          python -m mypy test_db.py
-          python -m mypy test_project.py
-          python -m mypy ./cli/__init__.py
-          python -m mypy .
+          python -m mypy cli_habit.py --check-untyped-defs
+          python -m mypy db.py --check-untyped-defs
+          python -m mypy habit.py --check-untyped-defs
+          python -m mypy main.py --check-untyped-defs
+          python -m mypy sample_data.py --check-untyped-defs
+          python -m mypy test_cli.py --check-untyped-defs
+          python -m mypy test_db.py --check-untyped-defs
+          python -m mypy test_project.py --check-untyped-defs
+          python -m mypy ./cli/__init__.py --check-untyped-defs
+          python -m mypy . --check-untyped-defs
 
       - name: Analyse with pycodestyle
         run: |
