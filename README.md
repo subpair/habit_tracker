@@ -15,7 +15,9 @@ This application was built with Python 3.10 and is automatically tested against 
 A habit tracker application is in general like a todo list whose tasks are coupled to specific dates and repeat in a 
 set periodicity. \
 This application can be used to keep track of those and provide you with analytics about how you kept up with those for 
-the set periodicity. 
+the set periodicity. \
+If a habit is successful completed at-least 2 times in a row, a so-called streak begins, which lasts until a habit is 
+marked as failed.
 
 ### A habit's properties
 A habit consists of \
@@ -31,7 +33,7 @@ or weekly and a default time value that can be used to skip entering a time valu
 #### Updating a habit
 A habit can be updated for the current periodicity via the update function either on the day/week it was created or the 
 day/week after, which is called the due date. Once the due date is over the habit will be automatically marked as failed 
-for the missed date/s.\
+for the missed date/s.
 #### Analysing habits
 For analyses of the stored habits are currently 5 options available: \
 -Show all habits and their data \
@@ -125,7 +127,7 @@ The options are:
 5 Launches the alter dialog \
 9 Exit the application gracefully
 
-All dialogs repeat themselves until a correct answer is chosen, the escape sequence "ctrl + c" can be anytime pressed \
+All dialogs repeat themselves until a correct answer is chosen, the escape sequence "ctrl + c" can be anytime pressed 
 and the application will terminate gracefully by closing the database connection and exiting, so the application can be 
 re-opened at anytime to start again from the main menu. \
 \
@@ -245,7 +247,7 @@ The next routine for this habit needs to be checked until the end of the date "2
 ```
 
 ### Analyse Menu
-The analyse-menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. \ 
+The analyse-menu is a submenu and can be navigated like the main menu by entering a number and pressing the enter key. \
 It is used to gain all information that is currently available about the saved habits.
 ```console
 You are in the analyse menu.
@@ -298,7 +300,7 @@ read a book           every week a little bit         weekly       0          20
 
 
 #### Return the longest run streak of all defined habits
-This displays the currently highest streak and which habit it is.
+This displays the current highest streak and which habit it is.
 ```console
 Showing the longest streak of all habits:
 The habit "study daily" is currently your best habit with a run streak of "21" days in a row.
