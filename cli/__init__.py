@@ -1,6 +1,6 @@
 """Cli module for handling user input and validating these."""
 from os import system
-from typing import Union, Tuple
+from typing import Union, Tuple, Optional
 from datetime import datetime, date
 
 
@@ -238,7 +238,8 @@ class Cli:
             valid_input = False
         return valid_input, validation_input
 
-    def menu(self, menu_name: str = None, menu_options: dict = None, menu_functions: dict = None) -> None:
+    def menu(self, menu_name: Optional[str] = None, menu_options: Optional[dict] = None,
+             menu_functions: Optional[dict] = None) -> None:
         """
         Menu that is created via the parameters and loops until an associated option is found.
 

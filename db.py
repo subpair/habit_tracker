@@ -1,4 +1,5 @@
 """Contains all database commands."""
+from typing import Optional
 from sqlite3 import connect, Error, Connection
 from datetime import date
 
@@ -6,7 +7,7 @@ from datetime import date
 class Database:
     """Database class for interacting with the database."""
 
-    def __init__(self, file_name: str = None):
+    def __init__(self, file_name: Optional[str] = None):
         """
         Initialize the database.
 

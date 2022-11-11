@@ -1,5 +1,5 @@
 """Contains the habit tracker logic."""
-from typing import Tuple
+from typing import Tuple, Optional
 from datetime import date, timedelta, datetime
 from db import Database
 
@@ -7,8 +7,9 @@ from db import Database
 class Habit:
     """Habit class for the general habit tracker logic."""
 
-    def __init__(self, name: str = None, description: str = None, periodicity: int = None, default_time: int = None,
-                 db_filename: str = None, generate_new_dates: bool = None) -> None:
+    def __init__(self, name: Optional[str] = None, description: Optional[str] = None, periodicity: Optional[int] = None,
+                 default_time: Optional[int] = None, db_filename: Optional[str] = None,
+                 generate_new_dates: Optional[bool] = None) -> None:
         """
         Initialize the habit object and all its attributes.
 
@@ -157,8 +158,9 @@ class Habit:
             return True
         return False
 
-    def create_habit(self, name: str = None, description: str = None, periodicity: int = None, default_time: int = None,
-                     created_date: date = None, next_periodicity_due_date: date = None) -> bool:
+    def create_habit(self, name: Optional[str] = None, description: Optional[str] = None,
+                     periodicity: Optional[int] = None, default_time: Optional[int] = None,
+                     created_date: Optional[date] = None, next_periodicity_due_date: Optional[date] = None) -> bool:
         """
         Insert a new habit into the habits table.
 
@@ -193,7 +195,7 @@ class Habit:
                                                        self.created_date, self.next_periodicity_due_date, default_time)
         return create_status
 
-    def create_event(self, name: str, next_periodicity_due_date: date, change_date: date = None) \
+    def create_event(self, name: str, next_periodicity_due_date: date, change_date: Optional[date] = None) \
             -> Tuple[str, dict]:
         """
         Event logic, to decide if it is a simple update, too early to update or an update with additional fills.
@@ -254,7 +256,7 @@ class Habit:
             update_lower_range = self.next_periodicity_due_date - timedelta(days=self.periodicity)
         return update_lower_range, missed_dates
 
-    def create_event_update(self, completed: bool, next_periodicity_due_date: date, change_date: date = None) \
+    def create_event_update(self, completed: bool, next_periodicity_due_date: date, change_date: Optional[date] = None)\
             -> bool:
         """
         Insert a new event into the habits_events table.
@@ -308,7 +310,7 @@ class Habit:
         result: list = self.database.read_habits_by_periodicity(periodicity)
         return result
 
-    def analyse_longest_streak(self, habit_id: int = None) -> tuple:
+    def analyse_longest_streak(self, habit_id: Optional[int] = None) -> tuple:
         """
         Read all habit events from the habits_events table and calculate the longest streak.
 
@@ -399,7 +401,7 @@ class Habit:
         status = self.database.update_default_time(habit_id, default_time)
         return status
 
-    def alter_event_completion(self, change_id: int, completed: bool, change_date: date = None) -> bool:
+    def alter_event_completion(self, change_id: int, completed: bool, change_date: Optional[date] = None) -> bool:
         """
         Alter the default time field of a habit record in the database.
 
@@ -419,7 +421,7 @@ class Habit:
         status = self.database.update_habits_event_completion(change_id, completed, change_date)
         return status
 
-    def alter_event_time(self, change_id: int, time: int, change_date: date = None) -> bool:
+    def alter_event_time(self, change_id: int, time: int, change_date: Optional[date] = None) -> bool:
         """
         Alter the default time field of a habit record in the database.
 

@@ -1,4 +1,5 @@
 """Contains a sample data generator."""
+from typing import Optional
 from random import choices, randrange
 from habit import Habit
 
@@ -6,7 +7,7 @@ from habit import Habit
 class SampleData:
     """SampleData class for generating random events."""
 
-    def __init__(self, duration: int, db_filename: str = None) -> None:
+    def __init__(self, duration: int, db_filename: Optional[str] = None) -> None:
         """
         Initialize the sampledata object with a duration value for which the simulated events take place.
 
